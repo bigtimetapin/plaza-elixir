@@ -17,7 +17,7 @@ defmodule PlazaWeb.Router do
   scope "/", PlazaWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", LandingLive
   end
 
   # Other scopes may use custom stacks.
