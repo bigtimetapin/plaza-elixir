@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/castore/castore.iml" filepath="$PROJECT_DIR$/plaza/deps/castore/castore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/connection/connection.iml" filepath="$PROJECT_DIR$/plaza/deps/connection/connection.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/db_connection/db_connection.iml" filepath="$PROJECT_DIR$/plaza/deps/db_connection/db_connection.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/decimal/decimal.iml" filepath="$PROJECT_DIR$/plaza/deps/decimal/decimal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/ecto/ecto.iml" filepath="$PROJECT_DIR$/plaza/deps/ecto/ecto.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/ecto_sql/ecto_sql.iml" filepath="$PROJECT_DIR$/plaza/deps/ecto_sql/ecto_sql.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/esbuild/esbuild.iml" filepath="$PROJECT_DIR$/plaza/deps/esbuild/esbuild.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/expo/expo.iml" filepath="$PROJECT_DIR$/plaza/deps/expo/expo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/file_system/file_system.iml" filepath="$PROJECT_DIR$/plaza/deps/file_system/file_system.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/finch/finch.iml" filepath="$PROJECT_DIR$/plaza/deps/finch/finch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/floki/floki.iml" filepath="$PROJECT_DIR$/plaza/deps/floki/floki.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/gettext/gettext.iml" filepath="$PROJECT_DIR$/plaza/deps/gettext/gettext.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/hpax/hpax.iml" filepath="$PROJECT_DIR$/plaza/deps/hpax/hpax.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/jason/jason.iml" filepath="$PROJECT_DIR$/plaza/deps/jason/jason.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/mime/mime.iml" filepath="$PROJECT_DIR$/plaza/deps/mime/mime.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/mint/mint.iml" filepath="$PROJECT_DIR$/plaza/deps/mint/mint.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/nimble_options/nimble_options.iml" filepath="$PROJECT_DIR$/plaza/deps/nimble_options/nimble_options.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/nimble_pool/nimble_pool.iml" filepath="$PROJECT_DIR$/plaza/deps/nimble_pool/nimble_pool.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/phoenix/phoenix.iml" filepath="$PROJECT_DIR$/plaza/deps/phoenix/phoenix.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/phoenix_ecto/phoenix_ecto.iml" filepath="$PROJECT_DIR$/plaza/deps/phoenix_ecto/phoenix_ecto.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/phoenix_html/phoenix_html.iml" filepath="$PROJECT_DIR$/plaza/deps/phoenix_html/phoenix_html.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/phoenix_live_dashboard/phoenix_live_dashboard.iml" filepath="$PROJECT_DIR$/plaza/deps/phoenix_live_dashboard/phoenix_live_dashboard.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/phoenix_live_reload/phoenix_live_reload.iml" filepath="$PROJECT_DIR$/plaza/deps/phoenix_live_reload/phoenix_live_reload.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/phoenix_live_view/phoenix_live_view.iml" filepath="$PROJECT_DIR$/plaza/deps/phoenix_live_view/phoenix_live_view.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/phoenix_pubsub/phoenix_pubsub.iml" filepath="$PROJECT_DIR$/plaza/deps/phoenix_pubsub/phoenix_pubsub.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/phoenix_template/phoenix_template.iml" filepath="$PROJECT_DIR$/plaza/deps/phoenix_template/phoenix_template.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/plaza.iml" filepath="$PROJECT_DIR$/plaza/plaza.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/plug/plug.iml" filepath="$PROJECT_DIR$/plaza/deps/plug/plug.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/plug_cowboy/plug_cowboy.iml" filepath="$PROJECT_DIR$/plaza/deps/plug_cowboy/plug_cowboy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/plug_crypto/plug_crypto.iml" filepath="$PROJECT_DIR$/plaza/deps/plug_crypto/plug_crypto.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/postgrex/postgrex.iml" filepath="$PROJECT_DIR$/plaza/deps/postgrex/postgrex.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/swoosh/swoosh.iml" filepath="$PROJECT_DIR$/plaza/deps/swoosh/swoosh.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/tailwind/tailwind.iml" filepath="$PROJECT_DIR$/plaza/deps/tailwind/tailwind.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/telemetry/telemetry.iml" filepath="$PROJECT_DIR$/plaza/deps/telemetry/telemetry.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/telemetry_metrics/telemetry_metrics.iml" filepath="$PROJECT_DIR$/plaza/deps/telemetry_metrics/telemetry_metrics.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/websock/websock.iml" filepath="$PROJECT_DIR$/plaza/deps/websock/websock.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plaza/deps/websock_adapter/websock_adapter.iml" filepath="$PROJECT_DIR$/plaza/deps/websock_adapter/websock_adapter.iml" />
+    </modules>
+  </component>
+</project>
