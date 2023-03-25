@@ -4,5 +4,4 @@ defmodule PlazaWeb.LandingLive do
   def mount(params, session, socket) do
     {:ok, assign(socket, :page_title, "Plaza Hello")}
   end
-
 end
