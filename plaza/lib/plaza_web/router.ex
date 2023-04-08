@@ -18,6 +18,7 @@ defmodule PlazaWeb.Router do
     pipe_through :browser
 
     live "/", LandingLive
+    live "/upload", UploadLive
   end
 
   # Other scopes may use custom stacks.

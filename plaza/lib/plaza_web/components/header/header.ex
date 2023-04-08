@@ -22,7 +22,11 @@ defmodule PlazaWeb.Header do
             <div class="has-dark-gray-text ml-xxsmall">buscar artista</div>
           </div>
         </div>
-        <div class="level-item pr-xmedium">quero vender</div>
+        <div class="level-item pr-xmedium">
+          <.link navigate="/upload">
+            quero vender
+          </.link>
+        </div>
         <div class="level-item pr-xmedium">registre-se</div>
         <div class="level-item">carrinho</div>
       </:right>
