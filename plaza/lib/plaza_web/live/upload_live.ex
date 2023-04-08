@@ -12,7 +12,9 @@ defmodule PlazaWeb.UploadLive do
 
   def render(assigns) do
     ~H"""
-    <div Upload Stuff />
+    <div>
+      Upload Stuff
+    </div>
     """
   end
 end
