@@ -36,4 +36,4 @@ npm-debug.log
 /assets/node_modules/
 
 # css build
-./assets/css/custom.css
+/assets/css/custom.css
