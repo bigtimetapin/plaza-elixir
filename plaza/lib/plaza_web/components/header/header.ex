@@ -18,6 +18,22 @@ defmodule PlazaWeb.Header do
     """
   end
 
+  def upload(assigns) do
+    ~H"""
+    <.left>
+      <:right>
+        <div class="level-item pr-xxsmall">envie seu design</div>
+        <.seperator />
+        <div class="level-item pr-xxsmall">escolha seu produto</div>
+        <.seperator />
+        <div class="level-item pr-xxsmall">calcule sue lucro</div>
+        <.seperator />
+        <div class="level-item">publique sua loja</div>
+      </:right>
+    </.left>
+    """
+  end
+
   slot :right, required: true
 
   defp left(assigns) do
@@ -35,6 +51,14 @@ defmodule PlazaWeb.Header do
           </div>
         </nav>
       </div>
+    </div>
+    """
+  end
+
+  defp seperator(assigns) do
+    ~H"""
+    <div class="level-item pr-xxsmall">
+      <div class="is-header-seperator" />
     </div>
     """
   end

@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "SCSS Build",
   "scripts": {
-    "build": "sh sync-fonts.sh; node-sass --output-style expanded --include-path=node_modules/bulma custom.scss ../css/custom.css",
+    "build": "sh build.sh", 
     "start": "npm run build --watch"
   },
   "author": "mrmizz",
   "license": "ISC",
   "devDependencies": {
     "bulma": "^0.9.4",
+    "tailwindcss": "3.2.4",
     "node-sass": "^6.0.0"
   }
 }

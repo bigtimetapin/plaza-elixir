@@ -134,6 +134,12 @@ a:link, a:visited {
   flex-shrink: 0;
 }
 
+.is-header-seperator {
+  width: 19px;
+  height: 0px;
+  border-bottom: 2px solid #4a4a4a;
+}
+
 .is-product-1 {
   border: 1px solid #707070;
   height: 26.75rem;
