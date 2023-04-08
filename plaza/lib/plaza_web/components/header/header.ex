@@ -1,7 +1,19 @@
 defmodule PlazaWeb.Header do
   use Phoenix.Component
 
-  def landing(assigns) do
+  def header(%{header: :landing} = assigns) do
+    ~H"""
+    <.landing />
+    """
+  end
+
+  def header(%{header: :upload} = assigns) do
+    ~H"""
+    <.upload />
+    """
+  end
+
+  defp landing(assigns) do
     ~H"""
     <.left>
       <:right>
@@ -18,7 +30,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  def upload(assigns) do
+  defp upload(assigns) do
     ~H"""
     <.left>
       <:right>
