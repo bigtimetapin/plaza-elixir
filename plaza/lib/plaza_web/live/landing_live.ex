@@ -7,6 +7,7 @@ defmodule PlazaWeb.LandingLive do
     socket =
       socket
       |> assign(:page_title, "Hello Plaza")
+      |> assign(:header, :landing)
       |> assign(
         :products,
         [
