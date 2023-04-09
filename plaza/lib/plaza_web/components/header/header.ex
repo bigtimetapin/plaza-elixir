@@ -1,6 +1,14 @@
 defmodule PlazaWeb.Header do
   use Phoenix.Component
 
+  def get(%{header: header}) do
+    header
+  end
+
+  def get(_) do
+    :landing
+  end
+
   def header(%{header: :landing} = assigns) do
     ~H"""
     <.landing />
