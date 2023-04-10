@@ -1,6 +1,14 @@
 defmodule PlazaWeb.UploadLive do
   use PlazaWeb, :live_view
 
+  alias Phoenix.Component
+  alias Phoenix.HTML
+  alias Phoenix.HTML.Form
+  alias Phoenix.HTML.FormData
+
+  alias Plaza.Products
+  alias Plaza.Products.Product
+
   def mount(_params, _session, socket) do
     socket =
       socket
@@ -15,6 +23,23 @@ defmodule PlazaWeb.UploadLive do
     socket =
       socket
       |> assign(:step, 2)
+      |> assign(:num_colors, 1)
+
+    IO.inspect(socket)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("color", %{"color" => num_colors_as_string}, socket) do
+    num_colors =
+      case num_colors_as_string do
+        "1" -> 1
+        "2" -> 2
+      end
+
+    socket =
+      socket
+      |> assign(:num_colors, num_colors)
 
     {:noreply, socket}
   end
@@ -30,11 +55,13 @@ defmodule PlazaWeb.UploadLive do
   end
 
   def render(%{step: 2} = assigns) do
+    IO.inspect(assigns)
+
     ~H"""
     <div style="margin-top: 200px;">
       <.body>
         <:center>
-          <.two />
+          <.two num_colors={@num_colors} />
         </:center>
       </.body>
     </div>
@@ -70,6 +97,8 @@ defmodule PlazaWeb.UploadLive do
     """
   end
 
+  attr :num_colors, :integer, required: true
+
   defp two(assigns) do
     ~H"""
     <div>
@@ -83,12 +112,32 @@ defmodule PlazaWeb.UploadLive do
           quantas cores tem sua estampa?
         </div>
       </div>
-      <form>
-        <input type="radio" name="color" id="white-radio" />
-        <label for="white-radio" class="white">1</label>
-        <input type="radio" name="color" id="yellow-radio" />
-        <label for="yellow-radio" class="yellow">2</label>
-      </form>
+      <.form>
+        <input
+          type="radio"
+          name="num-color-radio-one"
+          id="num-color-radio-one"
+          phx-click="color"
+          phx-value-color={1}
+        />
+        <label for="num-color-radio-one" class={if @num_colors == 1, do: "yellow", else: "white"}>
+          <div class="has-text-centered">
+            1
+          </div>
+        </label>
+        <input
+          type="radio"
+          name="num-color-radio-two"
+          id="num-color-radio-two"
+          phx-click="color"
+          phx-value-color={2}
+        />
+        <label for="num-color-radio-two" class={if @num_colors == 2, do: "yellow", else: "white"}>
+          <div class="has-text-centered">
+            2
+          </div>
+        </label>
+      </.form>
     </div>
     """
   end
