@@ -25,8 +25,6 @@ defmodule PlazaWeb.UploadLive do
       |> assign(:step, 2)
       |> assign(:num_colors, 1)
 
-    IO.inspect(socket)
-
     {:noreply, socket}
   end
 
@@ -35,6 +33,9 @@ defmodule PlazaWeb.UploadLive do
       case num_colors_as_string do
         "1" -> 1
         "2" -> 2
+        "3" -> 3
+        "4" -> 4
+        "5" -> 5
       end
 
     socket =
@@ -55,8 +56,6 @@ defmodule PlazaWeb.UploadLive do
   end
 
   def render(%{step: 2} = assigns) do
-    IO.inspect(assigns)
-
     ~H"""
     <div style="margin-top: 200px;">
       <.body>
@@ -113,32 +112,39 @@ defmodule PlazaWeb.UploadLive do
         </div>
       </div>
       <.form>
-        <input
-          type="radio"
-          name="num-color-radio-one"
-          id="num-color-radio-one"
-          phx-click="color"
-          phx-value-color={1}
-        />
-        <label for="num-color-radio-one" class={if @num_colors == 1, do: "yellow", else: "white"}>
-          <div class="has-text-centered">
-            1
-          </div>
-        </label>
-        <input
-          type="radio"
-          name="num-color-radio-two"
-          id="num-color-radio-two"
-          phx-click="color"
-          phx-value-color={2}
-        />
-        <label for="num-color-radio-two" class={if @num_colors == 2, do: "yellow", else: "white"}>
-          <div class="has-text-centered">
-            2
-          </div>
-        </label>
+        <.num_color_input num_colors={@num_colors} color={1} />
+        <.num_color_input num_colors={@num_colors} color={2} />
+        <.num_color_input num_colors={@num_colors} color={3} />
+        <.num_color_input num_colors={@num_colors} color={4} />
+        <.num_color_input num_colors={@num_colors} color={5} />
       </.form>
     </div>
     """
+  end
+
+  attr :color, :integer, required: true
+  attr :num_colors, :integer, required: true
+
+  defp num_color_input(assigns) do
+    assigns = assign(assigns, :id, "num-color-radio-#{color_to_string(assigns.color)}")
+
+    ~H"""
+    <input type="radio" name={@id} id={@id} phx-click="color" phx-value-color={@color} />
+    <label for={@id} class={if @color == @num_colors, do: "yellow", else: "white"}>
+      <div class="has-text-centered">
+        <%= @color %>
+      </div>
+    </label>
+    """
+  end
+
+  defp color_to_string(color) do
+    case color do
+      1 -> "one"
+      2 -> "two"
+      3 -> "three"
+      4 -> "four"
+      5 -> "five"
+    end
   end
 end
