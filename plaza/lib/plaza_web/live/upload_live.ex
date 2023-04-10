@@ -83,6 +83,12 @@ defmodule PlazaWeb.UploadLive do
           quantas cores tem sua estampa?
         </div>
       </div>
+      <form>
+        <input type="radio" name="color" id="white-radio" />
+        <label for="white-radio" class="white">1</label>
+        <input type="radio" name="color" id="yellow-radio" />
+        <label for="yellow-radio" class="yellow">2</label>
+      </form>
     </div>
     """
   end
