@@ -129,9 +129,16 @@ defmodule PlazaWeb.UploadLive do
     assigns = assign(assigns, :id, "num-color-radio-#{color_to_string(assigns.color)}")
 
     ~H"""
-    <input type="radio" name={@id} id={@id} phx-click="color" phx-value-color={@color} />
+    <input
+      style="width: 0;"
+      type="radio"
+      name={@id}
+      id={@id}
+      phx-click="color"
+      phx-value-color={@color}
+    />
     <label for={@id} class={if @color == @num_colors, do: "yellow", else: "white"}>
-      <div class="has-text-centered">
+      <div class="has-text-centered" style="position: relative; top: -4px;">
         <%= @color %>
       </div>
     </label>

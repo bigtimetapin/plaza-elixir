@@ -124,14 +124,14 @@ $family-secondary: "Press Start 2P", BlinkMacSystemFont, -apple-system, "Helveti
 label {
   display: inline-block;
   cursor: pointer;
-  left: 50%;
 }
 
 label.white, label.yellow { 
-  height: 50px;
-  width: 50px;
+  height: 35px;
+  width: 35px;
   border:1px solid gray; 
   border-radius:50%;
+  font-size: 1.85rem;
 }
 
 label.white {
