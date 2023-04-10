@@ -82,6 +82,26 @@ defmodule PlazaWeb.UploadLive do
         <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
           quantas cores tem sua estampa?
         </div>
+
+        <form>
+          <h1>Custom Radio Buttons</h1>
+          <label class="plaza-radio-container">
+            One <input type="radio" checked="checked" name="radio" />
+            <span class="plaza-radio"></span>
+          </label>
+          <label class="plaza-radio-container">
+            Two <input type="radio" name="radio" />
+            <span class="plaza-radio"></span>
+          </label>
+          <label class="plaza-radio-container">
+            Three <input type="radio" name="radio" />
+            <span class="plaza-radio"></span>
+          </label>
+          <label class="plaza-radio-container">
+            Four <input type="radio" name="radio" />
+            <span class="plaza-radio"></span>
+          </label>
+        </form>
       </div>
     </div>
     """
