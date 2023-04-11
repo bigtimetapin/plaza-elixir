@@ -67,6 +67,7 @@ defmodule PlazaWeb.UploadLive do
     """
   end
 
+  # TODO; only render button during step 2
   def render(%{step: 3} = assigns) do
     ~H"""
     <.body>
