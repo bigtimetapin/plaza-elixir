@@ -20,6 +20,14 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
+  def handle_event("step", %{"step" => "3"}, socket) do
+    socket =
+      socket
+      |> assign(:step, 3)
+
+    {:noreply, socket}
+  end
+
   def handle_event("color", %{"color" => num_colors_as_string}, socket) do
     num_colors =
       case num_colors_as_string do
@@ -59,7 +67,20 @@ defmodule PlazaWeb.UploadLive do
     """
   end
 
+  def render(%{step: 3} = assigns) do
+    ~H"""
+    <.body>
+      <:center>
+        <div>
+          step 3
+        </div>
+      </:center>
+    </.body>
+    """
+  end
+
   slot :center, required: true
+  attr :step, :integer, required: true
   attr :rest, :global
 
   defp body(assigns) do
@@ -80,14 +101,16 @@ defmodule PlazaWeb.UploadLive do
             </div>
           </div>
           <div style="position: absolute; bottom: 50px;">
-            <div
-              style="width: 200px; height: 100px; border-radius: 200px; border: 1px solid gray;"
-              class="has-yellow"
-            >
-              <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-                próximo
+            <button phx-click="step" phx-value-step="3">
+              <div
+                style="width: 200px; height: 100px; border-radius: 200px; border: 1px solid gray;"
+                class="has-yellow"
+              >
+                <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                  próximo
+                </div>
               </div>
-            </div>
+            </button>
           </div>
         </div>
       </div>
