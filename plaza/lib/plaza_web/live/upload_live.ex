@@ -65,9 +65,31 @@ defmodule PlazaWeb.UploadLive do
   defp body(assigns) do
     ~H"""
     <div class="columns">
-      <div class="column is-2"></div>
-      <div class="column has-font-3 is-size-8">
+      <div class="column is-3"></div>
+      <div class="column is-6 has-font-3 is-size-8">
         <%= render_slot(@center) %>
+      </div>
+      <div class="column is-3 has-font-3 is-size-8">
+        <div style="position: relative; height: 100%;">
+          <div style="position: absolute; top: 50px;">
+            <div class="mb-xsmall">
+              dúvidas
+            </div>
+            <div>
+              baixar modelo .pdf
+            </div>
+          </div>
+          <div style="position: absolute; bottom: 50px;">
+            <div
+              style="width: 200px; height: 100px; border-radius: 200px; border: 1px solid gray;"
+              class="has-yellow"
+            >
+              <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                próximo
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     """
