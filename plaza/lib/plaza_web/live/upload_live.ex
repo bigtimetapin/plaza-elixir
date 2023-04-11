@@ -100,20 +100,43 @@ defmodule PlazaWeb.UploadLive do
       </div>
       <div style="width: 750px; height: 300px; border: 2px solid gray;">
         <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-          quantas cores tem sua estampa?
+          <div class="columns" style="width: 100%;">
+            <div class="column is-7" style="text-align: center;">
+              quantas cores tem sua estampa?
+            </div>
+            <div class="column is-5" style="position: relative; top: 5px;">
+              <.num_color_input num_colors={@num_colors} color={1} />
+              <.num_color_input
+                num_colors={@num_colors}
+                color={2}
+                style="position: relative; right: 10px;"
+              />
+              <.num_color_input
+                num_colors={@num_colors}
+                color={3}
+                style="position: relative; right: 20px;"
+              />
+              <.num_color_input
+                num_colors={@num_colors}
+                color={4}
+                style="position: relative; right: 30px;"
+              />
+              <.num_color_input
+                num_colors={@num_colors}
+                color={5}
+                style="position: relative; right: 40px;"
+              />
+            </div>
+          </div>
         </div>
       </div>
-      <.num_color_input num_colors={@num_colors} color={1} />
-      <.num_color_input num_colors={@num_colors} color={2} />
-      <.num_color_input num_colors={@num_colors} color={3} />
-      <.num_color_input num_colors={@num_colors} color={4} />
-      <.num_color_input num_colors={@num_colors} color={5} />
     </div>
     """
   end
 
   attr :color, :integer, required: true
   attr :num_colors, :integer, required: true
+  attr :rest, :global
 
   defp num_color_input(assigns) do
     ~H"""
@@ -128,6 +151,7 @@ defmodule PlazaWeb.UploadLive do
     <label
       for={num_color_input_id(assigns.color)}
       class={if @color == @num_colors, do: "yellow", else: "white"}
+      {@rest}
     >
       <div class="has-text-centered" style="position: relative; top: -6px;">
         <%= @color %>
