@@ -1,14 +1,6 @@
 defmodule PlazaWeb.UploadLive do
   use PlazaWeb, :live_view
 
-  alias Phoenix.Component
-  alias Phoenix.HTML
-  alias Phoenix.HTML.Form
-  alias Phoenix.HTML.FormData
-
-  alias Plaza.Products
-  alias Plaza.Products.Product
-
   def mount(_params, _session, socket) do
     socket =
       socket
@@ -111,13 +103,11 @@ defmodule PlazaWeb.UploadLive do
           quantas cores tem sua estampa?
         </div>
       </div>
-      <.form>
-        <.num_color_input num_colors={@num_colors} color={1} />
-        <.num_color_input num_colors={@num_colors} color={2} />
-        <.num_color_input num_colors={@num_colors} color={3} />
-        <.num_color_input num_colors={@num_colors} color={4} />
-        <.num_color_input num_colors={@num_colors} color={5} />
-      </.form>
+      <.num_color_input num_colors={@num_colors} color={1} />
+      <.num_color_input num_colors={@num_colors} color={2} />
+      <.num_color_input num_colors={@num_colors} color={3} />
+      <.num_color_input num_colors={@num_colors} color={4} />
+      <.num_color_input num_colors={@num_colors} color={5} />
     </div>
     """
   end
@@ -126,32 +116,27 @@ defmodule PlazaWeb.UploadLive do
   attr :num_colors, :integer, required: true
 
   defp num_color_input(assigns) do
-    assigns = assign(assigns, :id, "num-color-radio-#{color_to_string(assigns.color)}")
-
     ~H"""
     <input
       style="width: 0;"
       type="radio"
-      name={@id}
-      id={@id}
+      name={num_color_input_id(assigns.color)}
+      id={num_color_input_id(assigns.color)}
       phx-click="color"
       phx-value-color={@color}
     />
-    <label for={@id} class={if @color == @num_colors, do: "yellow", else: "white"}>
-      <div class="has-text-centered" style="position: relative; top: -4px;">
+    <label
+      for={num_color_input_id(assigns.color)}
+      class={if @color == @num_colors, do: "yellow", else: "white"}
+    >
+      <div class="has-text-centered" style="position: relative; top: -6px;">
         <%= @color %>
       </div>
     </label>
     """
   end
 
-  defp color_to_string(color) do
-    case color do
-      1 -> "one"
-      2 -> "two"
-      3 -> "three"
-      4 -> "four"
-      5 -> "five"
-    end
+  defp num_color_input_id(color) do
+    "num-color-radio-#{color}"
   end
 end
