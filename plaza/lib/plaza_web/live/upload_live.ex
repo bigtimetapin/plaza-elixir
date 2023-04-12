@@ -81,39 +81,13 @@ defmodule PlazaWeb.UploadLive do
   end
 
   slot :center, required: true
-  attr :step, :integer, required: true
-  attr :rest, :global
 
   defp body(assigns) do
     ~H"""
     <div class="columns">
       <div class="column is-3"></div>
-      <div class="column is-6 has-font-3 is-size-8">
+      <div class="column has-font-3 is-size-8">
         <%= render_slot(@center) %>
-      </div>
-      <div class="column is-3 has-font-3 is-size-8">
-        <div style="position: relative; height: 100%;">
-          <div style="position: absolute; top: 50px;">
-            <div class="mb-xsmall">
-              dúvidas
-            </div>
-            <div>
-              baixar modelo .pdf
-            </div>
-          </div>
-          <div style="position: absolute; bottom: 50px;">
-            <button phx-click="step" phx-value-step="3">
-              <div
-                style="width: 200px; height: 100px; border-radius: 200px; border: 1px solid gray;"
-                class="has-yellow"
-              >
-                <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-                  próximo
-                </div>
-              </div>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
     """
@@ -138,41 +112,67 @@ defmodule PlazaWeb.UploadLive do
 
   defp two(assigns) do
     ~H"""
-    <div>
-      <div style="width: 750px; height: 300px; border: 2px solid gray;" class="mb-medium">
-        <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-          arquivo enviado arte101.png
+    <div class="columns">
+      <div class="column is-6">
+        <div style="width: 750px; height: 300px; border: 2px solid gray;" class="mb-medium">
+          <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+            arquivo enviado arte101.png
+          </div>
+        </div>
+        <div style="width: 750px; height: 300px; border: 2px solid gray;">
+          <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+            <div class="columns" style="width: 100%;">
+              <div class="column is-7" style="text-align: center;">
+                quantas cores tem sua estampa?
+              </div>
+              <div class="column is-5" style="position: relative; top: 5px;">
+                <.num_color_input num_colors={@num_colors} color={1} />
+                <.num_color_input
+                  num_colors={@num_colors}
+                  color={2}
+                  style="position: relative; right: 10px;"
+                />
+                <.num_color_input
+                  num_colors={@num_colors}
+                  color={3}
+                  style="position: relative; right: 20px;"
+                />
+                <.num_color_input
+                  num_colors={@num_colors}
+                  color={4}
+                  style="position: relative; right: 30px;"
+                />
+                <.num_color_input
+                  num_colors={@num_colors}
+                  color={5}
+                  style="position: relative; right: 40px;"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div style="width: 750px; height: 300px; border: 2px solid gray;">
-        <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-          <div class="columns" style="width: 100%;">
-            <div class="column is-7" style="text-align: center;">
-              quantas cores tem sua estampa?
+      <div class="column is-6 has-font-3 is-size-8" style="display: flex; justify-content: center;">
+        <div style="position: relative; height: 100%;">
+          <div style="position: absolute; top: 50px; width: 250px;">
+            <div class="mb-xsmall">
+              dúvidas
             </div>
-            <div class="column is-5" style="position: relative; top: 5px;">
-              <.num_color_input num_colors={@num_colors} color={1} />
-              <.num_color_input
-                num_colors={@num_colors}
-                color={2}
-                style="position: relative; right: 10px;"
-              />
-              <.num_color_input
-                num_colors={@num_colors}
-                color={3}
-                style="position: relative; right: 20px;"
-              />
-              <.num_color_input
-                num_colors={@num_colors}
-                color={4}
-                style="position: relative; right: 30px;"
-              />
-              <.num_color_input
-                num_colors={@num_colors}
-                color={5}
-                style="position: relative; right: 40px;"
-              />
+            <div>
+              baixar modelo .pdf
             </div>
+          </div>
+          <div style="position: absolute; bottom: 50px;">
+            <button phx-click="step" phx-value-step="3">
+              <div
+                style="width: 200px; height: 100px; border-radius: 200px; border: 1px solid gray;"
+                class="has-yellow"
+              >
+                <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                  próximo
+                </div>
+              </div>
+            </button>
           </div>
         </div>
       </div>
