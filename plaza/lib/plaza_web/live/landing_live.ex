@@ -29,7 +29,7 @@ defmodule PlazaWeb.LandingLive do
       <div class="is-size-5-desktop is-size-6-touch">
         <div class="mb-small">produtos em alta</div>
       </div>
-      <.product products={@products}></.product>
+      <.products products={@products}></.products>
     </div>
     """
   end

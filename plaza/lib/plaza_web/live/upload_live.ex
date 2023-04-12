@@ -1,6 +1,8 @@
 defmodule PlazaWeb.UploadLive do
   use PlazaWeb, :live_view
 
+  alias PlazaWeb.ProductComponent
+
   def mount(_params, _session, socket) do
     socket =
       socket
@@ -24,6 +26,7 @@ defmodule PlazaWeb.UploadLive do
     socket =
       socket
       |> assign(:step, 3)
+      |> assign(:product_type, 1)
 
     {:noreply, socket}
   end
@@ -67,16 +70,22 @@ defmodule PlazaWeb.UploadLive do
     """
   end
 
-  # TODO; only render button during step 2
   def render(%{step: 3} = assigns) do
     ~H"""
-    <.body>
-      <:center>
-        <div>
-          step 3
-        </div>
-      </:center>
-    </.body>
+    <div style="margin-top: 200px;">
+      <.body>
+        <:center>
+          <div class="columns is-size-8">
+            <div class="column is-3">
+              <ProductComponent.selectable
+                selected={@product_type == 1}
+                product={%{name: "camiseta 1", price: "30"}}
+              />
+            </div>
+          </div>
+        </:center>
+      </.body>
+    </div>
     """
   end
 

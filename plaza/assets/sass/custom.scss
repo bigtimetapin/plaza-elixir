@@ -190,11 +190,21 @@ input[type="radio"] {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // buttons /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-.is-product-1 {
+.is-product-1 { 
+  height: 428px; // TODO; responsive
+  width: 370px; // TODO; responsive
   border: 1px solid #707070;
-  height: 26.75rem; // TODO; responsive
-  width: 23.15rem; // TODO; responsive
   position: relative;
+  top: 10px;
+  left: 10px;
+  background-color: #FFFFFF;  
+}
+
+.is-selected-product-1 {
+  height: 448px;
+  width: 390px;
+  background-color: #F9FD5F;
+  outline: 1px solid #707070;
 }
 
 .is-button-1, .is-button-2, .is-button-3 {
