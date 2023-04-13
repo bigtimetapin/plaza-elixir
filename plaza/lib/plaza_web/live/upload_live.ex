@@ -88,7 +88,7 @@ defmodule PlazaWeb.UploadLive do
         <div class="column is-3">
           <ProductComponent.selectable
             selected={@product_type == 1}
-            product={%{name: "camiseta 1", price: "30"}}
+            product={product_type(1)}
             phx-click="product"
             phx-value-product={1}
           />
@@ -97,7 +97,7 @@ defmodule PlazaWeb.UploadLive do
         <div class="column is-3">
           <ProductComponent.selectable
             selected={@product_type == 2}
-            product={%{name: "camiseta 2", price: "40"}}
+            product={product_type(2)}
             phx-click="product"
             phx-value-product={2}
           />
@@ -105,7 +105,7 @@ defmodule PlazaWeb.UploadLive do
         <div class="column is-3">
           <ProductComponent.selectable
             selected={@product_type == 3}
-            product={%{name: "camiseta 3", price: "50"}}
+            product={product_type(3)}
             phx-click="product"
             phx-value-product={3}
           />
@@ -113,7 +113,7 @@ defmodule PlazaWeb.UploadLive do
         <div class="column is-3">
           <ProductComponent.selectable
             selected={@product_type == 4}
-            product={%{name: "boné 1", price: "45"}}
+            product={product_type(4)}
             phx-click="product"
             phx-value-product={4}
           />
@@ -128,8 +128,8 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 4} = assigns) do
     ~H"""
-    <div>
-      step 4
+    <div class="mx-large has-font-3 is-size-8" style="margin-top: 200px;">
+      <ProductComponent.product product={product_type(@product_type)} />
     </div>
     """
   end
@@ -270,5 +270,14 @@ defmodule PlazaWeb.UploadLive do
 
   defp num_color_input_id(color) do
     "num-color-radio-#{color}"
+  end
+
+  defp product_type(int) do
+    case int do
+      1 -> %{name: "camiseta 1", price: 30}
+      2 -> %{name: "camiseta 2", price: 40}
+      3 -> %{name: "camiseta 3", price: 50}
+      4 -> %{name: "boné ", price: 45}
+    end
   end
 end

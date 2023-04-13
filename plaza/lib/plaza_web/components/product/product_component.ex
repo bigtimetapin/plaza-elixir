@@ -6,7 +6,7 @@ defmodule PlazaWeb.ProductComponent do
     <div class="columns is-multiline is-size-8">
       <%= for product <- @products do %>
         <div class="column is-one-quarter">
-          <.product product={product} />
+          <.productp product={product} />
         </div>
       <% end %>
     </div>
@@ -20,8 +20,16 @@ defmodule PlazaWeb.ProductComponent do
   def selectable(assigns) do
     ~H"""
     <div class={if @selected, do: "is-selected-product-1"}>
-      <.product product={@product} disabled={false} {@rest} />
+      <.productp product={@product} disabled={false} {@rest} />
     </div>
+    """
+  end
+
+  attr :product, :map, required: true
+
+  def product(assigns) do
+    ~H"""
+    <.productp product={@product} />
     """
   end
 
@@ -29,7 +37,7 @@ defmodule PlazaWeb.ProductComponent do
   attr :product, :map, required: true
   attr :rest, :global
 
-  defp product(assigns) do
+  defp productp(assigns) do
     ~H"""
     <button class="is-product-1 has-font-3 mr-medium mb-medium" disabled={@disabled} {@rest}>
       <div style="position: absolute; bottom: 0px; left: 10px;"><%= @product.name %></div>
