@@ -32,18 +32,21 @@ defmodule PlazaWeb.UploadLive do
   end
 
   def handle_event("color", %{"color" => num_colors_as_string}, socket) do
-    num_colors =
-      case num_colors_as_string do
-        "1" -> 1
-        "2" -> 2
-        "3" -> 3
-        "4" -> 4
-        "5" -> 5
-      end
+    num_colors = String.to_integer(num_colors_as_string)
 
     socket =
       socket
       |> assign(:num_colors, num_colors)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("product", %{"product" => product_type_as_string}, socket) do
+    product_type = String.to_integer(product_type_as_string)
+
+    socket =
+      socket
+      |> assign(:product_type, product_type)
 
     {:noreply, socket}
   end
@@ -73,18 +76,41 @@ defmodule PlazaWeb.UploadLive do
   def render(%{step: 3} = assigns) do
     ~H"""
     <div style="margin-top: 200px;">
-      <.body>
-        <:center>
-          <div class="columns is-size-8">
-            <div class="column is-3">
-              <ProductComponent.selectable
-                selected={@product_type == 1}
-                product={%{name: "camiseta 1", price: "30"}}
-              />
-            </div>
-          </div>
-        </:center>
-      </.body>
+      <div class="columns is-size-8 mx-large">
+        <div class="column is-3">
+          <ProductComponent.selectable
+            selected={@product_type == 1}
+            product={%{name: "camiseta 1", price: "30"}}
+            phx-click="product"
+            phx-value-product={1}
+          />
+        </div>
+
+        <div class="column is-3">
+          <ProductComponent.selectable
+            selected={@product_type == 2}
+            product={%{name: "camiseta 2", price: "40"}}
+            phx-click="product"
+            phx-value-product={2}
+          />
+        </div>
+        <div class="column is-3">
+          <ProductComponent.selectable
+            selected={@product_type == 3}
+            product={%{name: "camiseta 3", price: "50"}}
+            phx-click="product"
+            phx-value-product={3}
+          />
+        </div>
+        <div class="column is-3">
+          <ProductComponent.selectable
+            selected={@product_type == 4}
+            product={%{name: "boné 1", price: "45"}}
+            phx-click="product"
+            phx-value-product={4}
+          />
+        </div>
+      </div>
     </div>
     """
   end
