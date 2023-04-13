@@ -35,6 +35,7 @@ defmodule PlazaWeb.UploadLive do
     socket =
       socket
       |> assign(:step, 4)
+      |> assign(:num_expected, 50)
 
     {:noreply, socket}
   end
@@ -56,6 +57,25 @@ defmodule PlazaWeb.UploadLive do
       socket
       |> assign(:product_type, product_type)
 
+    {:noreply, socket}
+  end
+
+  def handle_event("num-expected-change", %{"num-expected" => num_expected_as_string}, socket) do
+    num_expected =
+      case num_expected_as_string do
+        "" -> 0
+        nes -> String.to_integer(nes)
+      end
+
+    socket =
+      socket
+      |> assign(:num_expected, num_expected)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("num-expected-submit", params, socket) do
+    IO.inspect(params)
     {:noreply, socket}
   end
 
@@ -148,9 +168,18 @@ defmodule PlazaWeb.UploadLive do
             Quantas unidades você espera vender
           </div>
           <div style="display: inline-block;">
-            <div style="width: 120px; height: 60px; border: 1px solid gray; display: flex; justify-content: center; align-items: center;">
-              50
-            </div>
+            <form>
+              <input
+                type="number"
+                id="num-expected"
+                name="num-expected"
+                value={@num_expected}
+                style="width: 120px; height: 60px; border: 1px solid gray; display: flex; justify-content: center; align-items: center;"
+                class="has-font-3 is-size-8"
+                phx-change="num-expected-change"
+                phx-submit="num-expected-submit"
+              />
+            </form>
           </div>
         </div>
       </div>
