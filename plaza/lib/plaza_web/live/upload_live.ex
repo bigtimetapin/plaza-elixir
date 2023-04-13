@@ -129,7 +129,31 @@ defmodule PlazaWeb.UploadLive do
   def render(%{step: 4} = assigns) do
     ~H"""
     <div class="mx-large has-font-3 is-size-8" style="margin-top: 200px;">
-      <ProductComponent.product product={product_type(@product_type)} />
+      <div style="display: inline-block;">
+        <ProductComponent.product product={product_type(@product_type)} />
+      </div>
+      <div style="display: inline-block; position: relative; left: 100px;">
+        <div class="mb-small">
+          <div style="display: inline-block; position: relative; right: 15px;">
+            Defina sua margem de lucro por unidade
+          </div>
+          <div style="display: inline-block;">
+            <div style="width: 120px; height: 60px; border: 1px solid gray; display: flex; justify-content: center; align-items: center;">
+              15 reais
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+          <div style="display: inline-block; position: relative; right: 25px;">
+            Quantas unidades você espera vender
+          </div>
+          <div style="display: inline-block;">
+            <div style="width: 120px; height: 60px; border: 1px solid gray; display: flex; justify-content: center; align-items: center;">
+              50
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     """
   end
