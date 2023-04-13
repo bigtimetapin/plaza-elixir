@@ -31,6 +31,14 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
+  def handle_event("step", %{"step" => "4"}, socket) do
+    socket =
+      socket
+      |> assign(:step, 4)
+
+    {:noreply, socket}
+  end
+
   def handle_event("color", %{"color" => num_colors_as_string}, socket) do
     num_colors = String.to_integer(num_colors_as_string)
 
@@ -75,8 +83,8 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 3} = assigns) do
     ~H"""
-    <div style="margin-top: 200px;">
-      <div class="columns is-size-8 mx-large">
+    <div class="is-size-8 mx-large" style="margin-top: 200px;">
+      <div class="columns">
         <div class="column is-3">
           <ProductComponent.selectable
             selected={@product_type == 1}
@@ -111,6 +119,17 @@ defmodule PlazaWeb.UploadLive do
           />
         </div>
       </div>
+      <div class="mt-xlarge" style="display: flex; justify-content: flex-end;">
+        <.next_button phx-value-step="4" />
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{step: 4} = assigns) do
+    ~H"""
+    <div>
+      step 4
     </div>
     """
   end
@@ -198,20 +217,28 @@ defmodule PlazaWeb.UploadLive do
             </div>
           </div>
           <div style="position: absolute; bottom: 50px;">
-            <button phx-click="step" phx-value-step="3">
-              <div
-                style="width: 200px; height: 100px; border-radius: 200px; border: 1px solid gray;"
-                class="has-yellow"
-              >
-                <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-                  próximo
-                </div>
-              </div>
-            </button>
+            <.next_button phx-value-step="3" />
           </div>
         </div>
       </div>
     </div>
+    """
+  end
+
+  attr :rest, :global
+
+  defp next_button(assigns) do
+    ~H"""
+    <button phx-click="step" {@rest}>
+      <div
+        style="width: 200px; height: 100px; border-radius: 200px; border: 1px solid gray;"
+        class="has-yellow"
+      >
+        <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+          próximo
+        </div>
+      </div>
+    </button>
     """
   end
 
