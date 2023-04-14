@@ -175,6 +175,17 @@ defmodule PlazaWeb.UploadLive do
           </div>
         </div>
       </div>
+      <div style="display: inline-block; position: relative; left: 200px; bottom: 15px;">
+        <div style="text-align: center;">
+          Seu lucro:
+        </div>
+        <div
+          class="has-yellow"
+          style="width: 200px; height: 140px; border: 1px solid gray; border-radius: 100px; display: flex; justify-content: center; align-items: center; font-size: 50px;"
+        >
+          750 reais
+        </div>
+      </div>
     </div>
     """
   end
