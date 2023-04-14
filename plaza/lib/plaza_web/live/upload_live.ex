@@ -74,11 +74,6 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
-  def handle_event("num-expected-submit", params, socket) do
-    IO.inspect(params)
-    {:noreply, socket}
-  end
-
   def render(%{step: 1} = assigns) do
     ~H"""
     <.body>
@@ -168,16 +163,13 @@ defmodule PlazaWeb.UploadLive do
             Quantas unidades você espera vender
           </div>
           <div style="display: inline-block;">
-            <form>
+            <form phx-change="num-expected-change" onkeydown="return event.key != 'Enter';">
               <input
                 type="number"
-                id="num-expected"
                 name="num-expected"
                 value={@num_expected}
                 style="width: 120px; height: 60px; border: 1px solid gray; display: flex; justify-content: center; align-items: center;"
                 class="has-font-3 is-size-8"
-                phx-change="num-expected-change"
-                phx-submit="num-expected-submit"
               />
             </form>
           </div>
