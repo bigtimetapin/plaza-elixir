@@ -24,7 +24,7 @@ defmodule PlazaWeb.LandingLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mt-large">
+    <div class="mt-large mx-large">
       <div class="is-size-3-desktop is-size-4-touch mb-medium mt-large">onde artistas vestem</div>
       <div class="is-size-5-desktop is-size-6-touch">
         <div class="mb-small">produtos em alta</div>
