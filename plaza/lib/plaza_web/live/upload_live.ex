@@ -175,7 +175,7 @@ defmodule PlazaWeb.UploadLive do
           </div>
         </div>
       </div>
-      <div style="display: inline-block; position: relative; left: 200px; bottom: 15px;">
+      <div style="display: inline-block; position: relative; left: 200px; top: 100px;">
         <div style="text-align: center;">
           Seu lucro:
         </div>
@@ -184,6 +184,9 @@ defmodule PlazaWeb.UploadLive do
           style="width: 200px; height: 140px; border: 1px solid gray; border-radius: 100px; display: flex; justify-content: center; align-items: center; font-size: 50px;"
         >
           <%= @num_expected * 15 %> reais
+        </div>
+        <div style="position: relative; top: 150px; left: 100px;">
+          <.next_button phx-value-step="5" />
         </div>
       </div>
     </div>
