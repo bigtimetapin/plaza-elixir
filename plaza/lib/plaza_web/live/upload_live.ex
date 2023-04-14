@@ -183,7 +183,7 @@ defmodule PlazaWeb.UploadLive do
           class="has-yellow"
           style="width: 200px; height: 140px; border: 1px solid gray; border-radius: 100px; display: flex; justify-content: center; align-items: center; font-size: 50px;"
         >
-          750 reais
+          <%= @num_expected * 15 %> reais
         </div>
       </div>
     </div>
