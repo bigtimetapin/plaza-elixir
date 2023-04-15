@@ -40,6 +40,19 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
+  def handle_event("step", %{"step" => "5"}, socket) do
+    IO.inspect(socket)
+
+    socket =
+      socket
+      |> assign(:step, 5)
+      |> assign(:name, nil)
+      |> assign(:descr_short, nil)
+      |> assign(:descr_long, nil)
+
+    {:noreply, socket}
+  end
+
   def handle_event("color", %{"color" => num_colors_as_string}, socket) do
     num_colors = String.to_integer(num_colors_as_string)
 
@@ -193,6 +206,34 @@ defmodule PlazaWeb.UploadLive do
         </div>
         <div style="position: relative; top: 150px; left: 100px;">
           <.next_button phx-value-step="5" />
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{step: 5} = assigns) do
+    ~H"""
+    <div class="mx-large has-font-3 is-size-8" style="margin-top: 200px;">
+      <div style="display: inline-block; position: relative; left: 100px;">
+        <ProductComponent.product product={product_type(@product_type)} />
+      </div>
+      <div style="display: inline-block; position: relative; left: 200px;">
+        <div>
+          <div style="display: inline-block;">
+            logo (opcional)
+          </div>
+          <div style="display: inline-block;">
+            <form>
+              <input
+                name="logo"
+                class="has-font-3"
+                style="width: 150px; height: 45px; border: 1px solid gray; text-align: center; font-size: 22px;"
+                placeholder="upload"
+                disabled
+              />
+            </form>
+          </div>
         </div>
       </div>
     </div>
