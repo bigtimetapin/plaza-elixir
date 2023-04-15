@@ -93,6 +93,11 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
+  def handle_event("descr-short-change", params, socket) do
+    IO.inspect(params)
+    {:noreply, socket}
+  end
+
   def render(%{step: 1} = assigns) do
     ~H"""
     <.body>
@@ -224,11 +229,15 @@ defmodule PlazaWeb.UploadLive do
             logo (opcional)
           </div>
 
-          <div style="margin-bottom: 0px;">
+          <div style="margin-bottom: 25px;">
             nome do produto
           </div>
+
+          <div style="margin-bottom: 0px;">
+            descrição breve
+          </div>
         </div>
-        <div style="display: inline-block;">
+        <div style="display: inline-block; position: relative; top: 40px; left: 5px;">
           <div style="margin-bottom: 35px;">
             <form>
               <input
@@ -240,13 +249,25 @@ defmodule PlazaWeb.UploadLive do
               />
             </form>
           </div>
-          <div>
+          <div style="margin-bottom: 25px;">
             <form>
               <input
                 type="text"
                 name="product-name"
                 class="has-font-3"
                 style="width: 300px; height: 45px; border: 1px solid gray; text-align: center; font-size: 22px;"
+              />
+            </form>
+          </div>
+          <div style="margin-bottom: 0px;">
+            <form phx-change="descr-short-change">
+              <textarea
+                type="text"
+                name="descr-short"
+                wrap="soft"
+                class="has-font-3"
+                maxlength="100"
+                style="width: 300px; height: 90px; border: 1px solid gray; text-align: center; font-size: 22px; overflow: scroll; overflow-x: hidden; resize: none;"
               />
             </form>
           </div>
