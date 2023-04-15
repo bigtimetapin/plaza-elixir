@@ -41,8 +41,6 @@ defmodule PlazaWeb.UploadLive do
   end
 
   def handle_event("step", %{"step" => "5"}, socket) do
-    IO.inspect(socket)
-
     socket =
       socket
       |> assign(:step, 5)
@@ -50,6 +48,10 @@ defmodule PlazaWeb.UploadLive do
       |> assign(:descr_short, nil)
       |> assign(:descr_long, nil)
 
+    {:noreply, socket}
+  end
+
+  def handle_event("step", %{"step" => "submit"}, socket) do
     {:noreply, socket}
   end
 
@@ -93,13 +95,11 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
-  def handle_event("descr-short-change", params, socket) do
-    IO.inspect(params)
+  def handle_event("descr-short-change", _params, socket) do
     {:noreply, socket}
   end
 
-  def handle_event("descr-long-change", params, socket) do
-    IO.inspect(params)
+  def handle_event("descr-long-change", _params, socket) do
     {:noreply, socket}
   end
 
@@ -290,6 +290,9 @@ defmodule PlazaWeb.UploadLive do
             </form>
           </div>
         </div>
+      </div>
+      <div style="display: inline-block; position: relative; left: 250px; top: 250px;">
+        <.next_button phx-value-step="submit" />
       </div>
     </div>
     """
