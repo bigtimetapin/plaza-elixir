@@ -219,11 +219,17 @@ defmodule PlazaWeb.UploadLive do
         <ProductComponent.product product={product_type(@product_type)} />
       </div>
       <div style="display: inline-block; position: relative; left: 200px;">
-        <div class="mb-medium">
-          <div style="display: inline-block;">
+        <div style="display: inline-block; text-align: right;">
+          <div style="margin-bottom: 35px;">
             logo (opcional)
           </div>
-          <div style="display: inline-block;">
+
+          <div style="margin-bottom: 0px;">
+            nome do produto
+          </div>
+        </div>
+        <div style="display: inline-block;">
+          <div style="margin-bottom: 35px;">
             <form>
               <input
                 name="logo"
@@ -234,12 +240,7 @@ defmodule PlazaWeb.UploadLive do
               />
             </form>
           </div>
-        </div>
-        <div>
-          <div style="display: inline-block;">
-            nome do produto
-          </div>
-          <div style="display: inline-block;">
+          <div>
             <form>
               <input
                 type="text"
