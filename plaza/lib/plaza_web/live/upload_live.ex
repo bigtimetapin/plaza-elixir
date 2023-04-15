@@ -68,8 +68,14 @@ defmodule PlazaWeb.UploadLive do
       end
 
     socket =
-      socket
-      |> assign(:num_expected, num_expected)
+      case num_expected >= 0 do
+        true ->
+          socket
+          |> assign(:num_expected, num_expected)
+
+        false ->
+          socket
+      end
 
     {:noreply, socket}
   end
