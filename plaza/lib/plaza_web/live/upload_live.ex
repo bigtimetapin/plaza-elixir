@@ -98,6 +98,11 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
+  def handle_event("descr-long-change", params, socket) do
+    IO.inspect(params)
+    {:noreply, socket}
+  end
+
   def render(%{step: 1} = assigns) do
     ~H"""
     <.body>
@@ -219,25 +224,26 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 5} = assigns) do
     ~H"""
-    <div class="mx-large has-font-3 is-size-8" style="margin-top: 200px;">
+    <div class="mx-large has-font-3 is-size-8">
       <div style="display: inline-block; position: relative; left: 100px;">
         <ProductComponent.product product={product_type(@product_type)} />
       </div>
-      <div style="display: inline-block; position: relative; left: 200px;">
+      <div style="display: inline-block; position: relative; left: 135px; top: 175px;">
         <div style="display: inline-block; text-align: right;">
           <div style="margin-bottom: 35px;">
             logo (opcional)
           </div>
-
           <div style="margin-bottom: 25px;">
             nome do produto
           </div>
-
-          <div style="margin-bottom: 0px;">
+          <div style="margin-bottom: 100px;">
             descrição breve
           </div>
+          <div style="margin-bottom: 0px;">
+            descrição completa
+          </div>
         </div>
-        <div style="display: inline-block; position: relative; top: 40px; left: 5px;">
+        <div style="display: inline-block; position: relative; top: 60px; left: 5px;">
           <div style="margin-bottom: 35px;">
             <form>
               <input
@@ -259,7 +265,7 @@ defmodule PlazaWeb.UploadLive do
               />
             </form>
           </div>
-          <div style="margin-bottom: 0px;">
+          <div style="margin-bottom: 50px;">
             <form phx-change="descr-short-change">
               <textarea
                 type="text"
@@ -267,6 +273,18 @@ defmodule PlazaWeb.UploadLive do
                 wrap="soft"
                 class="has-font-3"
                 maxlength="100"
+                style="width: 300px; height: 90px; border: 1px solid gray; text-align: center; font-size: 22px; overflow: scroll; overflow-x: hidden; resize: none;"
+              />
+            </form>
+          </div>
+          <div style="margin-bottom: 0px;">
+            <form phx-change="descr-long-change">
+              <textarea
+                type="text"
+                name="descr-long"
+                wrap="soft"
+                class="has-font-3"
+                maxlength="350"
                 style="width: 300px; height: 90px; border: 1px solid gray; text-align: center; font-size: 22px; overflow: scroll; overflow-x: hidden; resize: none;"
               />
             </form>
