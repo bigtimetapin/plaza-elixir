@@ -54,31 +54,6 @@ defmodule PlazaWeb.UploadLive do
   end
 
   def handle_event("step", %{"step" => "submit"}, socket) do
-    IO.inspect(socket)
-
-    params = %{
-      descr_long: socket.assigns.descr_long,
-      descr_short: socket.assigns.descr_short,
-      name: socket.assigns.name,
-      num_colors: socket.assigns.num_colors,
-      num_expected: socket.assigns.num_expected,
-      product_type: socket.assigns.product_type,
-      user_id: socket.assigns.current_user.id
-    }
-
-    result = Products.create_product(params)
-
-    case result do
-      {:ok, product} ->
-        IO.inspect(product)
-
-      {:error, changeset} ->
-        IO.inspect(changeset)
-    end
-
-    products = Products.list_products()
-    IO.inspect(products)
-
     {:noreply, socket}
   end
 

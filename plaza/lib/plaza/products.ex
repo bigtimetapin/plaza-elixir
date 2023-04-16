@@ -21,6 +21,10 @@ defmodule Plaza.Products do
     Repo.all(Product)
   end
 
+  def list_products_by_user_id(id) do
+    Repo.all(from p in Product, where: [user_id: ^id])
+  end
+
   @doc """
   Gets a single product.
 
