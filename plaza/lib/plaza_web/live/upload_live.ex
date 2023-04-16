@@ -1,6 +1,8 @@
 defmodule PlazaWeb.UploadLive do
   use PlazaWeb, :live_view
 
+  alias Plaza.Products
+  alias Plaza.Products.Product
   alias PlazaWeb.ProductComponent
 
   def mount(_params, _session, socket) do
@@ -52,6 +54,31 @@ defmodule PlazaWeb.UploadLive do
   end
 
   def handle_event("step", %{"step" => "submit"}, socket) do
+    IO.inspect(socket)
+
+    params = %{
+      descr_long: socket.assigns.descr_long,
+      descr_short: socket.assigns.descr_short,
+      name: socket.assigns.name,
+      num_colors: socket.assigns.num_colors,
+      num_expected: socket.assigns.num_expected,
+      product_type: socket.assigns.product_type,
+      user_id: socket.assigns.current_user.id
+    }
+
+    result = Products.create_product(params)
+
+    case result do
+      {:ok, product} ->
+        IO.inspect(product)
+
+      {:error, changeset} ->
+        IO.inspect(changeset)
+    end
+
+    products = Products.list_products()
+    IO.inspect(products)
+
     {:noreply, socket}
   end
 
@@ -95,11 +122,27 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
-  def handle_event("descr-short-change", _params, socket) do
+  def handle_event("product-name-change", %{"product-name" => name}, socket) do
+    socket =
+      socket
+      |> assign(:name, name)
+
     {:noreply, socket}
   end
 
-  def handle_event("descr-long-change", _params, socket) do
+  def handle_event("descr-short-change", %{"descr-short" => descr_short}, socket) do
+    socket =
+      socket
+      |> assign(:descr_short, descr_short)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("descr-long-change", %{"descr-long" => descr_long}, socket) do
+    socket =
+      socket
+      |> assign(:descr_long, descr_long)
+
     {:noreply, socket}
   end
 
@@ -256,12 +299,12 @@ defmodule PlazaWeb.UploadLive do
             </form>
           </div>
           <div style="margin-bottom: 25px;">
-            <form>
-              <input
+            <form phx-change="product-name-change">
+              <textarea
                 type="text"
                 name="product-name"
                 class="has-font-3"
-                style="width: 300px; height: 45px; border: 1px solid gray; text-align: center; font-size: 22px;"
+                style="width: 300px; height: 45px; border: 1px solid gray; text-align: center; font-size: 22px; overflow: hidden; resize: none;"
               />
             </form>
           </div>

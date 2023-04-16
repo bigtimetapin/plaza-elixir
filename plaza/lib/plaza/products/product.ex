@@ -17,7 +17,23 @@ defmodule Plaza.Products.Product do
   @doc false
   def changeset(product, attrs) do
     product
-    |> cast(attrs, [:name, :descr_short, :descr_long, :product_type, :num_colors, :num_expected])
-    |> validate_required([:name, :descr_short, :descr_long, :product_type, :num_colors, :num_expected])
+    |> cast(attrs, [
+      :name,
+      :descr_short,
+      :descr_long,
+      :product_type,
+      :num_colors,
+      :num_expected,
+      :user_id
+    ])
+    |> validate_required([
+      :name,
+      :descr_short,
+      :descr_long,
+      :product_type,
+      :num_colors,
+      :num_expected,
+      :user_id
+    ])
   end
 end
