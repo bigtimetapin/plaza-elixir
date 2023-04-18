@@ -5,16 +5,21 @@ defmodule PlazaWeb.UploadLive do
   alias Plaza.Products.Product
   alias PlazaWeb.ProductComponent
 
+  @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     socket =
       socket
       |> assign(:page_title, "Upload")
       |> assign(:header, :upload)
+      |> assign(:design_uri, nil)
+      |> allow_upload(:design, accept: ~w(.jpg .jpeg .png), max_entries: 1)
+      |> allow_upload(:logo, accept: ~w(.jpg .jpeg .png), max_entries: 1)
       |> assign(:step, 1)
 
     {:ok, socket}
   end
 
+  @impl Phoenix.LiveView
   def handle_event("step", %{"step" => "2"}, socket) do
     socket =
       socket
@@ -121,11 +126,44 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
+  def handle_event("design-upload-change", params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("design-upload-save", _params, socket) do
+    [design_uri | []] =
+      consume_uploaded_entries(socket, :design, fn %{path: path}, entry ->
+        unique_file_name = "#{entry.uuid}-#{entry.client_name}"
+
+        dest =
+          Path.join([
+            :code.priv_dir(:plaza),
+            "static",
+            "uploads",
+            unique_file_name
+          ])
+
+        File.cp!(path, dest)
+        {:ok, ~p"/uploads/#{unique_file_name}"}
+      end)
+
+    socket =
+      socket
+      |> assign(:design_uri, design_uri)
+
+    {:noreply, socket}
+  end
+
+  defp error_to_string(:too_large), do: "Too large"
+  defp error_to_string(:too_many_files), do: "You have selected too many files"
+  defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
+
+  @impl Phoenix.LiveView
   def render(%{step: 1} = assigns) do
     ~H"""
     <.body>
       <:center>
-        <.one />
+        <.one uploads={@uploads} design_uri={@design_uri} />
       </:center>
     </.body>
     """
@@ -329,6 +367,9 @@ defmodule PlazaWeb.UploadLive do
     """
   end
 
+  attr :uploads, :any, required: true
+  attr :design_uri, :string
+
   defp one(assigns) do
     ~H"""
     <div>
@@ -340,6 +381,50 @@ defmodule PlazaWeb.UploadLive do
       >
         arraste seu arquivo aqui
       </button>
+      <form id="design-upload-form" phx-submit="design-upload-save" phx-change="design-upload-change">
+        <.live_file_input upload={@uploads.design} />
+        <button type="submit">Upload</button>
+      </form>
+
+      <%!-- use phx-drop-target with the upload ref to enable file drag and drop --%>
+      <section phx-drop-target={@uploads.design.ref}>
+        <%!-- render each design entry --%>
+        <%= for entry <- @uploads.design.entries do %>
+          <article class="upload-entry">
+            <figure>
+              <.live_img_preview entry={entry} style="width: 100px;" />
+              <figcaption><%= entry.client_name %></figcaption>
+            </figure>
+
+            <%!-- entry.progress will update automatically for in-flight entries --%>
+            <progress value={entry.progress} max="100"><%= entry.progress %>%</progress>
+
+            <%!-- a regular click event whose handler will invoke Phoenix.LiveView.cancel_upload/3 --%>
+            <button
+              type="button"
+              phx-click="cancel-upload"
+              phx-value-ref={entry.ref}
+              aria-label="cancel"
+            >
+              &times;
+            </button>
+
+            <%!-- Phoenix.Component.upload_errors/2 returns a list of error atoms --%>
+            <%= for err <- upload_errors(@uploads.design, entry) do %>
+              <p class="alert alert-danger"><%= error_to_string(err) %></p>
+            <% end %>
+          </article>
+        <% end %>
+
+        <%!-- Phoenix.Component.upload_errors/1 returns a list of error atoms --%>
+        <%= for err <- upload_errors(@uploads.design) do %>
+          <p class="alert alert-danger"><%= error_to_string(err) %></p>
+        <% end %>
+      </section>
+
+      <div :if={@design_uri}>
+        <img src={@design_uri} style="width: 100;" />
+      </div>
     </div>
     """
   end
