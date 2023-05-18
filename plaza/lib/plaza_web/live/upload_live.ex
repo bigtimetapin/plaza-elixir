@@ -5,6 +5,12 @@ defmodule PlazaWeb.UploadLive do
   alias Plaza.Products.Product
   alias PlazaWeb.ProductComponent
 
+  alias ExAws
+  alias ExAws.S3
+
+  @aws_s3_region "us-west-2"
+  @aws_s3_bucket "plaza-static-dev"
+
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     socket =
@@ -35,6 +41,29 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
+  def handle_info({:upload_design, {file_name, src}}, socket) do
+    request =
+      S3.put_object(
+        @aws_s3_bucket,
+        file_name,
+        File.read!(src)
+      )
+
+    ExAws.request!(
+      request,
+      region: @aws_s3_region
+    )
+
+    design_uri = "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{file_name}"
+
+    socket =
+      socket
+      |> assign(design_uri: design_uri)
+
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
   def handle_event("step", %{"step" => "3"}, socket) do
     socket =
       socket
@@ -137,7 +166,7 @@ defmodule PlazaWeb.UploadLive do
   end
 
   def handle_event("design-upload-save", _params, socket) do
-    [design_uri | []] =
+    [tup | []] =
       consume_uploaded_entries(socket, :design, fn %{path: path}, entry ->
         unique_file_name = "#{entry.uuid}-#{entry.client_name}"
 
@@ -150,14 +179,11 @@ defmodule PlazaWeb.UploadLive do
           ])
 
         File.cp!(path, dest)
-        {:ok, ~p"/uploads/#{unique_file_name}"}
+        {:ok, {"uploads/#{unique_file_name}", dest}}
       end)
 
-    socket =
-      socket
-      |> assign(:design_uri, design_uri)
-
     send(self(), {:step, 2})
+    send(self(), {:upload_design, tup})
 
     {:noreply, socket}
   end
