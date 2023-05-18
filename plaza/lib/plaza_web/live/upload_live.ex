@@ -17,7 +17,8 @@ defmodule PlazaWeb.UploadLive do
       socket
       |> assign(:page_title, "Upload")
       |> assign(:header, :upload)
-      |> assign(:design_uri, nil)
+      |> assign(:design_url, nil)
+      |> assign(:products, products)
       |> allow_upload(:design, accept: ~w(.jpg .jpeg .png), max_entries: 1)
       |> allow_upload(:logo, accept: ~w(.jpg .jpeg .png), max_entries: 1)
       |> assign(:step, 1)
@@ -54,11 +55,11 @@ defmodule PlazaWeb.UploadLive do
       region: @aws_s3_region
     )
 
-    design_uri = "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{file_name}"
+    design_url = "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{file_name}"
 
     socket =
       socket
-      |> assign(design_uri: design_uri)
+      |> assign(design_url: design_url)
 
     {:noreply, socket}
   end
@@ -94,6 +95,17 @@ defmodule PlazaWeb.UploadLive do
   end
 
   def handle_event("step", %{"step" => "submit"}, socket) do
+    Products.create_product(%{
+      descr_long: socket.assigns.descr_long,
+      descr_short: socket.assigns.descr_short,
+      name: socket.assigns.name,
+      num_colors: socket.assigns.num_colors,
+      num_expected: socket.assigns.num_expected,
+      product_type: socket.assigns.product_type,
+      design_url: socket.assigns.design_url,
+      user_id: socket.assigns.current_user.id
+    })
+
     {:noreply, socket}
   end
 
@@ -197,7 +209,7 @@ defmodule PlazaWeb.UploadLive do
     ~H"""
     <.body>
       <:center>
-        <.one uploads={@uploads} design_uri={@design_uri} />
+        <.one uploads={@uploads} products={@products} />
       </:center>
     </.body>
     """
@@ -402,7 +414,7 @@ defmodule PlazaWeb.UploadLive do
   end
 
   attr :uploads, :any, required: true
-  attr :design_uri, :string
+  attr :products, :list, required: true
 
   defp one(assigns) do
     ~H"""
@@ -455,10 +467,6 @@ defmodule PlazaWeb.UploadLive do
           <p class="alert alert-danger"><%= error_to_string(err) %></p>
         <% end %>
       </section>
-
-      <div :if={@design_uri}>
-        <img src={@design_uri} style="width: 100;" />
-      </div>
     </div>
     """
   end

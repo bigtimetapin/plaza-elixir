@@ -9,6 +9,7 @@ defmodule Plaza.Products.Product do
     field :num_colors, :integer
     field :num_expected, :integer
     field :product_type, :integer
+    field :design_url, :string
     field :user_id, :id
 
     timestamps()
@@ -24,6 +25,7 @@ defmodule Plaza.Products.Product do
       :product_type,
       :num_colors,
       :num_expected,
+      :design_url,
       :user_id
     ])
     |> validate_required([
@@ -33,6 +35,7 @@ defmodule Plaza.Products.Product do
       :product_type,
       :num_colors,
       :num_expected,
+      :design_url,
       :user_id
     ])
   end
