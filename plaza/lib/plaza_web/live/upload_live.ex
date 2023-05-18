@@ -20,11 +20,17 @@ defmodule PlazaWeb.UploadLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_event("step", %{"step" => "2"}, socket) do
+  def handle_info({:step, msg}, socket) do
     socket =
-      socket
-      |> assign(:step, 2)
-      |> assign(:num_colors, 1)
+      case msg do
+        2 ->
+          socket
+          |> assign(:step, 2)
+          |> assign(:num_colors, 1)
+
+        _ ->
+          socket
+      end
 
     {:noreply, socket}
   end
@@ -150,6 +156,8 @@ defmodule PlazaWeb.UploadLive do
     socket =
       socket
       |> assign(:design_uri, design_uri)
+
+    send(self(), {:step, 2})
 
     {:noreply, socket}
   end
