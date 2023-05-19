@@ -2,7 +2,6 @@ defmodule PlazaWeb.UploadLive do
   use PlazaWeb, :live_view
 
   alias Plaza.Products
-  alias Plaza.Products.Product
   alias PlazaWeb.ProductComponent
 
   alias ExAws
@@ -18,7 +17,6 @@ defmodule PlazaWeb.UploadLive do
       |> assign(:page_title, "Upload")
       |> assign(:header, :upload)
       |> assign(:design_url, nil)
-      |> assign(:products, products)
       |> allow_upload(:design, accept: ~w(.jpg .jpeg .png), max_entries: 1)
       |> allow_upload(:logo, accept: ~w(.jpg .jpeg .png), max_entries: 1)
       |> assign(:step, 1)
@@ -173,7 +171,7 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
-  def handle_event("design-upload-change", params, socket) do
+  def handle_event("design-upload-change", _params, socket) do
     {:noreply, socket}
   end
 
@@ -209,7 +207,7 @@ defmodule PlazaWeb.UploadLive do
     ~H"""
     <.body>
       <:center>
-        <.one uploads={@uploads} products={@products} />
+        <.one uploads={@uploads} />
       </:center>
     </.body>
     """
@@ -414,7 +412,6 @@ defmodule PlazaWeb.UploadLive do
   end
 
   attr :uploads, :any, required: true
-  attr :products, :list, required: true
 
   defp one(assigns) do
     ~H"""
