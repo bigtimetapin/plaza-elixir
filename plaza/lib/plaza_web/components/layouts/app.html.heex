@@ -1,18 +1,31 @@
 <body>
-<section class="hero is-fullheight has-white has-font-1">
-    <PlazaWeb.Header.header header={PlazaWeb.Header.get(assigns)} />
+  <section class="hero is-fullheight has-white has-font-1">
+    <PlazaWeb.Header.header header={PlazaWeb.Header.get(assigns)} my_products={assigns[:my_products]} />
     <main class="my-large">
       <%= @inner_content %>
     </main>
     <div class="hero-foot">
-        <footer class="level has-right">
-            <div class="level-item"><a href="https://twitter.com/bigtimetapin" target="_blank"><span
-                    class="icon is-medium"><i class="fab fa-sm fa-twitter" aria-hidden="true"></i></span></a></div>
-            <div class="level-item"><a href="https://github.com/bigtimetapin/somos-crowd" target="_blank"><span
-                    class="icon is-medium"><i class="fab fa-sm fa-github" aria-hidden="true"></i></span></a></div>
-            <div class="level-item"><a class="icon is-medium" href="mailto:bigtimetapin@gmail.com" target="_blank"><i
-                    class="far fa-sm fa-envelope" aria-hidden="true"></i></a></div>
-        </footer>
+      <footer class="level has-right">
+        <div class="level-item">
+          <a href="https://twitter.com/bigtimetapin" target="_blank">
+            <span class="icon is-medium">
+              <i class="fab fa-sm fa-twitter" aria-hidden="true"></i>
+            </span>
+          </a>
+        </div>
+        <div class="level-item">
+          <a href="https://github.com/bigtimetapin/somos-crowd" target="_blank">
+            <span class="icon is-medium">
+              <i class="fab fa-sm fa-github" aria-hidden="true"></i>
+            </span>
+          </a>
+        </div>
+        <div class="level-item">
+          <a class="icon is-medium" href="mailto:bigtimetapin@gmail.com" target="_blank">
+            <i class="far fa-sm fa-envelope" aria-hidden="true"></i>
+          </a>
+        </div>
+      </footer>
     </div>
-</section>
+  </section>
 </body>

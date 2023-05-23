@@ -9,9 +9,33 @@ defmodule PlazaWeb.Header do
     :landing
   end
 
-  def header(%{header: :landing} = assigns) do
+  def header(%{header: :landing, my_products: nil} = assigns) do
     ~H"""
-    <.landing />
+    <.landing>
+      <:store>
+        <.no_store_yet />
+      </:store>
+    </.landing>
+    """
+  end
+
+  def header(%{header: :landing, my_products: []} = assigns) do
+    ~H"""
+    <.landing>
+      <:store>
+        <.no_store_yet />
+      </:store>
+    </.landing>
+    """
+  end
+
+  def header(%{header: :landing, my_products: _} = assigns) do
+    ~H"""
+    <.landing>
+      <:store>
+        <.my_store />
+      </:store>
+    </.landing>
     """
   end
 
@@ -20,6 +44,8 @@ defmodule PlazaWeb.Header do
     <.upload />
     """
   end
+
+  slot :store, required: true
 
   defp landing(assigns) do
     ~H"""
@@ -31,14 +57,28 @@ defmodule PlazaWeb.Header do
           </div>
         </div>
         <div class="level-item pr-xmedium">
-          <.link navigate="/upload">
-            quero vender
-          </.link>
+          <%= render_slot(@store) %>
         </div>
         <div class="level-item pr-xmedium">registre-se</div>
         <div class="level-item">carrinho</div>
       </:right>
     </.left>
+    """
+  end
+
+  defp my_store(assigns) do
+    ~H"""
+    <.link navigate="/upload">
+      minha loja
+    </.link>
+    """
+  end
+
+  defp no_store_yet(assigns) do
+    ~H"""
+    <.link navigate="/upload">
+      quero vender
+    </.link>
     """
   end
 
