@@ -13,7 +13,7 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.landing>
       <:store>
-        <.no_store_yet />
+        <.no_store_yet_href />
       </:store>
     </.landing>
     """
@@ -23,7 +23,7 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.landing>
       <:store>
-        <.no_store_yet />
+        <.no_store_yet_href />
       </:store>
     </.landing>
     """
@@ -33,7 +33,7 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.landing>
       <:store>
-        <.my_store />
+        <.my_store_href />
       </:store>
     </.landing>
     """
@@ -42,6 +42,12 @@ defmodule PlazaWeb.Header do
   def header(%{header: :upload} = assigns) do
     ~H"""
     <.upload />
+    """
+  end
+
+  def header(%{header: :my_store} = assigns) do
+    ~H"""
+    <.my_store />
     """
   end
 
@@ -66,7 +72,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  defp my_store(assigns) do
+  defp my_store_href(assigns) do
     ~H"""
     <.link navigate="/my-store">
       minha loja
@@ -74,7 +80,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  defp no_store_yet(assigns) do
+  defp no_store_yet_href(assigns) do
     ~H"""
     <.link navigate="/upload">
       quero vender
@@ -98,13 +104,39 @@ defmodule PlazaWeb.Header do
     """
   end
 
+  defp my_store(assigns) do
+    ~H"""
+    <.left>
+      <:right>
+        <div class="level-item pr-xxsmall">
+          <div>
+            Loja
+          </div>
+        </div>
+        <.seperator />
+        <div class="level-item pr-xxsmall">
+          <div>
+            Minha loja
+          </div>
+          <div>
+            <img
+              src="svg/yellow-circle.svg"
+              style="position: relative; width: 33px; top: 45px; right: 70px;"
+            />
+          </div>
+        </div>
+      </:right>
+    </.left>
+    """
+  end
+
   slot :right, required: true
 
   defp left(assigns) do
     ~H"""
     <div class="hero-head has-font-3">
       <div class="is-navbar">
-        <nav class="level is-navbar-child">
+        <nav class="level is-navbar-child" style="position: relative; top: 20px;">
           <div class="level-left">
             <div class="level-item">
               <div class="is-size-3-desktop is-size-4-touch">plazaaaaa</div>

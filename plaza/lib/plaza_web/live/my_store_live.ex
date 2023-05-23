@@ -3,6 +3,10 @@ defmodule PlazaWeb.MyStoreLive do
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
+    socket =
+      socket
+      |> assign(header: :my_store)
+
     {:ok, socket}
   end
 
