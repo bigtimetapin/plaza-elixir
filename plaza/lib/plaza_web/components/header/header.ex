@@ -102,15 +102,15 @@ defmodule PlazaWeb.Header do
 
   defp left(assigns) do
     ~H"""
-    <div class="hero-head">
+    <div class="hero-head has-font-3">
       <div class="is-navbar">
         <nav class="level is-navbar-child">
           <div class="level-left">
             <div class="level-item">
-              <div class="is-size-1-desktop is-size-2-touch">Plaza</div>
+              <div class="is-size-3-desktop is-size-4-touch">plazaaaaa</div>
             </div>
           </div>
-          <div class="level-right has-font-3 is-size-8">
+          <div class="level-right is-size-8">
             <%= render_slot(@right) %>
           </div>
         </nav>
