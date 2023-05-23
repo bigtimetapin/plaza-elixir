@@ -68,7 +68,7 @@ defmodule PlazaWeb.Header do
 
   defp my_store(assigns) do
     ~H"""
-    <.link navigate="/upload">
+    <.link navigate="/my-store">
       minha loja
     </.link>
     """
