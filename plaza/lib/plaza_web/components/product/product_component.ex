@@ -3,9 +3,9 @@ defmodule PlazaWeb.ProductComponent do
 
   def products(assigns) do
     ~H"""
-    <div class="columns is-multiline is-size-5">
+    <div class="columns is-multiline is-size-6">
       <%= for product <- @products do %>
-        <div class="column is-one-quarter">
+        <div class="column is-one-third">
           <.productp product={product} />
         </div>
       <% end %>
@@ -40,9 +40,15 @@ defmodule PlazaWeb.ProductComponent do
   defp productp(assigns) do
     ~H"""
     <button class="is-product-1 has-font-3 mr-medium mb-medium" disabled={@disabled} {@rest}>
-      <div style="position: absolute; bottom: 0px; left: 10px;"><%= @product.name %></div>
-      <div class="pr-xsmall" style="position: absolute; bottom: 0px; right: 0px;">
+      <div>
+        <img src={@product[:design_url]} style="width: 370px;" />
+      </div>
+      <div style="position: absolute; bottom: 25px; left: 10px;"><%= @product.name %></div>
+      <div class="pr-xsmall" style="position: absolute; bottom: 25px; right: 0px;">
         R$ <%= @product.price %>
+      </div>
+      <div class="has-dark-gray-text is-size-7" style="position: absolute; bottom: 0px; left: 10px;">
+        username
       </div>
     </button>
     """
