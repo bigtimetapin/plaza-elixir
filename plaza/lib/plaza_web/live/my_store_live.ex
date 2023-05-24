@@ -14,7 +14,17 @@ defmodule PlazaWeb.MyStoreLive do
   def render(assigns) do
     ~H"""
     <div>
-      My Store
+      <div class="has-font-3" style="display: inline-block;">
+        <div class="mb-large">
+          <img src="images/pep.png" style="width: 377px;" />
+        </div>
+        <div style="position: relative; left: 61px;">
+          <div class="is-size-8" style="text-decoration: underline; margin-bottom: 33px;">
+            username
+          </div>
+          <div></div>
+        </div>
+      </div>
     </div>
     """
   end
