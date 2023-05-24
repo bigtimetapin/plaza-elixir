@@ -227,7 +227,7 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 3} = assigns) do
     ~H"""
-    <div class="is-size-8 mx-large" style="margin-top: 200px;">
+    <div class="is-size-5 mx-large" style="margin-top: 200px;">
       <div class="columns">
         <div class="column is-3">
           <ProductComponent.selectable
@@ -272,7 +272,7 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 4} = assigns) do
     ~H"""
-    <div class="mx-large has-font-3 is-size-8" style="margin-top: 200px;">
+    <div class="mx-large has-font-3 is-size-5" style="margin-top: 200px;">
       <div style="display: inline-block;">
         <ProductComponent.product product={product_type(@product_type)} />
       </div>
@@ -298,7 +298,7 @@ defmodule PlazaWeb.UploadLive do
                 name="num-expected"
                 value={@num_expected}
                 style="width: 120px; height: 60px; border: 1px solid gray; display: flex; justify-content: center; align-items: center;"
-                class="has-font-3 is-size-8"
+                class="has-font-3 is-size-5"
               />
             </form>
           </div>
@@ -324,7 +324,7 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 5} = assigns) do
     ~H"""
-    <div class="mx-large has-font-3 is-size-8">
+    <div class="mx-large has-font-3 is-size-5">
       <div style="display: inline-block; position: relative; left: 100px;">
         <ProductComponent.product product={product_type(@product_type)} />
       </div>
@@ -404,7 +404,7 @@ defmodule PlazaWeb.UploadLive do
     ~H"""
     <div class="columns">
       <div class="column is-3"></div>
-      <div class="column has-font-3 is-size-8">
+      <div class="column has-font-3 is-size-5">
         <%= render_slot(@center) %>
       </div>
     </div>
@@ -512,7 +512,7 @@ defmodule PlazaWeb.UploadLive do
           </div>
         </div>
       </div>
-      <div class="column is-6 has-font-3 is-size-8" style="display: flex; justify-content: center;">
+      <div class="column is-6 has-font-3 is-size-5" style="display: flex; justify-content: center;">
         <div style="position: relative; height: 100%;">
           <div style="position: absolute; top: 50px; width: 250px;">
             <div class="mb-xsmall">

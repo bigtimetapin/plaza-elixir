@@ -139,10 +139,10 @@ defmodule PlazaWeb.Header do
         <nav class="level is-navbar-child" style="position: relative; top: 20px;">
           <div class="level-left">
             <div class="level-item">
-              <div class="is-size-3-desktop is-size-4-touch">plazaaaaa</div>
+              <div class="is-size-1-desktop is-size-2-touch">plazaaaaa</div>
             </div>
           </div>
-          <div class="level-right is-size-8">
+          <div class="level-right is-size-5">
             <%= render_slot(@right) %>
           </div>
         </nav>

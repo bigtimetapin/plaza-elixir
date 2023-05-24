@@ -3,7 +3,7 @@ defmodule PlazaWeb.ProductComponent do
 
   def products(assigns) do
     ~H"""
-    <div class="columns is-multiline is-size-8">
+    <div class="columns is-multiline is-size-5">
       <%= for product <- @products do %>
         <div class="column is-one-quarter">
           <.productp product={product} />

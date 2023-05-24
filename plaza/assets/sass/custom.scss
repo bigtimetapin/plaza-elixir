@@ -264,16 +264,16 @@ input[type="radio"] {
 // navbar
 $navbar-item-img-max-height: 4.00rem;
 $navbar-height: 4.00rem;
-$size-1: 11.50rem;
-$size-2: 8.50rem;
+$size-1: 5.00rem;
+$size-2: 4.00rem;
 
-$size-3: 5.00rem;
-$size-4: 4.00rem;
+$size-3: 2.75rem;
+$size-4: 2.25rem;
 
-$size-5: 2.75rem;
-$size-6: 2.25rem;
+$size-5: 2.00rem;
+$size-6: 1.50rem;
 
-$size-7: 2.00rem;
+$size-7: 1.00rem;
 
 
 $spacing-values: (
@@ -303,7 +303,7 @@ $spacing-values: (
   }
 }
 
-.is-size-8 {
+.is-size-5 {
   @include until($tablet) {
     font-size: 1.75rem;
   }

@@ -19,7 +19,7 @@ defmodule PlazaWeb.MyStoreLive do
           <img src="images/pep.png" style="width: 377px;" />
         </div>
         <div style="position: relative; left: 61px;">
-          <div class="is-size-8" style="text-decoration: underline; margin-bottom: 33px;">
+          <div class="is-size-5" style="text-decoration: underline; margin-bottom: 33px;">
             username
           </div>
           <div></div>
