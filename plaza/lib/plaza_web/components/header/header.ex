@@ -108,21 +108,22 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.left>
       <:right>
-        <div class="level-item pr-xxsmall">
+        <div class="level-item pr-small">
           <div>
             Loja
           </div>
         </div>
-        <.seperator />
-        <div class="level-item pr-xxsmall">
+        <div class="level-item pl-medium pr-small">
           <div>
             Minha loja
           </div>
+          <div style="position: relative; width: 33px; top: 45px; right: 70px;">
+            <img src="svg/yellow-circle.svg" />
+          </div>
+        </div>
+        <div class="level-item">
           <div>
-            <img
-              src="svg/yellow-circle.svg"
-              style="position: relative; width: 33px; top: 45px; right: 70px;"
-            />
+            Conta
           </div>
         </div>
       </:right>
