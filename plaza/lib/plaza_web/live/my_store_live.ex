@@ -30,11 +30,11 @@ defmodule PlazaWeb.MyStoreLive do
 
   defp left(assigns) do
     ~H"""
-    <div class="has-font-3" style="display: inline-block;">
+    <div class="has-font-3" style="display: inline-block; position: relative; top: 50px;">
       <div>
         <img src="images/pep.png" style="width: 377px;" />
       </div>
-      <div style="position: relative; left: 61px; width: 316px; border-right: 1px solid #707070;">
+      <div style="position: relative; left: 61px; width: 316px; height: 423px; border-right: 1px solid #707070;">
         <div class="is-size-6 mb-small" style="text-decoration: underline;">
           username
         </div>
@@ -66,7 +66,7 @@ defmodule PlazaWeb.MyStoreLive do
 
   defp right(assigns) do
     ~H"""
-    <div style="display: inline-block; position: relative; left: 200px;">
+    <div style="display: inline-block; position: relative; left: 75px; bottom: 275px;">
       <ProductComponent.products3 products={@my_products} />
     </div>
     """
