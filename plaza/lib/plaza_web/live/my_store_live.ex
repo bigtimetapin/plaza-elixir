@@ -31,10 +31,10 @@ defmodule PlazaWeb.MyStoreLive do
   defp left(assigns) do
     ~H"""
     <div class="has-font-3" style="display: inline-block;">
-      <div class="mb-xsmall">
+      <div>
         <img src="images/pep.png" style="width: 377px;" />
       </div>
-      <div style="position: relative; left: 61px; width: 316px; border-right: 1px solid gray;">
+      <div style="position: relative; left: 61px; width: 316px; border-right: 1px solid #707070;">
         <div class="is-size-6 mb-small" style="text-decoration: underline;">
           username
         </div>
