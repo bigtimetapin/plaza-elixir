@@ -3,9 +3,8 @@ defmodule PlazaWeb.LandingLive do
 
   on_mount {PlazaWeb.UserAuth, :mount_current_user}
 
-  import PlazaWeb.ProductComponent
-
   alias Plaza.Products
+  alias PlazaWeb.ProductComponent
   alias PlazaWeb.UserAuth
 
   def mount(_params, session, socket) do
@@ -44,7 +43,7 @@ defmodule PlazaWeb.LandingLive do
       <div class="is-size-3-desktop is-size-4-touch">
         <div class="mb-small">produtos em alta</div>
       </div>
-      <.products products={@products}></.products>
+      <ProductComponent.products4 products={@products}></ProductComponent.products4>
     </div>
     """
   end

@@ -1,11 +1,23 @@
 defmodule PlazaWeb.ProductComponent do
   use Phoenix.Component
 
-  def products(assigns) do
+  def products3(assigns) do
     ~H"""
-    <div class="columns is-multiline is-size-6">
+    <div class="columns is-multiline is-size-6 has-three-products">
       <%= for product <- @products do %>
         <div class="column is-one-third">
+          <.productp product={product} />
+        </div>
+      <% end %>
+    </div>
+    """
+  end
+
+  def products4(assigns) do
+    ~H"""
+    <div class="columns is-multiline is-size-6 has-four-products">
+      <%= for product <- @products do %>
+        <div class="column is-one-quarter">
           <.productp product={product} />
         </div>
       <% end %>
@@ -41,11 +53,11 @@ defmodule PlazaWeb.ProductComponent do
     ~H"""
     <button class="is-product-1 has-font-3 mr-medium mb-medium" disabled={@disabled} {@rest}>
       <div>
-        <img src={@product[:design_url]} style="width: 370px;" />
+        <img src={Map.get(@product, :design_url)} style="width: 100%;" />
       </div>
       <div style="position: absolute; bottom: 25px; left: 10px;"><%= @product.name %></div>
       <div class="pr-xsmall" style="position: absolute; bottom: 25px; right: 0px;">
-        R$ <%= @product.price %>
+        <%= if Map.get(@product, :price), do: "R$ #{@product.price}" %>
       </div>
       <div class="has-dark-gray-text is-size-7" style="position: absolute; bottom: 0px; left: 10px;">
         username
