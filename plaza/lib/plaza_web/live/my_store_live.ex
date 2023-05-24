@@ -15,14 +15,34 @@ defmodule PlazaWeb.MyStoreLive do
     ~H"""
     <div>
       <div class="has-font-3" style="display: inline-block;">
-        <div class="mb-large">
+        <div class="mb-xsmall">
           <img src="images/pep.png" style="width: 377px;" />
         </div>
-        <div style="position: relative; left: 61px;">
-          <div class="is-size-5" style="text-decoration: underline; margin-bottom: 33px;">
+        <div style="position: relative; left: 61px; width: 316px; border-right: 1px solid gray;">
+          <div class="is-size-6 mb-small" style="text-decoration: underline;">
             username
           </div>
-          <div></div>
+          <div class="is-size-6 mb-xsmall" style="line-height: 34px; width: 267px;">
+            Breve descrição do artista. Maximo 140 caracteres.
+          </div>
+          <div class="is-size-6 mb-small has-dark-gray-text">
+            Localização do artista.
+          </div>
+          <div class="is-size-6" style="text-decoration: underline;">
+            Instagram
+          </div>
+          <div class="is-size-6" style="text-decoration: underline;">
+            Email
+          </div>
+          <div class="is-size-6" style="text-decoration: underline;">
+            Soundcloud
+          </div>
+          <div class="is-size-6" style="text-decoration: underline;">
+            Website
+          </div>
+          <div class="is-size-6" style="text-decoration: underline;">
+            Twitter
+          </div>
         </div>
       </div>
     </div>
