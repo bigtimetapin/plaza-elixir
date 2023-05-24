@@ -21,7 +21,7 @@ defmodule PlazaWeb.MyStoreLive do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <div>
+    <div style="margin-bottom: 50px;">
       <.left />
       <.right my_products={@my_products} />
     </div>
@@ -66,8 +66,25 @@ defmodule PlazaWeb.MyStoreLive do
 
   defp right(assigns) do
     ~H"""
-    <div style="display: inline-block; position: relative; left: 75px; bottom: 275px;">
-      <ProductComponent.products3 products={@my_products} />
+    <div style="display: inline-block;">
+      <div style="position: relative; left: 75px; bottom: 175px;">
+        <ProductComponent.products3 products={@my_products} />
+      </div>
+      <div
+        class="has-font-3"
+        style="display: flex; justify-content: flex-end; position: relative; top: 50px;"
+      >
+        <div style="display: inline-block; position: relative; right: 200px;">
+          <div class="is-size-6" style="text-decoration: underline;">
+            Ver todos as produtos
+          </div>
+        </div>
+        <div style="display: inline-block; position: relative; left: 50px;">
+          <div class="is-size-6 has-dark-gray-text" style="text-decoration: underline;">
+            Acessar Painel de Vendedor
+          </div>
+        </div>
+      </div>
     </div>
     """
   end
