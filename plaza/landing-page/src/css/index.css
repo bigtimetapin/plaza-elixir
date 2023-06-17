@@ -1,0 +1,8 @@
+@font-face {
+  font-family: AppleGaramondLight;
+  src: url("../fonts/AppleGaramond-Light.ttf") format("truetype");
+}
+
+.has-font-light {
+  font-family: AppleGaramondLight, sans-serif;
+}
