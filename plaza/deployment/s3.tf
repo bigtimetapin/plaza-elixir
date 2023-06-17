@@ -13,28 +13,17 @@ resource "aws_s3_bucket_website_configuration" "domain" {
   }
 }
 
-resource "aws_s3_bucket_ownership_controls" "domain" {
-  bucket = aws_s3_bucket.domain.id
-  rule {
-    object_ownership = "BucketOwnerPreferred"
+resource "aws_s3_bucket_cors_configuration" "domain" {
+  bucket = aws_s3_bucket.domain.bucket
+  cors_rule {
+    allowed_headers = ["Authorization", "Content-Length"]
+    allowed_methods = ["GET", "POST"]
+    allowed_origins = ["https://${var.domain_name}"]
+    max_age_seconds = 3000
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "domain" {
-  bucket = aws_s3_bucket.domain.id
-
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
-
 resource "aws_s3_bucket_acl" "domain" {
-  depends_on = [
-    aws_s3_bucket_ownership_controls.domain,
-    aws_s3_bucket_public_access_block.domain,
-  ]
-
   bucket = aws_s3_bucket.domain.id
   acl    = "public-read"
 }
@@ -50,7 +39,7 @@ data "aws_iam_policy_document" "domain" {
     sid    = "AddPerm"
     effect = "Allow"
     principals {
-      type        = "AWS"
+      type        = "*"
       identifiers = ["*"]
     }
     actions = [
@@ -58,9 +47,25 @@ data "aws_iam_policy_document" "domain" {
     ]
 
     resources = [
-      aws_s3_bucket.domain.arn,
-      "${aws_s3_bucket.domain.arn}/*",
+
+      "arn:aws:s3:::${var.domain_name}",
+      "arn:aws:s3:::${var.domain_name}/*"
     ]
+  }
+}
+
+####################################################################################
+## www redirect to landing page ####################################################
+####################################################################################
+resource "aws_s3_bucket" "www" {
+  bucket        = "www.${var.domain_name}"
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_website_configuration" "www" {
+  bucket = aws_s3_bucket.www.id
+  redirect_all_requests_to {
+    host_name = var.domain_name
   }
 }
 

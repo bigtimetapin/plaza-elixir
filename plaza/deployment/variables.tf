@@ -5,5 +5,5 @@ variable "domain_name" {
 
 variable "cert_arn" {
   description = "SSL Cert"
-  default     = "arn:aws:acm:us-east-1:072445992302:certificate/fa380625-f4a9-40e1-a18b-a9473182b29c"
+  default     = "arn:aws:acm:us-east-1:739922988973:certificate/ebaa3f84-bba2-4bf4-8b5e-4ff4d5257067"
 }
