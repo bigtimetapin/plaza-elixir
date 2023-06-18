@@ -22,14 +22,7 @@ resource "aws_s3_bucket_public_access_block" "domain" {
   restrict_public_buckets = false
 }
 
-##resource "aws_s3_bucket_acl" "domain" {
-##  depends_on = [aws_s3_bucket_public_access_block.domain]
-##  bucket     = aws_s3_bucket.domain.id
-##  acl        = "public-read"
-##}
-
 resource "aws_s3_bucket_policy" "domain" {
-  #depends_on = [aws_s3_bucket_acl.domain]
   depends_on = [aws_s3_bucket_public_access_block.domain]
   bucket     = aws_s3_bucket.domain.id
   policy     = data.aws_iam_policy_document.domain.json
@@ -52,21 +45,6 @@ data "aws_iam_policy_document" "domain" {
   }
 }
 
-######################################################################################
-#### www redirect to landing page ####################################################
-######################################################################################
-##resource "aws_s3_bucket" "www" {
-##  bucket        = "www.${var.domain_name}"
-##  force_destroy = true
-##}
-##
-##resource "aws_s3_bucket_website_configuration" "www" {
-##  bucket = aws_s3_bucket.www.id
-##  redirect_all_requests_to {
-##    host_name = var.domain_name
-##  }
-##}
-##
 ######################################################################################
 #### static uploads ##################################################################
 ######################################################################################
