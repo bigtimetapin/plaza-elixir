@@ -198,6 +198,10 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
+  def handle_event("design-upload-cancel", %{"ref" => ref}, socket) do
+    {:noreply, Phoenix.LiveView.cancel_upload(socket, :design, ref)}
+  end
+
   defp error_to_string(:too_large), do: "Too large"
   defp error_to_string(:too_many_files), do: "You have selected too many files"
   defp error_to_string(:not_accepted), do: "You have selected an unacceptable file type"
@@ -445,7 +449,7 @@ defmodule PlazaWeb.UploadLive do
             <%!-- a regular click event whose handler will invoke Phoenix.LiveView.cancel_upload/3 --%>
             <button
               type="button"
-              phx-click="cancel-upload"
+              phx-click="design-upload-cancel"
               phx-value-ref={entry.ref}
               aria-label="cancel"
             >
