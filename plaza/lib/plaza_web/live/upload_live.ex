@@ -420,14 +420,6 @@ defmodule PlazaWeb.UploadLive do
   defp one(assigns) do
     ~H"""
     <div>
-      <button
-        style="width: 750px; height: 300px; border: 2px solid gray;"
-        phx-click="step"
-        phx-value-step="2"
-        class="has-font-3"
-      >
-        arraste seu arquivo aqui
-      </button>
       <form id="design-upload-form" phx-submit="design-upload-save" phx-change="design-upload-change">
         <.live_file_input upload={@uploads.design} />
         <button type="submit">Upload</button>

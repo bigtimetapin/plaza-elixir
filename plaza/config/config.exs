@@ -62,8 +62,8 @@ config :phoenix, :json_library, Jason
 
 # Configure AWS client
 config :ex_aws,
-  access_key_id: [{:awscli, "tap-in", 30}],
-  secret_access_key: [{:awscli, "tap-in", 30}]
+  access_key_id: [{:awscli, "plaza", 30}],
+  secret_access_key: [{:awscli, "plaza", 30}]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
