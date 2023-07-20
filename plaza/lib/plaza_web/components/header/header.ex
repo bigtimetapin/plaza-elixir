@@ -57,16 +57,12 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.left>
       <:right>
-        <div class="level-item pr-xmedium">
-          <div class="is-search-bar-1">
-            <div class="has-dark-gray-text ml-xxsmall">buscar artista</div>
-          </div>
-        </div>
+        <div class="level-item pr-xmedium">loja</div>
         <div class="level-item pr-xmedium">
           <%= render_slot(@store) %>
         </div>
-        <div class="level-item pr-xmedium">registre-se</div>
-        <div class="level-item">carrinho</div>
+        <div class="level-item pr-xmedium">carrinho</div>
+        <div class="has-dark-gray-text">buscar</div>
       </:right>
     </.left>
     """
@@ -92,13 +88,17 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.left>
       <:right>
-        <div class="level-item pr-xxsmall">envie seu design</div>
-        <.seperator />
-        <div class="level-item pr-xxsmall">escolha seu produto</div>
-        <.seperator />
-        <div class="level-item pr-xxsmall">calcule sue lucro</div>
-        <.seperator />
-        <div class="level-item">publique sua loja</div>
+        <div class="level-item pr-xmedium">loja</div>
+        <div class="level-item pr-small">
+          <div>
+            quero vender
+          </div>
+          <div style="position: relative; width: 35px; top: 45px; right: 93px;">
+            <img src="svg/yellow-circle.svg" />
+          </div>
+        </div>
+        <div class="level-item pr-xmedium">carrinho</div>
+        <div class="has-dark-gray-text">buscar</div>
       </:right>
     </.left>
     """
@@ -148,14 +148,6 @@ defmodule PlazaWeb.Header do
           </div>
         </nav>
       </div>
-    </div>
-    """
-  end
-
-  defp seperator(assigns) do
-    ~H"""
-    <div class="level-item pr-xxsmall">
-      <div class="is-header-seperator" />
     </div>
     """
   end
