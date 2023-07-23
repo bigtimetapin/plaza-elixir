@@ -29,6 +29,22 @@ defmodule PlazaWeb.UploadLive2 do
     {:noreply, socket}
   end
 
+  def handle_event("step", %{"step" => "4"}, socket) do
+    socket =
+      socket
+      |> assign(:step, 4)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("step", %{"step" => "5"}, socket) do
+    socket =
+      socket
+      |> assign(:step, 5)
+
+    {:noreply, socket}
+  end
+
   @impl Phoenix.LiveView
   def render(%{step: 1} = assigns) do
     ~H"""
@@ -104,8 +120,53 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: 3} = assigns) do
     ~H"""
-    <div>
-      step 3
+    <PlazaWeb.UploadLive2.header step={@step} />
+    """
+  end
+
+  def render(%{step: 4} = assigns) do
+    ~H"""
+    <PlazaWeb.UploadLive2.header step={@step} />
+    """
+  end
+
+  def render(%{step: 5} = assigns) do
+    ~H"""
+    <PlazaWeb.UploadLive2.header step={@step} />
+    """
+  end
+
+  attr :step, :integer, required: true
+
+  def header(assigns) do
+    ~H"""
+    <div style="display: flex; justify-content: center;">
+      <nav class="has-font-3 is-size-5">
+        <a
+          phx-click="step"
+          phx-value-step="3"
+          class="has-black-text mr-small"
+          style="display: inline-block;"
+        >
+          Configurar Estampa
+          <img :if={@step == 3} src="svg/yellow-circle.svg" style="position: relative; left: 87px;" />
+        </a>
+        <img src="svg/seperator.svg" class="mr-small" style="display: inline-block;" />
+        <a
+          phx-click="step"
+          phx-value-step="4"
+          class="has-black-text mr-small"
+          style="display: inline-block;"
+        >
+          Configuração de Campanha
+          <img :if={@step == 4} src="svg/yellow-circle.svg" style="position: relative; left: 123px;" />
+        </a>
+        <img src="svg/seperator.svg" class="mr-small" style="display: inline-block;" />
+        <a phx-click="step" phx-value-step="5" class="has-black-text" style="display: inline-block;">
+          Publique seu Produto
+          <img :if={@step == 5} src="svg/yellow-circle.svg" style="position: relative; left: 93px;" />
+        </a>
+      </nav>
     </div>
     """
   end
