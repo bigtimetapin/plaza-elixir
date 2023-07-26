@@ -24,6 +24,8 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   def handle_event("step", %{"step" => "3"}, socket) do
+    IO.inspect(socket)
+
     socket =
       socket
       |> assign(:step, 3)
@@ -60,6 +62,11 @@ defmodule PlazaWeb.UploadLive2 do
       socket
       |> assign(:step, 7)
 
+    {:noreply, socket}
+  end
+
+  def handle_event("front-upload-change", _params, socket) do
+    IO.inspect(socket)
     {:noreply, socket}
   end
 
@@ -139,13 +146,17 @@ defmodule PlazaWeb.UploadLive2 do
   def render(%{step: 3} = assigns) do
     ~H"""
     <PlazaWeb.UploadLive2.header step={@step} />
-    <.configure_upload uploads={@uploads} />
+    <.upload_form current={@uploads.front} front={@uploads.front} back={@uploads.back} />
+    <button phx-click="step" phx-value-step="4">
+      next
+    </button>
     """
   end
 
   def render(%{step: 4} = assigns) do
     ~H"""
     <PlazaWeb.UploadLive2.header step={@step} />
+    <.upload_form current={@uploads.back} front={@uploads.front} back={@uploads.back} />
     """
   end
 
@@ -206,19 +217,59 @@ defmodule PlazaWeb.UploadLive2 do
     """
   end
 
-  defp configure_upload(assigns) do
+  attr :current, Phoenix.LiveView.UploadConfig, required: true
+  attr :front, Phoenix.LiveView.UploadConfig, required: true
+  attr :back, Phoenix.LiveView.UploadConfig, required: true
+
+  defp upload_form(assigns) do
     ~H"""
     <div style="margin-top: 50px; margin-left: 25px;">
-      <div style="display: inline-block;">
-        <form id="front-upload-form" phx-submit="front-upload-save" phx-change="front-upload-change">
-          <label
-            class="has-font-3 is-size-4"
-            style="width: 760px; height: 130px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
-          >
-            <.live_file_input upload={@uploads.front} style="display: none;" />
-            Arraste seus arquivos .png aqui para fazer upload
-          </label>
-        </form>
+      <.upload_input upload={@current} />
+      <.upload_item upload={@front} no_file_yet="front.png not uploaded yet" />
+      <.upload_item upload={@back} no_file_yet="back.png not uploaded yet" />
+    </div>
+    """
+  end
+
+  attr :upload, Phoenix.LiveView.UploadConfig, required: true
+
+  defp upload_input(assigns) do
+    ~H"""
+    <div style="display: inline-block;">
+      <form id="front-upload-form" phx-submit="front-upload-save" phx-change="front-upload-change">
+        <label
+          class="has-font-3 is-size-4"
+          style="width: 760px; height: 130px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
+        >
+          <.live_file_input upload={@upload} style="display: none;" />
+          Arraste seus arquivos .png aqui para fazer upload
+        </label>
+      </form>
+    </div>
+    """
+  end
+
+  attr :upload, Phoenix.LiveView.UploadConfig, required: true
+  attr :no_file_yet, :string, required: true
+
+  defp upload_item(assigns) do
+    upload_item_name =
+      case assigns.upload.entries do
+        [head | []] ->
+          head.client_name
+
+        _ ->
+          assigns.no_file_yet
+      end
+
+    assigns =
+      assigns
+      |> assign(upload_item_name: upload_item_name)
+
+    ~H"""
+    <div>
+      <div class="has-font-3 is-size-6">
+        <%= @upload_item_name %>
       </div>
     </div>
     """
