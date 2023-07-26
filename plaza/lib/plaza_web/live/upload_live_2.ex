@@ -66,8 +66,19 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   def handle_event("front-upload-change", _params, socket) do
-    IO.inspect(socket)
     {:noreply, socket}
+  end
+
+  def handle_event("front-upload-cancel", %{"ref" => ref}, socket) do
+    {:noreply, Phoenix.LiveView.cancel_upload(socket, :front, ref)}
+  end
+
+  def handle_event("back-upload-change", _params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("back-upload-cancel", %{"ref" => ref}, socket) do
+    {:noreply, Phoenix.LiveView.cancel_upload(socket, :back, ref)}
   end
 
   @impl Phoenix.LiveView
@@ -253,23 +264,34 @@ defmodule PlazaWeb.UploadLive2 do
   attr :no_file_yet, :string, required: true
 
   defp upload_item(assigns) do
-    upload_item_name =
+    map =
       case assigns.upload.entries do
         [head | []] ->
-          head.client_name
+          head
 
         _ ->
-          assigns.no_file_yet
+          %{client_name: assigns.no_file_yet, client_size: 0}
       end
+
+    IO.inspect(map)
 
     assigns =
       assigns
-      |> assign(upload_item_name: upload_item_name)
+      |> assign(upload_item: map)
 
     ~H"""
     <div>
       <div class="has-font-3 is-size-6">
-        <%= @upload_item_name %>
+        <%= @upload_item.client_name %>
+        <button
+          :if={@upload_item.client_size > 0}
+          type="button"
+          phx-click={"#{@upload_item.upload_config}-upload-cancel"}
+          phx-value-ref={@upload_item.ref}
+          aria-label="cancel"
+        >
+          &times;
+        </button>
       </div>
     </div>
     """
