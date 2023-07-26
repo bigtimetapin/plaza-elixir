@@ -32,7 +32,7 @@ defmodule PlazaWeb.MyStoreLive do
     ~H"""
     <div class="has-font-3" style="display: inline-block; position: relative; top: 50px;">
       <div>
-        <img src="images/pep.png" style="width: 377px;" />
+        <img src="png/pep.png" style="width: 377px;" />
       </div>
       <div style="position: relative; left: 61px; width: 316px; height: 423px; border-right: 1px solid #707070;">
         <div class="is-size-6 mb-small" style="text-decoration: underline;">

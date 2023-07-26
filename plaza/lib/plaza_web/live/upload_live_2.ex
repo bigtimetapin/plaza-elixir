@@ -7,6 +7,8 @@ defmodule PlazaWeb.UploadLive2 do
       socket
       |> assign(:page_title, "Upload")
       |> assign(:header, :upload)
+      |> allow_upload(:front, accept: ~w(.png), max_entries: 1)
+      |> allow_upload(:back, accept: ~w(.png), max_entries: 1)
       |> assign(:step, 1)
 
     {:ok, socket}
@@ -41,6 +43,22 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 5)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("step", %{"step" => "6"}, socket) do
+    socket =
+      socket
+      |> assign(:step, 6)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("step", %{"step" => "7"}, socket) do
+    socket =
+      socket
+      |> assign(:step, 7)
 
     {:noreply, socket}
   end
@@ -121,6 +139,7 @@ defmodule PlazaWeb.UploadLive2 do
   def render(%{step: 3} = assigns) do
     ~H"""
     <PlazaWeb.UploadLive2.header step={@step} />
+    <.configure_upload uploads={@uploads} />
     """
   end
 
@@ -131,6 +150,18 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   def render(%{step: 5} = assigns) do
+    ~H"""
+    <PlazaWeb.UploadLive2.header step={@step} />
+    """
+  end
+
+  def render(%{step: 6} = assigns) do
+    ~H"""
+    <PlazaWeb.UploadLive2.header step={@step} />
+    """
+  end
+
+  def render(%{step: 7} = assigns) do
     ~H"""
     <PlazaWeb.UploadLive2.header step={@step} />
     """
@@ -149,24 +180,46 @@ defmodule PlazaWeb.UploadLive2 do
           style="display: inline-block;"
         >
           Configurar Estampa
-          <img :if={@step == 3} src="svg/yellow-circle.svg" style="position: relative; left: 87px;" />
+          <img
+            :if={Enum.member?([3, 4, 5], @step)}
+            src="svg/yellow-circle.svg"
+            style="position: relative; left: 87px;"
+          />
         </a>
         <img src="svg/seperator.svg" class="mr-small" style="display: inline-block;" />
         <a
           phx-click="step"
-          phx-value-step="4"
+          phx-value-step="6"
           class="has-black-text mr-small"
           style="display: inline-block;"
         >
           Configuração de Campanha
-          <img :if={@step == 4} src="svg/yellow-circle.svg" style="position: relative; left: 123px;" />
+          <img :if={@step == 6} src="svg/yellow-circle.svg" style="position: relative; left: 123px;" />
         </a>
         <img src="svg/seperator.svg" class="mr-small" style="display: inline-block;" />
-        <a phx-click="step" phx-value-step="5" class="has-black-text" style="display: inline-block;">
+        <a phx-click="step" phx-value-step="7" class="has-black-text" style="display: inline-block;">
           Publique seu Produto
-          <img :if={@step == 5} src="svg/yellow-circle.svg" style="position: relative; left: 93px;" />
+          <img :if={@step == 7} src="svg/yellow-circle.svg" style="position: relative; left: 93px;" />
         </a>
       </nav>
+    </div>
+    """
+  end
+
+  defp configure_upload(assigns) do
+    ~H"""
+    <div style="margin-top: 50px; margin-left: 25px;">
+      <div style="display: inline-block;">
+        <form id="front-upload-form" phx-submit="front-upload-save" phx-change="front-upload-change">
+          <label
+            class="has-font-3 is-size-4"
+            style="width: 760px; height: 130px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
+          >
+            <.live_file_input upload={@uploads.front} style="display: none;" />
+            Arraste seus arquivos .png aqui para fazer upload
+          </label>
+        </form>
+      </div>
     </div>
     """
   end

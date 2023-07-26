@@ -17,7 +17,7 @@ defmodule PlazaWeb do
   those modules here.
   """
 
-  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt uploads svg)
+  def static_paths, do: ~w(assets favicon.ico fonts images png robots.txt svg uploads)
 
   def router do
     quote do
