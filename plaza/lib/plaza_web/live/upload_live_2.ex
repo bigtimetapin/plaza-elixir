@@ -156,18 +156,23 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: 3} = assigns) do
     ~H"""
-    <PlazaWeb.UploadLive2.header step={@step} />
-    <.upload_form current={@uploads.front} front={@uploads.front} back={@uploads.back} />
-    <button phx-click="step" phx-value-step="4">
-      next
-    </button>
+    <div style="margin-top: 150px; margin-bottom: 750px;">
+      <PlazaWeb.UploadLive2.header step={@step} />
+      <div style="margin-top: 50px;">
+        <.upload_form current={@uploads.front} front={@uploads.front} back={@uploads.back} />
+        <.upload_preview upload={@uploads.front} />
+      </div>
+    </div>
     """
   end
 
   def render(%{step: 4} = assigns) do
     ~H"""
     <PlazaWeb.UploadLive2.header step={@step} />
-    <.upload_form current={@uploads.back} front={@uploads.front} back={@uploads.back} />
+    <div style="margin-top: 50px;">
+      <.upload_form current={@uploads.back} front={@uploads.front} back={@uploads.back} />
+      <.upload_preview upload={@uploads.back} />
+    </div>
     """
   end
 
@@ -234,7 +239,7 @@ defmodule PlazaWeb.UploadLive2 do
 
   defp upload_form(assigns) do
     ~H"""
-    <div style="margin-top: 50px; margin-left: 25px;">
+    <div style="margin-left: 50px; display: inline-block;">
       <.upload_input upload={@current} />
       <.upload_item upload={@front} no_file_yet="front.png not uploaded yet" />
       <.upload_item upload={@back} no_file_yet="back.png not uploaded yet" />
@@ -246,7 +251,7 @@ defmodule PlazaWeb.UploadLive2 do
 
   defp upload_input(assigns) do
     ~H"""
-    <div style="display: inline-block;">
+    <div>
       <form id="front-upload-form" phx-submit="front-upload-save" phx-change="front-upload-change">
         <label
           class="has-font-3 is-size-4"
@@ -273,25 +278,51 @@ defmodule PlazaWeb.UploadLive2 do
           %{client_name: assigns.no_file_yet, client_size: 0}
       end
 
-    IO.inspect(map)
-
     assigns =
       assigns
-      |> assign(upload_item: map)
+      |> assign(entry: map)
 
     ~H"""
     <div>
       <div class="has-font-3 is-size-6">
-        <%= @upload_item.client_name %>
+        <%= @entry.client_name %>
         <button
-          :if={@upload_item.client_size > 0}
+          :if={@entry.client_size > 0}
           type="button"
-          phx-click={"#{@upload_item.upload_config}-upload-cancel"}
-          phx-value-ref={@upload_item.ref}
+          phx-click={"#{@entry.upload_config}-upload-cancel"}
+          phx-value-ref={@entry.ref}
           aria-label="cancel"
         >
           &times;
         </button>
+      </div>
+    </div>
+    """
+  end
+
+  attr :upload, Phoenix.LiveView.UploadConfig, required: true
+
+  defp upload_preview(assigns) do
+    map =
+      case assigns.upload.entries do
+        [head | []] ->
+          head
+
+        _ ->
+          %{client_size: 0}
+      end
+
+    assigns =
+      assigns
+      |> assign(entry: map)
+
+    ~H"""
+    <div style="display: inline-block; position: absolute">
+      <div style="position: relative; left: 125px;">
+        <img src="png/mockup-front.png" />
+        <div style="overflow: hidden; width: 264px; height: 356px; position: relative; bottom: 560px; left: 205px; border: 1px dotted blue;">
+          <.live_img_preview :if={@entry.client_size > 0} entry={@entry} />
+        </div>
       </div>
     </div>
     """
