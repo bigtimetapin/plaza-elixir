@@ -1,6 +1,6 @@
-export const mp = new MercadoPago("APP_USR-7fa93b75-08c8-44b3-9e23-58cf238f1080");
+const mp = new MercadoPago("APP_USR-7fa93b75-08c8-44b3-9e23-58cf238f1080");
 const bricksBuilder = mp.bricks();
-const renderCardPaymentBrick = async (bricksBuilder) => {
+const _renderCardPaymentBrick = async (bricksBuilder) => {
   const settings = {
     initialization: {
       amount: 100, //value of the payment to be processed
@@ -29,4 +29,7 @@ const renderCardPaymentBrick = async (bricksBuilder) => {
   }
   cardPaymentBrickController = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', settings);
 };
-renderCardPaymentBrick(bricksBuilder);
+
+export function renderCardPaymentBrick() {
+  _renderCardPaymentBrick(bricksBuilder);
+}

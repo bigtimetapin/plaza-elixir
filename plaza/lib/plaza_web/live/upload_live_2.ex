@@ -81,9 +81,15 @@ defmodule PlazaWeb.UploadLive2 do
     {:noreply, Phoenix.LiveView.cancel_upload(socket, :back, ref)}
   end
 
+  def handle_event("from-js-to-phx", params, socket) do
+    IO.inspect(params)
+    {:reply, %{hello: "world"}, socket}
+  end
+
   @impl Phoenix.LiveView
   def render(%{step: 1} = assigns) do
     ~H"""
+    <div phx-hook="JavascriptHook" id="javascript-hook"></div>
     <div class="has-font-3 is-size-4" style="text-align: center; margin-top: 125px;">
       <div class="mb-xsmall">
         É Fácil e totalmente grátis.
@@ -117,6 +123,7 @@ defmodule PlazaWeb.UploadLive2 do
         </div>
       </button>
     </div>
+    <div id="cardPaymentBrick_container"></div>
     """
   end
 

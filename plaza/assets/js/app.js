@@ -21,24 +21,34 @@ import "phoenix_html";
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
-import { mp } from "../vendor/mercado-pago";
+import { renderCardPaymentBrick } from "../vendor/mercado-pago";
 
-let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, { params: { _csrf_token: csrfToken } })
+// csrf token 
+let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+// hooks 
+let Hooks = {};
+Hooks.JavascriptHook = {
+  mounted() {
+    this.pushEvent("from-js-to-phx", { foo: "bar" }, (reply, ref) =>
+      // this will print `{hello: "world"}` 
+      console.log(reply)
+    );
+    renderCardPaymentBrick();
+  }
+};
+// live socket 
+let liveSocket = new LiveSocket("/live", Socket, { params: { _csrf_token: csrfToken }, hooks: Hooks });
 
 // Show progress bar on live navigation and form submits
-topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" })
-window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
-window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
+topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" });
+window.addEventListener("phx:page-loading-start", _info => topbar.show(300));
+window.addEventListener("phx:page-loading-stop", _info => topbar.hide());
 
 // connect if there are any LiveViews on the page
-liveSocket.connect()
+liveSocket.connect();
 
 // expose liveSocket on window for web console debug logs and latency simulation:
 // >> liveSocket.enableDebug()
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
-window.liveSocket = liveSocket
-
-// mercado pago
-console.log(mp);
+window.liveSocket = liveSocket;
