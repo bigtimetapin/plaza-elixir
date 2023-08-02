@@ -29,6 +29,34 @@ const _renderCardPaymentBrick = async (bricksBuilder, phxEventPusher) => {
   }
   cardPaymentBrickController = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', settings);
 };
+const _renderStatusScreenBrick = async (bricksBuilder, paymentId) => {
+  const settings = {
+    initialization: {
+      paymentId: paymentId, // id do pagamento a ser mostrado
+    },
+    callbacks: {
+      onReady: () => {
+        /*
+          Callback chamado quando o Brick estiver pronto.
+          Aqui você pode ocultar loadings do seu site, por exemplo.
+        */
+        console.log("ready");
+      },
+      onError: (error) => {
+        // callback chamado para todos os casos de erro do Brick
+        console.error(error);
+      },
+    },
+  };
+  window.statusScreenBrickController = await bricksBuilder.create(
+    'statusScreen',
+    'statusScreenBrick_container',
+    settings,
+  );
+};
+export function renderStatusScreenBrick(paymentId) {
+  _renderStatusScreenBrick(bricksBuilder, paymentId);
+}
 
 export function renderCardPaymentBrick(phxEventPusher) {
   _renderCardPaymentBrick(bricksBuilder, phxEventPusher);
