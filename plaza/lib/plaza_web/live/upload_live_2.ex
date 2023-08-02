@@ -89,7 +89,7 @@ defmodule PlazaWeb.UploadLive2 do
   @impl Phoenix.LiveView
   def render(%{step: 1} = assigns) do
     ~H"""
-    <div phx-hook="JavascriptHook" id="javascript-hook"></div>
+    <div phx-hook="MercadoPagoHook" id="phx-mercado-pago-hook"></div>
     <div class="has-font-3 is-size-4" style="text-align: center; margin-top: 125px;">
       <div class="mb-xsmall">
         É Fácil e totalmente grátis.

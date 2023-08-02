@@ -1,6 +1,6 @@
 const mp = new MercadoPago("APP_USR-7fa93b75-08c8-44b3-9e23-58cf238f1080");
 const bricksBuilder = mp.bricks();
-const _renderCardPaymentBrick = async (bricksBuilder) => {
+const _renderCardPaymentBrick = async (bricksBuilder, phxEventPusher) => {
   const settings = {
     initialization: {
       amount: 100, //value of the payment to be processed
@@ -16,7 +16,7 @@ const _renderCardPaymentBrick = async (bricksBuilder) => {
       onSubmit: (cardFormData) => {
         // callback called when clicking on the submit data button
         return new Promise((resolve, reject) => {
-          Promise.resolve(console.log(cardFormData)).then(resolve())
+          Promise.resolve(console.log(cardFormData)).then(phxEventPusher).then(resolve())
         });
       },
       onReady: () => {
@@ -30,6 +30,6 @@ const _renderCardPaymentBrick = async (bricksBuilder) => {
   cardPaymentBrickController = await bricksBuilder.create('cardPayment', 'cardPaymentBrick_container', settings);
 };
 
-export function renderCardPaymentBrick() {
-  _renderCardPaymentBrick(bricksBuilder);
+export function renderCardPaymentBrick(phxEventPusher) {
+  _renderCardPaymentBrick(bricksBuilder, phxEventPusher);
 }

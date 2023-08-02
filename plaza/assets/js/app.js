@@ -27,13 +27,14 @@ import { renderCardPaymentBrick } from "../vendor/mercado-pago";
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
 // hooks 
 let Hooks = {};
-Hooks.JavascriptHook = {
+Hooks.MercadoPagoHook = {
   mounted() {
-    this.pushEvent("from-js-to-phx", { foo: "bar" }, (reply, ref) =>
-      // this will print `{hello: "world"}` 
-      console.log(reply)
+    renderCardPaymentBrick(
+      this.pushEvent("from-js-to-phx", { foo: "bar" }, (reply, ref) =>
+        // this will print `{hello: "world"}` 
+        console.log(reply)
+      )
     );
-    renderCardPaymentBrick();
   }
 };
 // live socket 
