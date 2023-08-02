@@ -65,6 +65,11 @@ config :ex_aws,
   access_key_id: [{:awscli, "plaza", 30}],
   secret_access_key: [{:awscli, "plaza", 30}]
 
+# Configure MercadoPago client
+config :mercadopago_api,
+  client_id: "MERCADOPAGO_CLIENT_ID",
+  client_secret: "MERCADOPAGO_CLIENT_SECRET"
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

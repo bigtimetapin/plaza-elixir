@@ -82,7 +82,9 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   def handle_event("from-js-to-phx", params, socket) do
-    IO.inspect(params)
+    card_form_data = params["card_form_data"]
+    response = Mercadopago.Requests.Payments.create(card_form_data)
+    IO.inspect(response)
     {:reply, %{hello: "world"}, socket}
   end
 

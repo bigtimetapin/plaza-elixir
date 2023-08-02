@@ -1,0 +1,14 @@
+{
+  "token": "65c4b9ebd248c1db2e0abacfc19362dc",
+  "issuer_id": "24",
+  "payment_method_id": "master",
+  "transaction_amount": 100,
+  "installments": 1,
+  "payer": {
+    "email": "example@gmail.com",
+    "identification": {
+      "type": "CPF",
+      "number": "12345678909"
+    }
+  }
+}

@@ -16,7 +16,7 @@ const _renderCardPaymentBrick = async (bricksBuilder, phxEventPusher) => {
       onSubmit: (cardFormData) => {
         // callback called when clicking on the submit data button
         return new Promise((resolve, reject) => {
-          Promise.resolve(console.log(cardFormData)).then(phxEventPusher).then(resolve())
+          Promise.resolve(console.log(cardFormData)).then(phxEventPusher(cardFormData)).then(resolve())
         });
       },
       onReady: () => {

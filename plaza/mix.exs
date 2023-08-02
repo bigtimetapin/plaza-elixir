@@ -54,7 +54,8 @@ defmodule Plaza.MixProject do
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.0"},
       {:hackney, "~> 1.9"},
-      {:configparser_ex, "~> 4.0"}
+      {:configparser_ex, "~> 4.0"},
+      {:mercadopago_api, "~> 0.2.1"}
     ]
   end
 

@@ -30,7 +30,7 @@ let Hooks = {};
 Hooks.MercadoPagoHook = {
   mounted() {
     renderCardPaymentBrick(
-      this.pushEvent("from-js-to-phx", { foo: "bar" }, (reply, ref) =>
+      (cardFormData) => this.pushEvent("from-js-to-phx", { foo: "bar", card_form_data: cardFormData }, (reply, ref) =>
         // this will print `{hello: "world"}` 
         console.log(reply)
       )
