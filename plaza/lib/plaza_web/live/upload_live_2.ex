@@ -20,6 +20,9 @@ defmodule PlazaWeb.UploadLive2 do
       socket
       |> assign(:step, 2)
 
+    data = %{"zipcode" => "01257-040", "quantity" => "1"}
+    response = Plaza.Dimona.Requests.Shipping.post(data)
+    IO.inspect(response)
     {:noreply, socket}
   end
 
