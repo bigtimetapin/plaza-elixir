@@ -53,17 +53,9 @@ COPY priv priv
 COPY lib lib
 
 COPY assets assets
-COPY assets/fonts assets/fonts 
-COPY assets/png assets/png
-COPY assets/svg assets/svg
-COPY assets/sass assets/sass
 
 # compile assets
 RUN mix assets.deploy
-RUN (cd assets/sass && npm install && npm run build)
-RUN (cd assets/svg && sh sync.sh)
-RUN (cd assets/png && sh sync.sh)
-RUN (cd assets/fonts && sh sync.sh)
 
 # Compile the release
 RUN mix compile
@@ -96,7 +88,6 @@ ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/plaza ./
-RUN ls .
 USER nobody
 
 CMD ["/app/bin/server"]
