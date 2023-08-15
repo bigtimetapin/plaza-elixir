@@ -20,9 +20,41 @@ defmodule PlazaWeb.UploadLive2 do
       socket
       |> assign(:step, 2)
 
-    data = %{"zipcode" => "01257-040", "quantity" => "1"}
-    response = Plaza.Dimona.Requests.Shipping.post(data)
-    IO.inspect(response)
+    shipping_data = %{"zipcode" => "01257-040", "quantity" => "1"}
+    {:ok, shipping_response} = Plaza.Dimona.Requests.Shipping.post(shipping_data)
+    IO.inspect(shipping_data)
+
+    data2 = %{
+      "delivery_method_id" => hd(shipping_response)["delivery_method_id"],
+      "order_id" => "asdusahdksjah18y321831ad",
+      "customer_name" => "Alexander Binaei",
+      "customer_document" => "123.456.789-13",
+      "customer_email" => "bigtimetapin@gmail.com",
+      "items" => [
+        %{
+          "name" => "Dimona Classic XGG Branco",
+          "sku" => "12346",
+          "qty" => 1,
+          "dimona_sku_id" => "010101110112",
+          "designs" => %{
+            "front" =>
+              "https://plaza-static-dev.s3.us-west-2.amazonaws.com/uploads/906bb598-bf04-4440-a75c-aaad65d85e47-Screenshot+2023-04-10+003945.png"
+          }
+        }
+      ],
+      "address" => %{
+        "street" => "Rua Paris",
+        "number" => "788",
+        "city" => "São Paulo",
+        "state" => "SP",
+        "zipcode" => "01257-040",
+        "neighborhood" => "Sumaré",
+        "country" => "BR"
+      }
+    }
+
+    order_response = Plaza.Dimona.Requests.Order.post(data2)
+    IO.inspect(order_response)
     {:noreply, socket}
   end
 
