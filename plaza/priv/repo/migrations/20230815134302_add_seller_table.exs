@@ -12,7 +12,7 @@ defmodule Plaza.Repo.Migrations.AddSellerTable do
       add :socials, :map
       timestamps()
     end
-  end
 
-  create unique_index(:sellers, [:user_name])
+    create unique_index(:sellers, [:user_name])
+  end
 end
