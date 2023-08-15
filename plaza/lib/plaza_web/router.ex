@@ -20,7 +20,11 @@ defmodule PlazaWeb.Router do
   scope "/", PlazaWeb do
     pipe_through :browser
 
-    live "/", LandingLive
+    live_session :default,
+      on_mount: [{PlazaWeb.UserAuth, :mount_current_user}] do
+      live "/", LandingLive
+      live "/my-account", MyAccountLive
+    end
   end
 
   # Other scopes may use custom stacks.

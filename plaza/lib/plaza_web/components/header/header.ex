@@ -13,7 +13,8 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.landing>
       <:store>
-        <.no_store_yet_href />
+        <%!-- <.no_store_yet_href /> --%>
+        <.my_account_href />
       </:store>
     </.landing>
     """
@@ -23,7 +24,8 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.landing>
       <:store>
-        <.no_store_yet_href />
+        <%!-- <.no_store_yet_href /> --%>
+        <.my_account_href />
       </:store>
     </.landing>
     """
@@ -33,7 +35,8 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.landing>
       <:store>
-        <.my_store_href />
+        <%!-- <.my_store_href /> --%>
+        <.my_account_href />
       </:store>
     </.landing>
     """
@@ -48,6 +51,12 @@ defmodule PlazaWeb.Header do
   def header(%{header: :my_store} = assigns) do
     ~H"""
     <.my_store />
+    """
+  end
+
+  def header(%{header: :my_account} = assigns) do
+    ~H"""
+    <.my_account />
     """
   end
 
@@ -81,6 +90,36 @@ defmodule PlazaWeb.Header do
     <.link navigate="/upload">
       quero vender
     </.link>
+    """
+  end
+
+  defp my_account_href(assigns) do
+    ~H"""
+    <.link navigate="/my-account">
+      conta
+    </.link>
+    """
+  end
+
+  defp my_account(assigns) do
+    ~H"""
+    <.left>
+      <:right>
+        <div class="level-item pr-xmedium">loja</div>
+        <div class="level-item pr-xmedium">
+          <div>
+            conta
+            <div style="position: absolute; width: 35px;">
+              <div style="position: relative; left: 11px;">
+                <img src="svg/yellow-circle.svg" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="level-item pr-xmedium">carrinho</div>
+        <div class="has-dark-gray-text">buscar</div>
+      </:right>
+    </.left>
     """
   end
 

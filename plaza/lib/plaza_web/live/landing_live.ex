@@ -1,8 +1,6 @@
 defmodule PlazaWeb.LandingLive do
   use PlazaWeb, :live_view
 
-  on_mount {PlazaWeb.UserAuth, :mount_current_user}
-
   alias Plaza.Products
   alias PlazaWeb.ProductComponent
   alias PlazaWeb.UserAuth
