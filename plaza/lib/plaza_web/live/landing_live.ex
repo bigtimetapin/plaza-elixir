@@ -3,7 +3,6 @@ defmodule PlazaWeb.LandingLive do
 
   alias Plaza.Products
   alias PlazaWeb.ProductComponent
-  alias PlazaWeb.UserAuth
 
   def mount(_params, session, socket) do
     my_products =

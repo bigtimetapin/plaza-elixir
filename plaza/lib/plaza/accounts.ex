@@ -6,7 +6,19 @@ defmodule Plaza.Accounts do
   import Ecto.Query, warn: false
   alias Plaza.Repo
 
-  alias Plaza.Accounts.{User, UserToken, UserNotifier}
+  alias Plaza.Accounts.{User, UserToken, UserNotifier, Seller}
+
+  ## Seller 
+
+  def get_seller_by_id(id) do
+    Repo.get_by(Seller, user_id: id)
+  end
+
+  def create_seller(attrs) do
+    %Seller{}
+    |> Seller.changeset(attrs)
+    |> Repo.insert()
+  end
 
   ## Database getters
 

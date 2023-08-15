@@ -11,6 +11,8 @@ defmodule Plaza.Accounts.Seller do
     field :location, :string
     field :website, :string
     field :socials, EctoSocials
+
+    timestamps()
   end
 
   def changeset(seller, attrs) do
