@@ -1,6 +1,14 @@
 defmodule PlazaWeb.UploadLive2 do
   use PlazaWeb, :live_view
 
+  alias Plaza.Products
+
+  alias ExAws
+  alias ExAws.S3
+
+  @aws_s3_region "us-west-2"
+  @aws_s3_bucket "plaza-static-dev"
+
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     socket =
@@ -27,6 +35,7 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 3)
+      |> assign(:product_name, nil)
 
     {:noreply, socket}
   end
@@ -63,7 +72,15 @@ defmodule PlazaWeb.UploadLive2 do
     {:noreply, socket}
   end
 
-  def handle_event("front-upload-change", _params, socket) do
+  def handle_event("upload-change", _params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("upload-submit", params, socket) do
+    socket =
+      socket
+      |> assign(:step, "tmp-product-submit")
+
     {:noreply, socket}
   end
 
@@ -71,12 +88,62 @@ defmodule PlazaWeb.UploadLive2 do
     {:noreply, Phoenix.LiveView.cancel_upload(socket, :front, ref)}
   end
 
-  def handle_event("back-upload-change", _params, socket) do
+  def handle_event("back-upload-cancel", %{"ref" => ref}, socket) do
+    {:noreply, Phoenix.LiveView.cancel_upload(socket, :back, ref)}
+  end
+
+  def handle_event("product-change", %{"product-name" => str}, socket) do
+    socket =
+      socket
+      |> assign(:product_name, str)
+
     {:noreply, socket}
   end
 
-  def handle_event("back-upload-cancel", %{"ref" => ref}, socket) do
-    {:noreply, Phoenix.LiveView.cancel_upload(socket, :back, ref)}
+  def handle_event("product-submit", %{"product-name" => str}, socket) do
+    [{file_name, src} | []] =
+      consume_uploaded_entries(socket, :front, fn %{path: path}, entry ->
+        unique_file_name = "#{entry.uuid}-#{entry.client_name}"
+
+        dest =
+          Path.join([
+            :code.priv_dir(:plaza),
+            "static",
+            "uploads",
+            unique_file_name
+          ])
+
+        File.cp!(path, dest)
+        {:ok, {"uploads/#{unique_file_name}", dest}}
+      end)
+
+    request =
+      S3.put_object(
+        @aws_s3_bucket,
+        file_name,
+        File.read!(src)
+      )
+
+    response =
+      ExAws.request!(
+        request,
+        region: @aws_s3_region
+      )
+
+    IO.inspect(response)
+
+    url = "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{file_name}"
+
+    attrs = %{"user_id" => socket.assigns.current_user.id, "name" => str, "front_url" => url}
+
+    response2 = Products.create_product(attrs)
+    IO.inspect(response2)
+
+    socket =
+      socket
+      |> assign(:step, "tmp-product-submit-success")
+
+    {:noreply, socket}
   end
 
   def handle_event("from-js-to-phx", params, socket) do
@@ -106,6 +173,25 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   @impl Phoenix.LiveView
+  def render(%{step: "tmp-product-submit"} = assigns) do
+    ~H"""
+    <div>
+      <form phx-change="product-change" phx-submit="product-submit">
+        <input type="text" name="product-name" value={@product_name} />
+        <button type="submit">upload</button>
+      </form>
+    </div>
+    """
+  end
+
+  def render(%{step: "tmp-product-submit-success"} = assigns) do
+    ~H"""
+    <div>
+      product submit success
+    </div>
+    """
+  end
+
   def render(%{step: 1} = assigns) do
     ~H"""
     <div class="has-font-3 is-size-4" style="text-align: center; margin-top: 125px;">
@@ -276,7 +362,7 @@ defmodule PlazaWeb.UploadLive2 do
   defp upload_input(assigns) do
     ~H"""
     <div>
-      <form id="front-upload-form" phx-submit="front-upload-save" phx-change="front-upload-change">
+      <form id="upload-form" phx-submit="upload-submit" phx-change="upload-change">
         <label
           class="has-font-3 is-size-4"
           style="width: 760px; height: 130px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
@@ -284,6 +370,7 @@ defmodule PlazaWeb.UploadLive2 do
           <.live_file_input upload={@upload} style="display: none;" />
           Arraste seus arquivos .png aqui para fazer upload
         </label>
+        <button type="submit">Próximo</button>
       </form>
     </div>
     """

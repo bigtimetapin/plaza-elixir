@@ -3,15 +3,9 @@ defmodule Plaza.Products.Product do
   import Ecto.Changeset
 
   schema "products" do
-    field :descr_long, :string
-    field :descr_short, :string
-    field :name, :string
-    field :num_colors, :integer
-    field :num_expected, :integer
-    field :product_type, :integer
-    field :design_url, :string
     field :user_id, :id
-
+    field :name, :string
+    field :front_url, :string
     timestamps()
   end
 
@@ -19,24 +13,17 @@ defmodule Plaza.Products.Product do
   def changeset(product, attrs) do
     product
     |> cast(attrs, [
+      :user_id,
       :name,
-      :descr_short,
-      :descr_long,
-      :product_type,
-      :num_colors,
-      :num_expected,
-      :design_url,
-      :user_id
+      :front_url
     ])
     |> validate_required([
-      :name,
-      :descr_short,
-      :descr_long,
-      :product_type,
-      :num_colors,
-      :num_expected,
-      :design_url,
-      :user_id
+      :user_id,
+      :name
+    ])
+    |> unique_constraint([
+      :user_id,
+      :name
     ])
   end
 end
