@@ -23,7 +23,6 @@ defmodule PlazaWeb.Router do
     live_session :default,
       on_mount: [{PlazaWeb.UserAuth, :mount_current_user}] do
       live "/", LandingLive
-      live "/my-account", MyAccountLive
     end
   end
 
@@ -74,6 +73,7 @@ defmodule PlazaWeb.Router do
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
       live "/upload", UploadLive2
       live "/my-store", MyStoreLive
+      live "/my-account", MyAccountLive
     end
   end
 

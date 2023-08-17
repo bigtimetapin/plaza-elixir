@@ -7,14 +7,7 @@ defmodule PlazaWeb.MyAccountLive do
   def mount(_params, _session, socket) do
     IO.inspect(socket)
 
-    seller =
-      case socket.assigns.current_user do
-        nil ->
-          nil
-
-        current_user ->
-          Accounts.get_seller_by_id(current_user.id)
-      end
+    seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
 
     IO.inspect(seller)
 
@@ -37,27 +30,28 @@ defmodule PlazaWeb.MyAccountLive do
   end
 
   def handle_event("user-name-submit", %{"user-name" => str}, socket) do
-    response = Accounts.create_seller(%{user_id: socket.assigns.current_user.id, user_name: str})
-    IO.inspect(response)
-    seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
-    IO.inspect(seller)
+    # response = Accounts.create_seller(%{user_id: socket.assigns.current_user.id, user_name: str})
+    # IO.inspect(response)
+    # seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
+    # IO.inspect(seller)
 
-    socket =
-      socket
-      |> assign(seller: seller)
+    {:ok, %Stripe.Account{id: id}} = Stripe.Account.create(%{type: :express})
+    IO.inspect(id)
+
+    response =
+      Stripe.AccountLink.create(%{
+        account: id,
+        refresh_url: "http://localhost:4000/my-account",
+        return_url: "http://localhost:4000/my-account",
+        type: :account_onboarding
+      })
+
+    IO.inspect(response)
 
     {:noreply, socket}
   end
 
   @impl Phoenix.LiveView
-  def render(%{current_user: nil} = assigns) do
-    ~H"""
-    <div class="mt-large mx-large">
-      register email
-    </div>
-    """
-  end
-
   def render(%{seller: nil} = assigns) do
     ~H"""
     <div class="mt-large mx-large">
@@ -76,6 +70,16 @@ defmodule PlazaWeb.MyAccountLive do
     ~H"""
     <div class="mt-large mx-large">
       <%= @seller.user_name %>
+    </div>
+
+    <div class="mt-large mx-large">
+      <div>
+        create user-name
+        <form phx-change="user-name-change" phx-submit="user-name-submit">
+          <input type="text" name="user-name" value={@user_name} />
+          <button type="submit">submit</button>
+        </form>
+      </div>
     </div>
     """
   end
