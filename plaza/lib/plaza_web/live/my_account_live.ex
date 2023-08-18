@@ -123,7 +123,7 @@ defmodule PlazaWeb.MyAccountLive do
   def handle_event("user-name-submit", %{"user-name" => str}, socket) do
     attrs = %{
       user_id: socket.assigns.current_user.id,
-      user_name_form: str
+      user_name: str
     }
 
     {:ok, seller} = Accounts.create_seller(attrs)
