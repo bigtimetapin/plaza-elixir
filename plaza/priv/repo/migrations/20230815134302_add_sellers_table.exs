@@ -10,6 +10,7 @@ defmodule Plaza.Repo.Migrations.AddSellerTable do
       add :location, :string
       add :website, :string
       add :socials, :map
+      add :stripe_id, :string
       timestamps()
     end
 

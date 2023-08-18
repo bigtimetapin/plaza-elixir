@@ -11,6 +11,7 @@ defmodule Plaza.Accounts.Seller do
     field :location, :string
     field :website, :string
     field :socials, EctoSocials
+    field :stripe_id, :string
 
     timestamps()
   end
@@ -24,7 +25,8 @@ defmodule Plaza.Accounts.Seller do
       :description,
       :location,
       :website,
-      :socials
+      :socials,
+      :stripe_id
     ])
     |> validate_required([
       :user_id,

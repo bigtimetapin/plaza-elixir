@@ -20,6 +20,12 @@ defmodule Plaza.Accounts do
     |> Repo.insert()
   end
 
+  def update_seller(%Seller{} = seller, attrs) do
+    seller
+    |> Seller.changeset(attrs)
+    |> Repo.update()
+  end
+
   ## Database getters
 
   @doc """
