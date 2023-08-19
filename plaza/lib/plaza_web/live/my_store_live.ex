@@ -1,6 +1,7 @@
 defmodule PlazaWeb.MyStoreLive do
   use PlazaWeb, :live_view
 
+  alias Plaza.Accounts
   alias Plaza.Products
   alias PlazaWeb.ProductComponent
 
@@ -16,6 +17,15 @@ defmodule PlazaWeb.MyStoreLive do
     IO.inspect(my_products)
 
     {:ok, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("product-href", %{"product-name" => product_name}, socket) do
+    seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
+    params = %{"seller" => seller.user_name, "product-name" => product_name}
+    url = URI.encode_query(params)
+    IO.inspect(url)
+    {:noreply, push_navigate(socket, to: "/product?#{url}")}
   end
 
   @impl Phoenix.LiveView
@@ -68,7 +78,7 @@ defmodule PlazaWeb.MyStoreLive do
     ~H"""
     <div style="display: inline-block;">
       <div style="position: relative; left: 75px; bottom: 175px;">
-        <ProductComponent.products3 products={@my_products} />
+        <ProductComponent.products3 disabled={false} products={@my_products} href={true} />
       </div>
       <div
         class="has-font-3"

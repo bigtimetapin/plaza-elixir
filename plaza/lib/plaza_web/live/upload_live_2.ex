@@ -175,8 +175,9 @@ defmodule PlazaWeb.UploadLive2 do
   @impl Phoenix.LiveView
   def render(%{step: "tmp-product-submit"} = assigns) do
     ~H"""
-    <div>
+    <div class="mx-large">
       <form phx-change="product-change" phx-submit="product-submit">
+        <title>product name</title>
         <input type="text" name="product-name" value={@product_name} />
         <button type="submit">upload</button>
       </form>
@@ -186,7 +187,7 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: "tmp-product-submit-success"} = assigns) do
     ~H"""
-    <div>
+    <div class="mx-large">
       product submit success
     </div>
     """
@@ -370,7 +371,14 @@ defmodule PlazaWeb.UploadLive2 do
           <.live_file_input upload={@upload} style="display: none;" />
           Arraste seus arquivos .png aqui para fazer upload
         </label>
-        <button type="submit">Próximo</button>
+        <div style="position: relative; left: 1585px; top: 580px;">
+          <button type="submit">
+            <img src="svg/yellow-ellipse.svg" />
+            <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
+              Próximo
+            </div>
+          </button>
+        </div>
       </form>
     </div>
     """

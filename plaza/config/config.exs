@@ -61,8 +61,8 @@ config :phoenix, :json_library, Jason
 
 # Configure AWS client
 config :ex_aws,
-  access_key_id: [{:awscli, "plaza", 30}],
-  secret_access_key: [{:awscli, "plaza", 30}]
+  access_key_id: [{:system, "AWS_ACCESS_KEY_ID_PLAZA"}],
+  secret_access_key: [{:system, "AWS_SECRET_ACCESS_KEY_PLAZA"}]
 
 # Configure Stripe 
 config :stripity_stripe,
