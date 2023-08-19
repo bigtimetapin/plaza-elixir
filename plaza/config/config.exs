@@ -64,9 +64,10 @@ config :ex_aws,
   access_key_id: [{:awscli, "plaza", 30}],
   secret_access_key: [{:awscli, "plaza", 30}]
 
+# Configure Stripe 
 config :stripity_stripe,
-  api_key: System.get_env("STRIPE_API_KEY"),
-  signing_secret: System.get_env("STRIPE_WEBHOOK_SIGNING_SECRET")
+  api_key: System.fetch_env!("STRIPE_API_KEY"),
+  signing_secret: System.fetch_env!("STRIPE_WEBHOOK_SIGNING_SECRET")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
