@@ -3,6 +3,7 @@ defmodule Plaza.Products.Product do
   import Ecto.Changeset
 
   schema "products" do
+    ## TODO; seller-id
     field :user_id, :id
     field :name, :string
     field :front_url, :string

@@ -23,6 +23,7 @@ defmodule PlazaWeb.Router do
     live_session :default,
       on_mount: [{PlazaWeb.UserAuth, :mount_current_user}] do
       live "/", LandingLive
+      live "/product", ProductLive
     end
   end
 

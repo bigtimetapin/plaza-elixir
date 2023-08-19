@@ -41,6 +41,10 @@ defmodule Plaza.Products do
   """
   def get_product!(id), do: Repo.get!(Product, id)
 
+  # TODO
+  def get_product(seller_id, product_name) do
+  end
+
   @doc """
   Creates a product.
 
