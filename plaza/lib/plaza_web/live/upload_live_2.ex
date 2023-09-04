@@ -76,7 +76,7 @@ defmodule PlazaWeb.UploadLive2 do
     {:noreply, socket}
   end
 
-  def handle_event("upload-submit", params, socket) do
+  def handle_event("upload-submit", _params, socket) do
     socket =
       socket
       |> assign(:step, "tmp-product-submit")
@@ -143,32 +143,6 @@ defmodule PlazaWeb.UploadLive2 do
       socket
       |> assign(:step, "tmp-product-submit-success")
 
-    {:noreply, socket}
-  end
-
-  def handle_event("from-js-to-phx", params, socket) do
-    card_form_data = params["card_form_data"]
-    response = Mercadopago.Requests.Payments.create(card_form_data)
-    IO.inspect(response)
-
-    case response do
-      {:ok, ok} ->
-        IO.inspect("Ok")
-        payment_id = ok.id
-        send(self(), {:check_payment_status, payment_id})
-        {:reply, %{payment_id: payment_id}, socket}
-
-      _ ->
-        IO.inspect("Not Ok")
-        {:reply, %{hello: "world"}, socket}
-    end
-  end
-
-  @impl Phoenix.LiveView
-  def handle_info({:check_payment_status, payment_id}, socket) do
-    IO.inspect(payment_id)
-    response = Mercadopago.Requests.Payments.show(payment_id)
-    IO.inspect(response)
     {:noreply, socket}
   end
 
