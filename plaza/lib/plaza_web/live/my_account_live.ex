@@ -4,6 +4,8 @@ defmodule PlazaWeb.MyAccountLive do
   alias Plaza.Accounts
   alias Plaza.Accounts.Seller
 
+  @site "https://plazaaaaa.fly.dev"
+
   @impl Phoenix.LiveView
   def mount(params, session, socket) do
     seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
@@ -48,8 +50,8 @@ defmodule PlazaWeb.MyAccountLive do
           {:ok, %Stripe.AccountLink{url: stripe_account_link_url}} =
             Stripe.AccountLink.create(%{
               account: stripe_id,
-              refresh_url: "http://localhost:4000/my-account?stripe-setup-refresh=#{stripe_id}",
-              return_url: "http://localhost:4000/my-account?stripe-setup-return=#{stripe_id}",
+              refresh_url: "#{@site}/my-account?stripe-setup-refresh=#{stripe_id}",
+              return_url: "#{@site}/my-account?stripe-setup-return=#{stripe_id}",
               type: :account_onboarding
             })
 
@@ -142,8 +144,8 @@ defmodule PlazaWeb.MyAccountLive do
     {:ok, %Stripe.AccountLink{url: stripe_account_link_url}} =
       Stripe.AccountLink.create(%{
         account: stripe_id,
-        refresh_url: "http://localhost:4000/my-account?stripe-setup-refresh=#{stripe_id}",
-        return_url: "http://localhost:4000/my-account?stripe-setup-return=#{stripe_id}",
+        refresh_url: "#{@site}/my-account?stripe-setup-refresh=#{stripe_id}",
+        return_url: "#{@site}/my-account?stripe-setup-return=#{stripe_id}",
         type: :account_onboarding
       })
 
