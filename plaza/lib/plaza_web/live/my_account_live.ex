@@ -195,6 +195,12 @@ defmodule PlazaWeb.MyAccountLive do
       <%= @seller.user_name %>
     </div>
 
+    <div>
+      <.link href="/users/log_out" method="delete">
+        log out
+      </.link>
+    </div>
+
     <div class="mt-large mx-large">
       <div>
         <%= "your seller stripe-id: #{@seller.stripe_id}" %>

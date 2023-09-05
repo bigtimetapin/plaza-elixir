@@ -1,17 +1,17 @@
 defmodule PlazaWeb.LandingLive do
   use PlazaWeb, :live_view
 
-  alias Plaza.Products
+  alias Plaza.Accounts
   alias PlazaWeb.ProductComponent
 
   def mount(_params, session, socket) do
-    my_products =
+    seller =
       case socket.assigns.current_user do
         nil ->
-          []
+          nil
 
         %{id: id} ->
-          Products.list_products_by_user_id(id)
+          Accounts.get_seller_by_id(id)
       end
 
     socket =
@@ -28,7 +28,9 @@ defmodule PlazaWeb.LandingLive do
           %{name: "bastante", price: "199"}
         ]
       )
-      |> assign(:my_products, my_products)
+      |> assign(:seller, seller)
+
+    IO.inspect(socket.assigns)
 
     {:ok, socket}
   end

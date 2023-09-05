@@ -7,14 +7,15 @@ defmodule PlazaWeb.MyStoreLive do
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
+    seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
+    IO.inspect(seller)
     my_products = Products.list_products_by_user_id(socket.assigns.current_user.id)
 
     socket =
       socket
       |> assign(:header, :my_store)
+      |> assign(:seller, seller)
       |> assign(:my_products, my_products)
-
-    IO.inspect(my_products)
 
     {:ok, socket}
   end
