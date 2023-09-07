@@ -101,8 +101,15 @@ defmodule PlazaWeb.UploadLive2 do
 
   def handle_event("change-seller-form", %{"seller" => seller}, socket) do
     form =
-      Seller.changeset(%Seller{}, seller)
-      |> Map.put(:action, :insert)
+      Seller.changeset(
+        %Seller{},
+        seller
+        |> Map.put(
+          "user_id",
+          socket.assigns.current_user.id
+        )
+      )
+      |> Map.put(:action, :validate)
       |> to_form
 
     IO.inspect(form)
@@ -322,7 +329,41 @@ defmodule PlazaWeb.UploadLive2 do
         </div>
         <div>
           <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
-            <.input field={@seller_form[:user_name]} type="text"></.input>
+            <.input
+              field={@seller_form[:user_name]}
+              type="text"
+              placeholder="username / nome da loja *"
+              style="border-top: none; border-left: none; border-right: none; border-radius: 0px; text-align: center; font-family: AppleGaramondLight; font-size: 34px;"
+            >
+            </.input>
+            <.input
+              field={@seller_form[:website]}
+              type="text"
+              placeholder="website"
+              style="border-top: none; border-left: none; border-right: none; border-radius: 0px; text-align: center; font-family: AppleGaramondLight; font-size: 34px;"
+            >
+            </.input>
+            <.input
+              field={@seller_form[:instagram]}
+              type="text"
+              placeholder="instagram"
+              style="border-top: none; border-left: none; border-right: none; border-radius: 0px; text-align: center; font-family: AppleGaramondLight; font-size: 34px;"
+            >
+            </.input>
+            <.input
+              field={@seller_form[:twitter]}
+              type="text"
+              placeholder="twitter"
+              style="border-top: none; border-left: none; border-right: none; border-radius: 0px; text-align: center; font-family: AppleGaramondLight; font-size: 34px;"
+            >
+            </.input>
+            <.input
+              field={@seller_form[:soundcloud]}
+              type="text"
+              placeholder="soundcloud"
+              style="border-top: none; border-left: none; border-right: none; border-radius: 0px; text-align: center; font-family: AppleGaramondLight; font-size: 34px;"
+            >
+            </.input>
           </.form>
         </div>
       </div>
