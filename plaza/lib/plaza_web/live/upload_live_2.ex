@@ -1,28 +1,56 @@
 defmodule PlazaWeb.UploadLive2 do
   use PlazaWeb, :live_view
 
+  alias Plaza.Accounts
+  alias Plaza.Accounts.Seller
   alias Plaza.Products
 
   alias ExAws
   alias ExAws.S3
+
+  @site "https://plazaaaaa.fly.dev"
 
   @aws_s3_region "us-west-2"
   @aws_s3_bucket "plaza-static-dev"
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
+    {seller, step} =
+      case socket.assigns.current_user do
+        nil ->
+          {nil, 1}
+
+        %{id: id} ->
+          case Accounts.get_seller_by_id(id) do
+            nil ->
+              {nil, 4}
+
+            %Seller{stripe_id: nil} = seller ->
+              {seller, 5}
+
+            seller ->
+              {seller, 6}
+          end
+      end
+
     socket =
       socket
       |> assign(:page_title, "Upload")
-      |> assign(:header, :upload)
+      |> assign(:header, :my_store)
       |> allow_upload(:front, accept: ~w(.png), max_entries: 1)
       |> allow_upload(:back, accept: ~w(.png), max_entries: 1)
-      |> assign(:step, 1)
+      |> assign(:seller, seller)
+      |> assign(:seller_form, to_form(Seller.changeset(%Seller{}, %{})))
+      |> assign(:step, step)
 
     {:ok, socket}
   end
 
   @impl Phoenix.LiveView
+  def handle_event("step", %{"step" => "noop"}, socket) do
+    {:noreply, socket}
+  end
+
   def handle_event("step", %{"step" => "2"}, socket) do
     socket =
       socket
@@ -35,7 +63,6 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 3)
-      |> assign(:product_name, nil)
 
     {:noreply, socket}
   end
@@ -69,6 +96,28 @@ defmodule PlazaWeb.UploadLive2 do
       socket
       |> assign(:step, 7)
 
+    {:noreply, socket}
+  end
+
+  def handle_event("change-seller-form", %{"seller" => seller}, socket) do
+    form =
+      Seller.changeset(%Seller{}, seller)
+      |> Map.put(:action, :insert)
+      |> to_form
+
+    IO.inspect(form)
+
+    socket =
+      socket
+      |> assign(seller_form: form)
+
+    IO.inspect(socket.assigns.seller_form[:user_name])
+
+    {:noreply, socket}
+  end
+
+  def handle_event("submit-seller-form", %{"seller" => seller}, socket) do
+    IO.inspect(socket.assigns.seller_form)
     {:noreply, socket}
   end
 
@@ -241,6 +290,48 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: 3} = assigns) do
     ~H"""
+    <div style="margin-top: 100px;">
+      <PlazaWeb.UploadLive2.preheader step={@step} />
+      <div style="opacity: 50%; margin-top: 25px; margin-bottom: 100px;">
+        <PlazaWeb.UploadLive2.header step={@step} />
+      </div>
+      <div class="has-font-3 is-size-5 mx-large">
+        <div>
+          you need to register your email and create a store (name, etc) before uploading designs to plaza
+        </div>
+        <div>
+          <.link class="has-font-3" navigate="/users/register">
+            register / login
+          </.link>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{step: 4} = assigns) do
+    ~H"""
+    <div style="margin-top: 100px;">
+      <PlazaWeb.UploadLive2.preheader step={@step} />
+      <div style="opacity: 50%; margin-top: 25px; margin-bottom: 100px;">
+        <PlazaWeb.UploadLive2.header step={@step} />
+      </div>
+      <div class="has-font-3 is-size-5 mx-large">
+        <div>
+          ok you've registered your email but you still need to create a store (name, etc) before uploading designs to plaza
+        </div>
+        <div>
+          <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
+            <.input field={@seller_form[:user_name]} type="text"></.input>
+          </.form>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{step: 30} = assigns) do
+    ~H"""
     <div style="margin-top: 150px; margin-bottom: 750px;">
       <PlazaWeb.UploadLive2.header step={@step} />
       <div style="margin-top: 50px;">
@@ -251,7 +342,7 @@ defmodule PlazaWeb.UploadLive2 do
     """
   end
 
-  def render(%{step: 4} = assigns) do
+  def render(%{step: 40} = assigns) do
     ~H"""
     <PlazaWeb.UploadLive2.header step={@step} />
     <div style="margin-top: 50px;">
@@ -281,19 +372,44 @@ defmodule PlazaWeb.UploadLive2 do
 
   attr :step, :integer, required: true
 
+  def preheader(assigns) do
+    ~H"""
+    <div style="display: flex; justify-content: center;">
+      <nav class="has-font-3 is-size-5">
+        <div class="has-black-text mr-small" style="display: inline-block;">
+          Register / Login
+          <img :if={@step == 3} src="svg/yellow-circle.svg" style="position: relative; left: 63px;" />
+        </div>
+        <img src="svg/seperator.svg" class="mr-small" style="display: inline-block;" />
+        <div class="has-black-text mr-small" style="display: inline-block;">
+          Create Your Store
+          <img
+            :if={Enum.member?([4, 5], @step)}
+            src="svg/yellow-circle.svg"
+            style="position: relative; left: 73px;"
+          />
+        </div>
+      </nav>
+    </div>
+    """
+  end
+
+  attr :step, :integer, required: true
+  attr :disabled, :boolean, default: true
+
   def header(assigns) do
     ~H"""
     <div style="display: flex; justify-content: center;">
       <nav class="has-font-3 is-size-5">
         <a
           phx-click="step"
-          phx-value-step="3"
+          phx-value-step={if @disabled, do: "noop", else: "30"}
           class="has-black-text mr-small"
           style="display: inline-block;"
         >
           Configurar Estampa
           <img
-            :if={Enum.member?([3, 4, 5], @step)}
+            :if={Enum.member?([30, 40, 50], @step)}
             src="svg/yellow-circle.svg"
             style="position: relative; left: 87px;"
           />
@@ -301,7 +417,7 @@ defmodule PlazaWeb.UploadLive2 do
         <img src="svg/seperator.svg" class="mr-small" style="display: inline-block;" />
         <a
           phx-click="step"
-          phx-value-step="6"
+          phx-value-step={if @disabled, do: "noop", else: "60"}
           class="has-black-text mr-small"
           style="display: inline-block;"
         >
@@ -309,7 +425,12 @@ defmodule PlazaWeb.UploadLive2 do
           <img :if={@step == 6} src="svg/yellow-circle.svg" style="position: relative; left: 123px;" />
         </a>
         <img src="svg/seperator.svg" class="mr-small" style="display: inline-block;" />
-        <a phx-click="step" phx-value-step="7" class="has-black-text" style="display: inline-block;">
+        <a
+          phx-click="step"
+          phx-value-step={if @disabled, do: "noop", else: "70"}
+          class="has-black-text"
+          style="display: inline-block;"
+        >
           Publique seu Produto
           <img :if={@step == 7} src="svg/yellow-circle.svg" style="position: relative; left: 93px;" />
         </a>

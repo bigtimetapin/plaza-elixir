@@ -176,7 +176,7 @@ defmodule PlazaWeb.Header do
 
   defp no_store_yet_href(assigns) do
     ~H"""
-    <.link navigate="/my-store">
+    <.link navigate="/upload">
       quero vender
     </.link>
     """
