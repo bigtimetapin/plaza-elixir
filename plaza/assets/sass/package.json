@@ -4,6 +4,7 @@
   "description": "SCSS Build",
   "scripts": {
     "build": "sh build.sh",
+    "build-manual": "sh build-manual.sh",
     "start": "npm run build --watch"
   },
   "author": "mrmizz",

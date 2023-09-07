@@ -304,7 +304,7 @@ defmodule PlazaWeb.UploadLive2 do
       </div>
       <div class="has-font-3 is-size-5 mx-large">
         <div>
-          you need to register your email and create a store (name, etc) before uploading designs to plaza
+          you need to register your email and create a store (name, logo, etc) before uploading designs to plaza
         </div>
         <div>
           <.link class="has-font-3" navigate="/users/register">
@@ -325,43 +325,46 @@ defmodule PlazaWeb.UploadLive2 do
       </div>
       <div class="has-font-3 is-size-5 mx-large">
         <div>
-          ok you've registered your email but you still need to create a store (name, etc) before uploading designs to plaza
+          ok you've registered your email but you still need to create a store (name, logo, etc) before uploading designs to plaza.
         </div>
         <div>
+          only the name is required to get started. you can add/edit more info later.
+        </div>
+        <div style="display: flex; justify-content: center;">
           <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
             <.input
               field={@seller_form[:user_name]}
               type="text"
               placeholder="username / nome da loja *"
-              style="border-top: none; border-left: none; border-right: none; border-radius: 0px; text-align: center; font-family: AppleGaramondLight; font-size: 34px;"
+              class="text-input-1"
             >
             </.input>
             <.input
               field={@seller_form[:website]}
               type="text"
               placeholder="website"
-              style="border-top: none; border-left: none; border-right: none; border-radius: 0px; text-align: center; font-family: AppleGaramondLight; font-size: 34px;"
+              class="text-input-1"
             >
             </.input>
             <.input
               field={@seller_form[:instagram]}
               type="text"
               placeholder="instagram"
-              style="border-top: none; border-left: none; border-right: none; border-radius: 0px; text-align: center; font-family: AppleGaramondLight; font-size: 34px;"
+              class="text-input-1"
             >
             </.input>
             <.input
               field={@seller_form[:twitter]}
               type="text"
               placeholder="twitter"
-              style="border-top: none; border-left: none; border-right: none; border-radius: 0px; text-align: center; font-family: AppleGaramondLight; font-size: 34px;"
+              class="text-input-1"
             >
             </.input>
             <.input
               field={@seller_form[:soundcloud]}
               type="text"
               placeholder="soundcloud"
-              style="border-top: none; border-left: none; border-right: none; border-radius: 0px; text-align: center; font-family: AppleGaramondLight; font-size: 34px;"
+              class="text-input-1"
             >
             </.input>
           </.form>

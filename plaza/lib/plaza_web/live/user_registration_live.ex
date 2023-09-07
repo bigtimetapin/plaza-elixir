@@ -48,6 +48,7 @@ defmodule PlazaWeb.UserRegistrationLive do
     socket =
       socket
       |> assign(trigger_submit: false, check_errors: false)
+      |> assign(:header, :login)
       |> assign_form(changeset)
 
     {:ok, socket, temporary_assigns: [form: nil]}
