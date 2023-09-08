@@ -75,6 +75,10 @@ defmodule PlazaWeb.UploadLive2 do
       socket
       |> assign(:step, 4)
 
+    IO.inspect(socket.assigns.uploads.front)
+
+    IO.inspect(socket.assigns.uploads.back)
+
     {:noreply, socket}
   end
 
@@ -82,6 +86,10 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 5)
+
+    IO.inspect(socket.assigns.uploads.front)
+
+    IO.inspect(socket.assigns.uploads.back)
 
     {:noreply, socket}
   end
@@ -258,7 +266,9 @@ defmodule PlazaWeb.UploadLive2 do
       <PlazaWeb.UploadLive2.header step={@step} />
       <div style="margin-top: 50px;">
         <.upload_form current={@uploads.front} front={@uploads.front} back={@uploads.back} />
-        <.upload_preview upload={@uploads.front} />
+        <%!-- flipping order in which elements are added to dom behaves as z-index --%>
+        <.upload_preview upload={@uploads.back} step={@step} />
+        <.upload_preview upload={@uploads.front} step={@step} />
       </div>
     </div>
     """
@@ -266,10 +276,13 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: 5} = assigns) do
     ~H"""
-    <PlazaWeb.UploadLive2.header step={@step} />
-    <div style="margin-top: 50px;">
-      <.upload_form current={@uploads.back} front={@uploads.front} back={@uploads.back} />
-      <.upload_preview upload={@uploads.back} />
+    <div style="margin-top: 150px; margin-bottom: 750px;">
+      <PlazaWeb.UploadLive2.header step={@step} />
+      <div style="margin-top: 50px;">
+        <.upload_form current={@uploads.back} front={@uploads.front} back={@uploads.back} />
+        <.upload_preview upload={@uploads.front} step={@step} />
+        <.upload_preview upload={@uploads.back} step={@step} />
+      </div>
     </div>
     """
   end
@@ -358,7 +371,7 @@ defmodule PlazaWeb.UploadLive2 do
           <.live_file_input upload={@upload} style="display: none;" />
           Arraste seus arquivos .png aqui para fazer upload
         </label>
-        <div style="position: relative; left: 1585px; top: 580px;">
+        <div style="position: relative; left: 1550px; top: 580px;">
           <button type="submit">
             <img src="svg/yellow-ellipse.svg" />
             <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
@@ -407,6 +420,7 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   attr :upload, Phoenix.LiveView.UploadConfig, required: true
+  attr :step, :integer, required: true
 
   defp upload_preview(assigns) do
     map =
@@ -424,10 +438,32 @@ defmodule PlazaWeb.UploadLive2 do
 
     ~H"""
     <div style="display: inline-block; position: absolute">
-      <div style="position: relative; left: 125px;">
+      <div style="position: relative; left: 75px;">
         <img src="png/mockup-front.png" />
         <div style="overflow: hidden; width: 264px; height: 356px; position: relative; bottom: 560px; left: 205px; border: 1px dotted blue;">
           <.live_img_preview :if={@entry.client_size > 0} entry={@entry} />
+        </div>
+        <div style="position: relative; bottom: 1160px; left: 700px;">
+          <div>
+            <button
+              phx-click="step"
+              phx-value-step="4"
+              class="has-font-3 is-size-5"
+              style={if @step == 4, do: "border-bottom: 2px solid black; height: 43px;"}
+            >
+              Frente
+            </button>
+          </div>
+          <div>
+            <button
+              phx-click="step"
+              phx-value-step="5"
+              class="has-font-3 is-size-5"
+              style={if @step == 5, do: "border-bottom: 2px solid black; height: 43px;"}
+            >
+              Costas
+            </button>
+          </div>
         </div>
       </div>
     </div>
