@@ -173,6 +173,8 @@ defmodule PlazaWeb.MyAccountLive do
           <button type="submit">submit</button>
         </form>
       </div>
+
+      <.logout />
     </div>
     """
   end
@@ -182,6 +184,8 @@ defmodule PlazaWeb.MyAccountLive do
     <div class="mt-large mx-large">
       <%= @seller.user_name %>
     </div>
+
+    <.logout />
 
     <div class="mt-large mx-large">
       <button phx-click="stripe-link-account">link stripe account</button>
@@ -195,11 +199,7 @@ defmodule PlazaWeb.MyAccountLive do
       <%= @seller.user_name %>
     </div>
 
-    <div>
-      <.link href="/users/log_out" method="delete">
-        log out
-      </.link>
-    </div>
+    <.logout />
 
     <div class="mt-large mx-large">
       <div>
@@ -227,6 +227,16 @@ defmodule PlazaWeb.MyAccountLive do
       <div>
         payouts enabled
       </div>
+    </div>
+    """
+  end
+
+  defp logout(assigns) do
+    ~H"""
+    <div>
+      <.link href="/users/log_out" method="delete">
+        log out
+      </.link>
     </div>
     """
   end

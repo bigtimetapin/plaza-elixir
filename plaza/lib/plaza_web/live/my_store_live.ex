@@ -2,6 +2,7 @@ defmodule PlazaWeb.MyStoreLive do
   use PlazaWeb, :live_view
 
   alias Plaza.Accounts
+  alias Plaza.Accounts.Seller
   alias Plaza.Products
   alias PlazaWeb.ProductComponent
 
@@ -16,6 +17,8 @@ defmodule PlazaWeb.MyStoreLive do
       |> assign(:header, :my_store)
       |> assign(:seller, seller)
       |> assign(:my_products, my_products)
+      |> allow_upload(:logo, accept: ~w(.png .jpg .jpeg .svg .gif), max_entries: 1)
+      |> assign(:seller_form, to_form(Seller.changeset(%Seller{}, %{})))
 
     {:ok, socket}
   end
@@ -95,6 +98,114 @@ defmodule PlazaWeb.MyStoreLive do
             Acessar Painel de Vendedor
           </div>
         </div>
+      </div>
+    </div>
+    """
+  end
+
+  defp seller_form_wip(assigns) do
+    ~H"""
+    <div style="display: flex; justify-content: center;">
+      <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
+        <div style="display: inline-block;">
+          <div style="position: absolute;">
+            <div style="position: relative; bottom: 335px; right: 315px;">
+              <div>
+                <label
+                  class="has-font-3 is-size-4"
+                  style="width: 312px; height: 300px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
+                >
+                  <.live_file_input
+                    upload={@uploads.logo}
+                    style="display: none;"
+                    phx-change="change-seller-logo"
+                  />
+                  <div style="text-align: center; text-decoration: underline; font-size: 24px;">
+                    Upload
+                    <div>
+                      Logo/Foto de Perfil
+                    </div>
+                  </div>
+                </label>
+              </div>
+              <div>
+                <.upload_item upload={@uploads.logo} />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display: inline-block; position: relative;left: 50px;">
+          <.input
+            field={@seller_form[:user_name]}
+            type="text"
+            placeholder="username / nome da loja *"
+            class="text-input-1"
+          >
+          </.input>
+          <.input
+            field={@seller_form[:website]}
+            type="text"
+            placeholder="website"
+            class="text-input-1"
+          >
+          </.input>
+          <.input
+            field={@seller_form[:instagram]}
+            type="text"
+            placeholder="instagram"
+            class="text-input-1"
+          >
+          </.input>
+          <.input
+            field={@seller_form[:twitter]}
+            type="text"
+            placeholder="twitter"
+            class="text-input-1"
+          >
+          </.input>
+          <.input
+            field={@seller_form[:soundcloud]}
+            type="text"
+            placeholder="soundcloud"
+            class="text-input-1"
+          >
+          </.input>
+        </div>
+      </.form>
+    </div>
+    """
+  end
+
+  attr :upload, Phoenix.LiveView.UploadConfig, required: true
+  attr :no_file_yet, :string, default: nil
+
+  defp upload_item(assigns) do
+    map =
+      case assigns.upload.entries do
+        [head | []] ->
+          head
+
+        _ ->
+          %{client_name: assigns.no_file_yet, client_size: 0}
+      end
+
+    assigns =
+      assigns
+      |> assign(entry: map)
+
+    ~H"""
+    <div>
+      <div class="has-font-3 is-size-6">
+        <%= @entry.client_name %>
+        <button
+          :if={@entry.client_size > 0}
+          type="button"
+          phx-click={"#{@entry.upload_config}-upload-cancel"}
+          phx-value-ref={@entry.ref}
+          aria-label="cancel"
+        >
+          &times;
+        </button>
       </div>
     </div>
     """

@@ -8,6 +8,10 @@ defmodule PlazaWeb.UploadLive2 do
   alias ExAws
   alias ExAws.S3
 
+  ## TODO; overlay logo view on input 
+  ## async task upload to s3: https://fly.io/phoenix-files/liveview-async-task/
+  ## collect payout info after creating first product at /my-store
+
   @site "https://plazaaaaa.fly.dev"
 
   @aws_s3_region "us-west-2"
@@ -37,11 +41,9 @@ defmodule PlazaWeb.UploadLive2 do
       socket
       |> assign(:page_title, "Upload")
       |> assign(:header, :my_store)
-      |> allow_upload(:logo, accept: ~w(.png .jpg .jpeg .svg .gif), max_entries: 1)
       |> allow_upload(:front, accept: ~w(.png), max_entries: 1)
       |> allow_upload(:back, accept: ~w(.png), max_entries: 1)
       |> assign(:seller, seller)
-      |> assign(:seller_form, to_form(Seller.changeset(%Seller{}, %{})))
       |> assign(:step, step)
 
     {:ok, socket}
@@ -309,18 +311,25 @@ defmodule PlazaWeb.UploadLive2 do
   def render(%{step: 3} = assigns) do
     ~H"""
     <div style="margin-top: 100px;">
-      <PlazaWeb.UploadLive2.preheader step={@step} />
-      <div style="opacity: 50%; margin-top: 25px; margin-bottom: 100px;">
-        <PlazaWeb.UploadLive2.header step={@step} />
+      <div style="opacity: 50%; margin-bottom: 100px;">
+        <PlazaWeb.UploadLive2.header step={@step} disabled={true} />
       </div>
       <div class="has-font-3 is-size-5 mx-large">
         <div>
-          you need to register your email and create a store (name, logo, etc) before uploading designs to plaza
+          before your campaign goes live you'll need to register (login) and make a store (name, logo, etc)
+          <div>
+            you can register now or upload first and register later. which do you prefer?
+          </div>
         </div>
         <div>
           <.link class="has-font-3" navigate="/users/register">
             register / login
           </.link>
+        </div>
+        <div>
+          <button phx-click="step" phx-value-step="4">
+            upload first
+          </button>
         </div>
       </div>
     </div>
@@ -330,86 +339,10 @@ defmodule PlazaWeb.UploadLive2 do
   def render(%{step: 4} = assigns) do
     ~H"""
     <div style="margin-top: 100px;">
-      <PlazaWeb.UploadLive2.preheader step={@step} />
-      <div style="opacity: 50%; margin-top: 25px; margin-bottom: 100px;">
+      <div style="margin-bottom: 100px;">
         <PlazaWeb.UploadLive2.header step={@step} />
       </div>
-      <div class="has-font-3 is-size-5 mx-large">
-        <div>
-          ok you've registered your email but you still need to create a store (name, logo, etc) before uploading designs to plaza.
-        </div>
-        <div>
-          only the name is required to get started. you can add/edit more info later.
-        </div>
-        <div style="display: flex; justify-content: center;">
-          <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
-            <div style="display: inline-block;">
-              <div style="position: absolute;">
-                <div style="position: relative; bottom: 335px; right: 315px;">
-                  <div>
-                    <label
-                      class="has-font-3 is-size-4"
-                      style="width: 312px; height: 300px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
-                    >
-                      <.live_file_input
-                        upload={@uploads.logo}
-                        style="display: none;"
-                        phx-change="change-seller-logo"
-                      />
-                      <div style="text-align: center; text-decoration: underline; font-size: 24px;">
-                        Upload
-                        <div>
-                          Logo/Foto de Perfil
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                  <div>
-                    <.upload_item upload={@uploads.logo} />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div style="display: inline-block; position: relative;left: 50px;">
-              <.input
-                field={@seller_form[:user_name]}
-                type="text"
-                placeholder="username / nome da loja *"
-                class="text-input-1"
-              >
-              </.input>
-              <.input
-                field={@seller_form[:website]}
-                type="text"
-                placeholder="website"
-                class="text-input-1"
-              >
-              </.input>
-              <.input
-                field={@seller_form[:instagram]}
-                type="text"
-                placeholder="instagram"
-                class="text-input-1"
-              >
-              </.input>
-              <.input
-                field={@seller_form[:twitter]}
-                type="text"
-                placeholder="twitter"
-                class="text-input-1"
-              >
-              </.input>
-              <.input
-                field={@seller_form[:soundcloud]}
-                type="text"
-                placeholder="soundcloud"
-                class="text-input-1"
-              >
-              </.input>
-            </div>
-          </.form>
-        </div>
-      </div>
+      <div class="has-font-3 is-size-5 mx-large"></div>
     </div>
     """
   end
@@ -455,31 +388,7 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   attr :step, :integer, required: true
-
-  def preheader(assigns) do
-    ~H"""
-    <div style="display: flex; justify-content: center;">
-      <nav class="has-font-3 is-size-5">
-        <div class="has-black-text mr-small" style="display: inline-block;">
-          Register / Login
-          <img :if={@step == 3} src="svg/yellow-circle.svg" style="position: relative; left: 63px;" />
-        </div>
-        <img src="svg/seperator.svg" class="mr-small" style="display: inline-block;" />
-        <div class="has-black-text mr-small" style="display: inline-block;">
-          Create Your Store
-          <img
-            :if={Enum.member?([4, 5], @step)}
-            src="svg/yellow-circle.svg"
-            style="position: relative; left: 73px;"
-          />
-        </div>
-      </nav>
-    </div>
-    """
-  end
-
-  attr :step, :integer, required: true
-  attr :disabled, :boolean, default: true
+  attr :disabled, :boolean, default: false
 
   def header(assigns) do
     ~H"""
@@ -487,13 +396,13 @@ defmodule PlazaWeb.UploadLive2 do
       <nav class="has-font-3 is-size-5">
         <a
           phx-click="step"
-          phx-value-step={if @disabled, do: "noop", else: "30"}
+          phx-value-step={if @disabled, do: "noop", else: "4"}
           class="has-black-text mr-small"
           style="display: inline-block;"
         >
           Configurar Estampa
           <img
-            :if={Enum.member?([30, 40, 50], @step)}
+            :if={Enum.member?([3, 4, 5, 6], @step)}
             src="svg/yellow-circle.svg"
             style="position: relative; left: 87px;"
           />
