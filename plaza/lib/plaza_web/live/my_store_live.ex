@@ -32,6 +32,45 @@ defmodule PlazaWeb.MyStoreLive do
     {:noreply, push_navigate(socket, to: "/product?#{url}")}
   end
 
+  def handle_event("change-seller-form", %{"seller" => seller}, socket) do
+    form =
+      Seller.changeset(
+        %Seller{},
+        seller
+        |> Map.put(
+          "user_id",
+          socket.assigns.current_user.id
+        )
+      )
+      |> Map.put(:action, :validate)
+      |> to_form
+
+    IO.inspect(form)
+
+    socket =
+      socket
+      |> assign(seller_form: form)
+
+    IO.inspect(socket.assigns.seller_form[:user_name])
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-seller-logo", _params, socket) do
+    IO.inspect(socket.assigns.uploads.logo)
+    IO.inspect(socket.assigns.seller_form)
+    {:noreply, socket}
+  end
+
+  def handle_event("logo-upload-cancel", %{"ref" => ref}, socket) do
+    {:noreply, Phoenix.LiveView.cancel_upload(socket, :logo, ref)}
+  end
+
+  def handle_event("submit-seller-form", %{"seller" => seller}, socket) do
+    IO.inspect(socket.assigns.seller_form)
+    {:noreply, socket}
+  end
+
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""

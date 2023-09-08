@@ -102,74 +102,11 @@ defmodule PlazaWeb.UploadLive2 do
     {:noreply, socket}
   end
 
-  def handle_event("change-seller-form", %{"seller" => seller}, socket) do
-    form =
-      Seller.changeset(
-        %Seller{},
-        seller
-        |> Map.put(
-          "user_id",
-          socket.assigns.current_user.id
-        )
-      )
-      |> Map.put(:action, :validate)
-      |> to_form
-
-    IO.inspect(form)
-
-    socket =
-      socket
-      |> assign(seller_form: form)
-
-    IO.inspect(socket.assigns.seller_form[:user_name])
-
-    {:noreply, socket}
-  end
-
-  def handle_event("change-seller-logo", _params, socket) do
-    IO.inspect(socket.assigns.uploads.logo)
-    IO.inspect(socket.assigns.seller_form)
-    {:noreply, socket}
-  end
-
-  def handle_event("logo-upload-cancel", %{"ref" => ref}, socket) do
-    {:noreply, Phoenix.LiveView.cancel_upload(socket, :logo, ref)}
-  end
-
-  def handle_event("submit-seller-form", %{"seller" => seller}, socket) do
-    IO.inspect(socket.assigns.seller_form)
-    {:noreply, socket}
-  end
-
   def handle_event("upload-change", _params, socket) do
     {:noreply, socket}
   end
 
   def handle_event("upload-submit", _params, socket) do
-    socket =
-      socket
-      |> assign(:step, "tmp-product-submit")
-
-    {:noreply, socket}
-  end
-
-  def handle_event("front-upload-cancel", %{"ref" => ref}, socket) do
-    {:noreply, Phoenix.LiveView.cancel_upload(socket, :front, ref)}
-  end
-
-  def handle_event("back-upload-cancel", %{"ref" => ref}, socket) do
-    {:noreply, Phoenix.LiveView.cancel_upload(socket, :back, ref)}
-  end
-
-  def handle_event("product-change", %{"product-name" => str}, socket) do
-    socket =
-      socket
-      |> assign(:product_name, str)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("product-submit", %{"product-name" => str}, socket) do
     [{file_name, src} | []] =
       consume_uploaded_entries(socket, :front, fn %{path: path}, entry ->
         unique_file_name = "#{entry.uuid}-#{entry.client_name}"
@@ -203,39 +140,18 @@ defmodule PlazaWeb.UploadLive2 do
 
     url = "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{file_name}"
 
-    attrs = %{"user_id" => socket.assigns.current_user.id, "name" => str, "front_url" => url}
-
-    response2 = Products.create_product(attrs)
-    IO.inspect(response2)
-
-    socket =
-      socket
-      |> assign(:step, "tmp-product-submit-success")
-
     {:noreply, socket}
   end
 
+  def handle_event("front-upload-cancel", %{"ref" => ref}, socket) do
+    {:noreply, Phoenix.LiveView.cancel_upload(socket, :front, ref)}
+  end
+
+  def handle_event("back-upload-cancel", %{"ref" => ref}, socket) do
+    {:noreply, Phoenix.LiveView.cancel_upload(socket, :back, ref)}
+  end
+
   @impl Phoenix.LiveView
-  def render(%{step: "tmp-product-submit"} = assigns) do
-    ~H"""
-    <div class="mx-large">
-      <form phx-change="product-change" phx-submit="product-submit">
-        <title>product name</title>
-        <input type="text" name="product-name" value={@product_name} />
-        <button type="submit">upload</button>
-      </form>
-    </div>
-    """
-  end
-
-  def render(%{step: "tmp-product-submit-success"} = assigns) do
-    ~H"""
-    <div class="mx-large">
-      product submit success
-    </div>
-    """
-  end
-
   def render(%{step: 1} = assigns) do
     ~H"""
     <div class="has-font-3 is-size-4" style="text-align: center; margin-top: 125px;">
@@ -338,17 +254,6 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: 4} = assigns) do
     ~H"""
-    <div style="margin-top: 100px;">
-      <div style="margin-bottom: 100px;">
-        <PlazaWeb.UploadLive2.header step={@step} />
-      </div>
-      <div class="has-font-3 is-size-5 mx-large"></div>
-    </div>
-    """
-  end
-
-  def render(%{step: 30} = assigns) do
-    ~H"""
     <div style="margin-top: 150px; margin-bottom: 750px;">
       <PlazaWeb.UploadLive2.header step={@step} />
       <div style="margin-top: 50px;">
@@ -359,19 +264,13 @@ defmodule PlazaWeb.UploadLive2 do
     """
   end
 
-  def render(%{step: 40} = assigns) do
+  def render(%{step: 5} = assigns) do
     ~H"""
     <PlazaWeb.UploadLive2.header step={@step} />
     <div style="margin-top: 50px;">
       <.upload_form current={@uploads.back} front={@uploads.front} back={@uploads.back} />
       <.upload_preview upload={@uploads.back} />
     </div>
-    """
-  end
-
-  def render(%{step: 5} = assigns) do
-    ~H"""
-    <PlazaWeb.UploadLive2.header step={@step} />
     """
   end
 
@@ -402,7 +301,7 @@ defmodule PlazaWeb.UploadLive2 do
         >
           Configurar Estampa
           <img
-            :if={Enum.member?([3, 4, 5, 6], @step)}
+            :if={Enum.member?([3, 4, 5], @step)}
             src="svg/yellow-circle.svg"
             style="position: relative; left: 87px;"
           />
