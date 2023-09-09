@@ -326,61 +326,29 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: 4} = assigns) do
     ~H"""
-    <div style="margin-top: 150px; margin-bottom: 750px;">
-      <PlazaWeb.UploadLive2.header step={@step} />
-      <div style="display: inline-block; position: absolute; margin-left: 50px;">
-        <div style="margin-top: 50px;">
-          <.upload_form
-            current={@uploads.front}
-            front={@uploads.front}
-            back={@uploads.back}
-            front_local_upload={@front_local_upload}
-            back_local_upload={@back_local_upload}
-          />
-        </div>
-      </div>
-      <div style="display: inline-block; position: relative; left: 900px; top: 50px;">
-        <div style="display: inline-block;">
-          <%!-- flipping order in which elements are added to dom behaves as z-index --%>
-          <.upload_preview local_url={@front_local_upload[:url]} />
-        </div>
-        <div style="display: inline-block; position: absolute;">
-          <div style="position: relative; left: 25px;">
-            <.upload_toggle step={@step} />
-          </div>
-        </div>
-      </div>
-    </div>
+    <.upload_generic
+      step={@step}
+      current={@uploads.front}
+      front={@uploads.front}
+      back={@uploads.back}
+      front_local_upload={@front_local_upload}
+      back_local_upload={@back_local_upload}
+      current_local_url={@front_local_upload[:url]}
+    />
     """
   end
 
   def render(%{step: 5} = assigns) do
     ~H"""
-    <div style="margin-top: 150px; margin-bottom: 750px;">
-      <PlazaWeb.UploadLive2.header step={@step} />
-      <div style="display: inline-block; position: absolute; margin-left: 50px;">
-        <div style="margin-top: 50px;">
-          <.upload_form
-            current={@uploads.back}
-            front={@uploads.front}
-            back={@uploads.back}
-            front_local_upload={@front_local_upload}
-            back_local_upload={@back_local_upload}
-          />
-        </div>
-      </div>
-      <div style="display: inline-block; position: relative; left: 900px; top: 50px;">
-        <div style="display: inline-block;">
-          <%!-- flipping order in which elements are added to dom behaves as z-index --%>
-          <.upload_preview local_url={@back_local_upload[:url]} />
-        </div>
-        <div style="display: inline-block; position: absolute;">
-          <div style="position: relative; left: 25px;">
-            <.upload_toggle step={@step} />
-          </div>
-        </div>
-      </div>
-    </div>
+    <.upload_generic
+      step={@step}
+      current={@uploads.back}
+      front={@uploads.front}
+      back={@uploads.back}
+      front_local_upload={@front_local_upload}
+      back_local_upload={@back_local_upload}
+      current_local_url={@back_local_upload[:url]}
+    />
     """
   end
 
@@ -452,6 +420,44 @@ defmodule PlazaWeb.UploadLive2 do
           <img :if={@step == 8} src="svg/yellow-circle.svg" style="position: relative; left: 93px;" />
         </a>
       </nav>
+    </div>
+    """
+  end
+
+  attr :step, :integer, required: true
+  attr :current, Phoenix.LiveView.UploadConfig, required: true
+  attr :front, Phoenix.LiveView.UploadConfig, required: true
+  attr :back, Phoenix.LiveView.UploadConfig, required: true
+  attr :front_local_upload, :map, default: nil
+  attr :back_local_upload, :map, default: nil
+  attr :current_local_url, :string, default: nil
+
+  defp upload_generic(assigns) do
+    ~H"""
+    <div style="margin-top: 150px; margin-bottom: 750px;">
+      <PlazaWeb.UploadLive2.header step={@step} />
+      <div style="display: inline-block; position: absolute; margin-left: 50px;">
+        <div style="margin-top: 50px;">
+          <.upload_form
+            current={@current}
+            front={@front}
+            back={@back}
+            front_local_upload={@front_local_upload}
+            back_local_upload={@back_local_upload}
+          />
+        </div>
+      </div>
+      <div style="display: inline-block; position: relative; left: 900px; top: 50px;">
+        <div style="display: inline-block;">
+          <%!-- flipping order in which elements are added to dom behaves as z-index --%>
+          <.upload_preview local_url={@current_local_url} />
+        </div>
+        <div style="display: inline-block; position: absolute;">
+          <div style="position: relative; left: 25px;">
+            <.upload_toggle step={@step} />
+          </div>
+        </div>
+      </div>
     </div>
     """
   end
