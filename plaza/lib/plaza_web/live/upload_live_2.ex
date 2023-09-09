@@ -49,8 +49,8 @@ defmodule PlazaWeb.UploadLive2 do
         auto_upload: true,
         progress: &handle_progress/3
       )
-      |> assign(:front_local_url, nil)
-      |> assign(:back_local_url, nil)
+      |> assign(:front_local_upload, nil)
+      |> assign(:back_local_upload, nil)
       |> assign(:seller, seller)
       |> assign(:step, step)
 
@@ -58,17 +58,17 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   defp handle_progress(:front, entry, socket) do
-    handle_progress_generic(:front_local_url, entry, socket)
+    handle_progress_generic(:front_local_upload, entry, socket)
   end
 
   defp handle_progress(:back, entry, socket) do
-    handle_progress_generic(:back_local_url, entry, socket)
+    handle_progress_generic(:back_local_upload, entry, socket)
   end
 
-  defp handle_progress_generic(local_url_atom, entry, socket) do
+  defp handle_progress_generic(local_upload_atom, entry, socket) do
     socket =
       if entry.done? do
-        local_url =
+        {local_url, file_name} =
           consume_uploaded_entry(socket, entry, fn %{path: path} ->
             IO.inspect(path)
             unique_file_name = "#{entry.uuid}-#{entry.client_name}"
@@ -82,14 +82,14 @@ defmodule PlazaWeb.UploadLive2 do
               ])
 
             File.cp!(path, dest)
-            {:ok, "uploads/#{unique_file_name}"}
+            {:ok, {"uploads/#{unique_file_name}", entry.client_name}}
           end)
 
         IO.inspect(local_url)
 
         socket =
           socket
-          |> assign(local_url_atom, local_url)
+          |> assign(local_upload_atom, %{url: local_url, file_name: file_name})
       else
         socket
       end
@@ -122,8 +122,8 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 4)
-      |> assign(:front_local_url, nil)
-      |> assign(:back_local_url, nil)
+      |> assign(:front_local_upload, nil)
+      |> assign(:back_local_upload, nil)
 
     IO.inspect(socket.assigns.uploads.front)
 
@@ -235,7 +235,7 @@ defmodule PlazaWeb.UploadLive2 do
   def handle_event("front-upload-cancel", _params, socket) do
     socket =
       socket
-      |> assign(:front_local_url, nil)
+      |> assign(:front_local_upload, nil)
 
     {:noreply, socket}
   end
@@ -243,7 +243,7 @@ defmodule PlazaWeb.UploadLive2 do
   def handle_event("back-upload-cancel", _params, socket) do
     socket =
       socket
-      |> assign(:back_local_url, nil)
+      |> assign(:back_local_upload, nil)
 
     {:noreply, socket}
   end
@@ -358,13 +358,13 @@ defmodule PlazaWeb.UploadLive2 do
           current={@uploads.front}
           front={@uploads.front}
           back={@uploads.back}
-          front_local_url={@front_local_url}
-          back_local_url={@back_local_url}
+          front_local_upload={@front_local_upload}
+          back_local_upload={@back_local_upload}
           step={@step}
         />
         <%!-- flipping order in which elements are added to dom behaves as z-index --%>
-        <.upload_preview local_url={@back_local_url} />
-        <.upload_preview local_url={@front_local_url} />
+        <.upload_preview local_url={@back_local_upload[:url]} />
+        <.upload_preview local_url={@front_local_upload[:url]} />
       </div>
     </div>
     """
@@ -379,12 +379,12 @@ defmodule PlazaWeb.UploadLive2 do
           current={@uploads.back}
           front={@uploads.front}
           back={@uploads.back}
-          front_local_url={@front_local_url}
-          back_local_url={@back_local_url}
+          front_local_upload={@front_local_upload}
+          back_local_upload={@back_local_upload}
           step={@step}
         />
-        <.upload_preview local_url={@front_local_url} />
-        <.upload_preview local_url={@back_local_url} />
+        <.upload_preview local_url={@front_local_upload[:url]} />
+        <.upload_preview local_url={@back_local_upload[:url]} />
       </div>
     </div>
     """
@@ -396,10 +396,10 @@ defmodule PlazaWeb.UploadLive2 do
       <PlazaWeb.UploadLive2.header step={@step} />
       <div style="margin-top: 50px;">
         <div>
-          <.upload_preview local_url={@front_local_url} />
+          <.upload_preview local_url={@front_local_upload[:url]} />
         </div>
         <div style="position: relative; left: 500px;">
-          <.upload_preview local_url={@back_local_url} />
+          <.upload_preview local_url={@back_local_upload[:url]} />
         </div>
       </div>
       <div style="position: relative; left: 1500px;">
@@ -465,23 +465,32 @@ defmodule PlazaWeb.UploadLive2 do
   attr :current, Phoenix.LiveView.UploadConfig, required: true
   attr :front, Phoenix.LiveView.UploadConfig, required: true
   attr :back, Phoenix.LiveView.UploadConfig, required: true
-  attr :front_local_url, :string, default: nil
-  attr :back_local_url, :string, default: nil
+  attr :front_local_upload, :map, default: nil
+  attr :back_local_upload, :map, default: nil
   attr :step, :integer, required: true
 
   defp upload_form(assigns) do
     ~H"""
     <div style="margin-left: 50px; display: inline-block;">
       <.upload_input upload={@current} step={@step} />
+      <div class="has-font-3" style="width: 760px; font-size: 28px;">
+        <div style="position: relative;">
+          Arquivo PNG com formato de cores RGB com pelo menos 300 dpi de resolução.
+          Medidas ajustadas dentro dos limites do A3 (29 x 42 cm)
+        </div>
+        <div>
+          Seus arquivos:
+        </div>
+      </div>
       <.upload_item
         upload={@front}
-        local_url={@front_local_url}
-        no_file_yet="front.png not uploaded yet"
+        local_file_name={@front_local_upload[:file_name]}
+        no_file_yet="front.png"
       />
       <.upload_item
         upload={@back}
-        local_url={@back_local_url}
-        no_file_yet="back.png not uploaded yet"
+        local_file_name={@back_local_upload[:file_name]}
+        no_file_yet="back.png"
       />
     </div>
     """
@@ -503,7 +512,7 @@ defmodule PlazaWeb.UploadLive2 do
         </label>
       </form>
 
-      <div style="position: relative;">
+      <div style="position: relative; left: 1525px; bottom: 125px;">
         <div>
           <button
             :if={@step == 4}
@@ -556,7 +565,7 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   attr :upload, Phoenix.LiveView.UploadConfig, required: true
-  attr :local_url, :string, default: nil
+  attr :local_file_name, :string, default: nil
   attr :no_file_yet, :string, default: nil
 
   defp upload_item(assigns) do
@@ -566,7 +575,7 @@ defmodule PlazaWeb.UploadLive2 do
           head
 
         _ ->
-          case assigns.local_url do
+          case assigns.local_file_name do
             nil ->
               %{progress: 0}
 
@@ -582,11 +591,11 @@ defmodule PlazaWeb.UploadLive2 do
     ~H"""
     <div>
       <div class="has-font-3 is-size-6">
-        <%= if @local_url, do: @local_url, else: @no_file_yet %>
+        <%= if @local_file_name, do: @local_file_name, else: @no_file_yet %>
         <div>
           <progress value={@entry.progress} max="100"><%= @entry.progress %>%</progress>
           <button
-            :if={@local_url}
+            :if={@local_file_name}
             type="button"
             phx-click={"#{@upload.name}-upload-cancel"}
             aria-label="cancel"
