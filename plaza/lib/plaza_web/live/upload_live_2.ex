@@ -193,30 +193,17 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   def handle_event("tmp-submit", _params, socket) do
-    IO.inspect(socket.assigns.uploads.front)
-
-    IO.inspect(socket.assigns.uploads.back)
-
-    [{file_name, src} | []] =
-      consume_uploaded_entries(socket, :front, fn %{path: path}, entry ->
-        unique_file_name = "#{entry.uuid}-#{entry.client_name}"
-
-        dest =
-          Path.join([
-            :code.priv_dir(:plaza),
-            "static",
-            "uploads",
-            unique_file_name
-          ])
-
-        File.cp!(path, dest)
-        {:ok, {"uploads/#{unique_file_name}", dest}}
-      end)
+    src =
+      Path.join([
+        :code.priv_dir(:plaza),
+        "static",
+        socket.assigns.front_local_upload.url
+      ])
 
     request =
       S3.put_object(
         @aws_s3_bucket,
-        file_name,
+        socket.assigns.front_local_upload.url,
         File.read!(src)
       )
 
@@ -228,7 +215,9 @@ defmodule PlazaWeb.UploadLive2 do
 
     IO.inspect(response)
 
-    url = "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{file_name}"
+    url =
+      "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{socket.assigns.front_local_upload.url}"
+
     {:noreply, socket}
   end
 
