@@ -8,10 +8,6 @@ defmodule PlazaWeb.UploadLive2 do
   alias ExAws
   alias ExAws.S3
 
-  ## TODO; overlay logo view on input 
-  ## async task upload to s3: https://fly.io/phoenix-files/liveview-async-task/
-  ## collect payout info after creating first product at /my-store
-
   @site "https://plazaaaaa.fly.dev"
 
   @aws_s3_region "us-west-2"
@@ -41,12 +37,23 @@ defmodule PlazaWeb.UploadLive2 do
       socket
       |> assign(:page_title, "Upload")
       |> assign(:header, :my_store)
-      |> allow_upload(:front, accept: ~w(.png), max_entries: 1, auto_upload: true)
+      |> allow_upload(:front,
+        accept: ~w(.png),
+        max_entries: 1,
+        auto_upload: true,
+        progress: &handle_progress/3
+      )
       |> allow_upload(:back, accept: ~w(.png), max_entries: 1, auto_upload: true)
       |> assign(:seller, seller)
       |> assign(:step, step)
 
     {:ok, socket}
+  end
+
+  ## TODO
+  defp handle_progress(:front, entry, socket) do
+    IO.inspect(entry)
+    {:noreply, socket}
   end
 
   @impl Phoenix.LiveView
@@ -75,9 +82,37 @@ defmodule PlazaWeb.UploadLive2 do
       socket
       |> assign(:step, 4)
 
+    uploads = socket.assigns.uploads
+
+    socket =
+      case uploads.front.entries do
+        [] ->
+          socket
+
+        [head | []] ->
+          Phoenix.LiveView.cancel_upload(socket, :front, head.ref)
+      end
+
+    socket =
+      case uploads.back.entries do
+        [] ->
+          socket
+
+        [head | []] ->
+          Phoenix.LiveView.cancel_upload(socket, :back, head.ref)
+      end
+
     IO.inspect(socket.assigns.uploads.front)
 
     IO.inspect(socket.assigns.uploads.back)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("step", %{"step" => "4-back"}, socket) do
+    socket =
+      socket
+      |> assign(:step, 4)
 
     {:noreply, socket}
   end
@@ -111,10 +146,17 @@ defmodule PlazaWeb.UploadLive2 do
       socket
       |> assign(:step, 7)
 
+    IO.inspect(socket.assigns.uploads.front)
+
+    IO.inspect(socket.assigns.uploads.back)
+
     {:noreply, socket}
   end
 
   def handle_event("upload-change", _params, socket) do
+    IO.inspect(socket.assigns.uploads.front)
+
+    IO.inspect(socket.assigns.uploads.back)
     {:noreply, socket}
   end
 
@@ -128,6 +170,10 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   def handle_event("tmp-submit", _params, socket) do
+    IO.inspect(socket.assigns.uploads.front)
+
+    IO.inspect(socket.assigns.uploads.back)
+
     [{file_name, src} | []] =
       consume_uploaded_entries(socket, :front, fn %{path: path}, entry ->
         unique_file_name = "#{entry.uuid}-#{entry.client_name}"
@@ -164,6 +210,7 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   def handle_event("front-upload-cancel", %{"ref" => ref}, socket) do
+    IO.inspect(ref)
     {:noreply, Phoenix.LiveView.cancel_upload(socket, :front, ref)}
   end
 
@@ -425,7 +472,7 @@ defmodule PlazaWeb.UploadLive2 do
           <button
             :if={@step == 5}
             phx-click="step"
-            phx-value-step="4"
+            phx-value-step="4-back"
             class="has-font-3 is-size-5"
             style="height: 43px;"
           >
