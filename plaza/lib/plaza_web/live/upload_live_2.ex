@@ -353,18 +353,27 @@ defmodule PlazaWeb.UploadLive2 do
     ~H"""
     <div style="margin-top: 150px; margin-bottom: 750px;">
       <PlazaWeb.UploadLive2.header step={@step} />
-      <div style="margin-top: 50px;">
-        <.upload_form
-          current={@uploads.front}
-          front={@uploads.front}
-          back={@uploads.back}
-          front_local_upload={@front_local_upload}
-          back_local_upload={@back_local_upload}
-          step={@step}
-        />
-        <%!-- flipping order in which elements are added to dom behaves as z-index --%>
-        <.upload_preview local_url={@back_local_upload[:url]} />
-        <.upload_preview local_url={@front_local_upload[:url]} />
+      <div style="display: inline-block; position: absolute; margin-left: 50px;">
+        <div style="margin-top: 50px;">
+          <.upload_form
+            current={@uploads.front}
+            front={@uploads.front}
+            back={@uploads.back}
+            front_local_upload={@front_local_upload}
+            back_local_upload={@back_local_upload}
+          />
+        </div>
+      </div>
+      <div style="display: inline-block; position: relative; left: 900px; top: 50px;">
+        <div style="display: inline-block;">
+          <%!-- flipping order in which elements are added to dom behaves as z-index --%>
+          <.upload_preview local_url={@front_local_upload[:url]} />
+        </div>
+        <div style="display: inline-block; position: absolute;">
+          <div style="position: relative; left: 25px;">
+            <.upload_toggle step={@step} />
+          </div>
+        </div>
       </div>
     </div>
     """
@@ -374,17 +383,27 @@ defmodule PlazaWeb.UploadLive2 do
     ~H"""
     <div style="margin-top: 150px; margin-bottom: 750px;">
       <PlazaWeb.UploadLive2.header step={@step} />
-      <div style="margin-top: 50px;">
-        <.upload_form
-          current={@uploads.back}
-          front={@uploads.front}
-          back={@uploads.back}
-          front_local_upload={@front_local_upload}
-          back_local_upload={@back_local_upload}
-          step={@step}
-        />
-        <.upload_preview local_url={@front_local_upload[:url]} />
-        <.upload_preview local_url={@back_local_upload[:url]} />
+      <div style="display: inline-block; position: absolute; margin-left: 50px;">
+        <div style="margin-top: 50px;">
+          <.upload_form
+            current={@uploads.back}
+            front={@uploads.front}
+            back={@uploads.back}
+            front_local_upload={@front_local_upload}
+            back_local_upload={@back_local_upload}
+          />
+        </div>
+      </div>
+      <div style="display: inline-block; position: relative; left: 900px; top: 50px;">
+        <div style="display: inline-block;">
+          <%!-- flipping order in which elements are added to dom behaves as z-index --%>
+          <.upload_preview local_url={@back_local_upload[:url]} />
+        </div>
+        <div style="display: inline-block; position: absolute;">
+          <div style="position: relative; left: 25px;">
+            <.upload_toggle step={@step} />
+          </div>
+        </div>
       </div>
     </div>
     """
@@ -467,37 +486,37 @@ defmodule PlazaWeb.UploadLive2 do
   attr :back, Phoenix.LiveView.UploadConfig, required: true
   attr :front_local_upload, :map, default: nil
   attr :back_local_upload, :map, default: nil
-  attr :step, :integer, required: true
 
   defp upload_form(assigns) do
     ~H"""
-    <div style="margin-left: 50px; display: inline-block;">
-      <.upload_input upload={@current} step={@step} />
+    <div>
+      <.upload_input upload={@current} />
       <div class="has-font-3" style="width: 760px; font-size: 28px;">
-        <div style="position: relative;">
+        <div style="margin-top: 25px;">
           Arquivo PNG com formato de cores RGB com pelo menos 300 dpi de resolução.
           Medidas ajustadas dentro dos limites do A3 (29 x 42 cm)
         </div>
-        <div>
+        <div style="margin-top: 50px; margin-left: 20px;">
           Seus arquivos:
         </div>
       </div>
-      <.upload_item
-        upload={@front}
-        local_file_name={@front_local_upload[:file_name]}
-        no_file_yet="front.png"
-      />
-      <.upload_item
-        upload={@back}
-        local_file_name={@back_local_upload[:file_name]}
-        no_file_yet="back.png"
-      />
+      <div style="margin-left: 20px;">
+        <.upload_item
+          upload={@front}
+          local_file_name={@front_local_upload[:file_name]}
+          no_file_yet="front.png"
+        />
+        <.upload_item
+          upload={@back}
+          local_file_name={@back_local_upload[:file_name]}
+          no_file_yet="back.png"
+        />
+      </div>
     </div>
     """
   end
 
   attr :upload, Phoenix.LiveView.UploadConfig, required: true
-  attr :step, :integer, required: true
 
   defp upload_input(assigns) do
     ~H"""
@@ -511,55 +530,6 @@ defmodule PlazaWeb.UploadLive2 do
           Arraste seus arquivos .png aqui para fazer upload
         </label>
       </form>
-
-      <div style="position: relative; left: 1525px; bottom: 125px;">
-        <div>
-          <button
-            :if={@step == 4}
-            class="has-font-3 is-size-5"
-            style="border-bottom: 2px solid black; height: 43px;"
-          >
-            Frente
-          </button>
-          <button
-            :if={@step == 5}
-            phx-click="step"
-            phx-value-step="4-back"
-            class="has-font-3 is-size-5"
-            style="height: 43px;"
-          >
-            Frente
-          </button>
-        </div>
-        <div>
-          <button
-            :if={@step == 4}
-            phx-click="step"
-            phx-value-step="5"
-            type="submit"
-            class="has-font-3 is-size-5"
-            style="height: 43px;"
-          >
-            Costas
-          </button>
-          <button
-            :if={@step == 5}
-            class="has-font-3 is-size-5"
-            style="border-bottom: 2px solid black; height: 43px;"
-          >
-            Costas
-          </button>
-        </div>
-      </div>
-
-      <div style="position: relative;">
-        <button :if={@step == 5} phx-click="step" phx-value-step="6">
-          <img src="svg/yellow-ellipse.svg" />
-          <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
-            Próximo
-          </div>
-        </button>
-      </div>
     </div>
     """
   end
@@ -612,13 +582,64 @@ defmodule PlazaWeb.UploadLive2 do
 
   defp upload_preview(assigns) do
     ~H"""
-    <div style="display: inline-block; position: absolute">
-      <div style="position: relative; left: 75px;">
-        <img src="png/mockup-front.png" />
-        <div style="overflow: hidden; width: 264px; height: 356px; position: relative; bottom: 560px; left: 205px; border: 1px dotted blue;">
-          <img src={@local_url} />
-        </div>
-        <div style="position: relative; bottom: 1160px; left: 700px;"></div>
+    <div>
+      <img src="png/mockup-front.png" />
+      <div style="overflow: hidden; width: 264px; height: 356px; position: relative; bottom: 560px; left: 205px; border: 1px dotted blue;">
+        <img src={@local_url} />
+      </div>
+    </div>
+    """
+  end
+
+  attr :step, :integer, required: true
+
+  defp upload_toggle(assigns) do
+    ~H"""
+    <div>
+      <div>
+        <button
+          :if={@step == 4}
+          class="has-font-3 is-size-5"
+          style="border-bottom: 2px solid black; height: 43px;"
+        >
+          Frente
+        </button>
+        <button
+          :if={@step == 5}
+          phx-click="step"
+          phx-value-step="4-back"
+          class="has-font-3 is-size-5"
+          style="height: 43px;"
+        >
+          Frente
+        </button>
+      </div>
+      <div>
+        <button
+          :if={@step == 4}
+          phx-click="step"
+          phx-value-step="5"
+          type="submit"
+          class="has-font-3 is-size-5"
+          style="height: 43px;"
+        >
+          Costas
+        </button>
+        <button
+          :if={@step == 5}
+          class="has-font-3 is-size-5"
+          style="border-bottom: 2px solid black; height: 43px;"
+        >
+          Costas
+        </button>
+      </div>
+      <div style="position: relative; top: 620px; width: 200px;">
+        <button :if={@step == 5} phx-click="step" phx-value-step="6">
+          <img src="svg/yellow-ellipse.svg" />
+          <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
+            Próximo
+          </div>
+        </button>
       </div>
     </div>
     """
