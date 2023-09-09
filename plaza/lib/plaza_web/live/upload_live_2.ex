@@ -122,20 +122,6 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 4)
-      |> assign(:front_local_upload, nil)
-      |> assign(:back_local_upload, nil)
-
-    IO.inspect(socket.assigns.uploads.front)
-
-    IO.inspect(socket.assigns.uploads.back)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("step", %{"step" => "4-back"}, socket) do
-    socket =
-      socket
-      |> assign(:step, 4)
 
     {:noreply, socket}
   end
@@ -596,7 +582,7 @@ defmodule PlazaWeb.UploadLive2 do
         <button
           :if={@step == 5}
           phx-click="step"
-          phx-value-step="4-back"
+          phx-value-step="4"
           class="has-font-3 is-size-5"
           style="height: 43px;"
         >
