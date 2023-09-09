@@ -356,18 +356,36 @@ defmodule PlazaWeb.UploadLive2 do
     ~H"""
     <div style="margin-top: 150px; margin-bottom: 750px;">
       <PlazaWeb.UploadLive2.header step={@step} />
-      <div style="margin-top: 50px;">
-        <div>
-          <.upload_preview local_url={@front_local_upload[:url]} />
+      <div style="display: flex; justify-content: center;  margin-top: 50px;">
+        <div class="has-font-3" style="font-size: 30px;">
+          <div style="display: flex; justify-content: center; margin-bottom: 25px;">
+            Seu produto ficou assim:
+          </div>
+          <div style="display: flex; justify-content: center;">
+            <div style="display: inline-block;">
+              <.upload_preview local_url={@front_local_upload[:url]} />
+              <div style="position: relative; bottom: 350px; left: 10px; font-size: 34px;">
+                Frente
+              </div>
+            </div>
+            <div style="display: inline-block; margin-left: 150px;">
+              <.upload_preview local_url={@back_local_upload[:url]} />
+              <div style="position: relative; bottom: 350px; left: 10px; font-size: 34px;">
+                Costas
+              </div>
+            </div>
+            <div style="display: inline-block;">
+              <div style="position: relative; left: 50px; top: 800px;">
+                <button phx-click="step" phx-value-step="7">
+                  <img src="svg/yellow-ellipse.svg" />
+                  <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
+                    Próximo
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div style="position: relative; left: 500px;">
-          <.upload_preview local_url={@back_local_upload[:url]} />
-        </div>
-      </div>
-      <div style="position: relative; left: 1500px;">
-        <button phx-click="tmp-submit">
-          submit
-        </button>
       </div>
     </div>
     """
