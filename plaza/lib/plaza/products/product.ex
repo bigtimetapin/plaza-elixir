@@ -2,11 +2,17 @@ defmodule Plaza.Products.Product do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Plaza.Products.EctoDesigns
+  alias Plaza.Products.EctoMocks
+
   schema "products" do
-    ## TODO; seller-id
     field :user_id, :id
     field :name, :string
-    field :front_url, :string
+    field :price, :float
+    field :campaign_duration, :integer
+    field :description, :string
+    field :designs, EctoDesigns
+    field :mocks, EctoMocks
     timestamps()
   end
 
@@ -16,15 +22,25 @@ defmodule Plaza.Products.Product do
     |> cast(attrs, [
       :user_id,
       :name,
-      :front_url
+      :price,
+      :campaign_duration,
+      :description,
+      :designs,
+      :mocks
     ])
     |> validate_required([
       :user_id,
-      :name
+      :name,
+      :price,
+      :campaign_duration,
+      :description,
+      :designs,
+      :mocks
     ])
     |> unique_constraint([
       :user_id,
       :name
     ])
+    |> validate_length(:description, max: 140)
   end
 end

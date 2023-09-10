@@ -4,6 +4,7 @@ defmodule PlazaWeb.UploadLive2 do
   alias Plaza.Accounts
   alias Plaza.Accounts.Seller
   alias Plaza.Products
+  alias Plaza.Products.Product
 
   alias ExAws
   alias ExAws.S3
@@ -52,6 +53,15 @@ defmodule PlazaWeb.UploadLive2 do
       |> assign(:front_local_upload, nil)
       |> assign(:back_local_upload, nil)
       |> assign(:seller, seller)
+      |> assign(
+        :product_form,
+        to_form(
+          Product.changeset(
+            %Product{},
+            %{}
+          )
+        )
+      )
       |> assign(:step, step)
 
     {:ok, socket}
@@ -230,6 +240,26 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:product_display, product_display)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-product-form", %{"product" => product}, socket) do
+    form =
+      Product.changeset(
+        %Product{},
+        product
+        |> Map.put(
+          "user_id",
+          socket.assigns.current_user.id
+        )
+      )
+      |> Map.put(:action, :validate)
+      |> to_form
+
+    socket =
+      socket
+      |> assign(:product_form, form)
 
     {:noreply, socket}
   end
@@ -445,6 +475,35 @@ defmodule PlazaWeb.UploadLive2 do
               <.upload_preview local_url={@back_local_upload[:url]} />
             </div>
           </div>
+        </div>
+      </div>
+      <div style="display: inline-block; position: absolute;">
+        <div style="position: relative; left: 50px; top: 50px;">
+          <.form for={@product_form} phx-change="change-product-form" phx-submit="submit-product-form">
+            <div style="display: inline-block;">
+              <div>
+                <.input
+                  field={@product_form[:name]}
+                  type="textarea"
+                  placeholder="*Nome do produto"
+                  style="color: #707070; font-size: 36px; text-decoration-line: underline; border: none;"
+                  class="has-font-3"
+                >
+                </.input>
+              </div>
+              <div>
+                <.input
+                  field={@product_form[:description]}
+                  type="textarea"
+                  placeholder="*Descrição"
+                  style="color: #707070;  font-size: 28px; text-decoration-line: underline; border: none; width: 500px; height: 250px;"
+                  class="has-font-3"
+                >
+                </.input>
+              </div>
+            </div>
+            <div style="display: inline-block;"></div>
+          </.form>
         </div>
       </div>
     </div>
