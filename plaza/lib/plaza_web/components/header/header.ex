@@ -55,7 +55,7 @@ defmodule PlazaWeb.Header do
         <div class="level-item pr-xmedium">
           <div>
             log in
-            <div style="position: absolute; width: 35px;">
+            <div style="position: absolute;">
               <div style="position: relative; left: 11px;">
                 <img src="../svg/yellow-circle.svg" />
               </div>
@@ -106,7 +106,7 @@ defmodule PlazaWeb.Header do
       <:store>
         <div>
           minha loja
-          <div style="position: absolute; width: 35px;">
+          <div style="position: absolute;">
             <div style="position: relative; left: 35px;">
               <img src="svg/yellow-circle.svg" />
             </div>
@@ -186,7 +186,7 @@ defmodule PlazaWeb.Header do
     ~H"""
     <div>
       quero vender
-      <div style="position: absolute; width: 35px;">
+      <div style="position: absolute;">
         <div style="position: relative; left: 45px;">
           <img src="svg/yellow-circle.svg" />
         </div>
@@ -212,7 +212,7 @@ defmodule PlazaWeb.Header do
         <div class="level-item pr-xmedium">
           <div>
             conta
-            <div style="position: absolute; width: 35px;">
+            <div style="position: absolute;">
               <div style="position: relative; left: 13px;">
                 <img src="svg/yellow-circle.svg" />
               </div>
@@ -263,7 +263,7 @@ defmodule PlazaWeb.Header do
               <div class="is-size-5" style="position: relative; top: 11px;">
                 <div :if={@selected}>
                   loja
-                  <div style="position: absolute; width: 35px;">
+                  <div style="position: absolute;">
                     <div style="position: relative; left: 2px;">
                       <img src="svg/yellow-circle.svg" />
                     </div>
