@@ -154,10 +154,7 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 7)
-
-    IO.inspect(socket.assigns.uploads.front)
-
-    IO.inspect(socket.assigns.uploads.back)
+      |> assign(:product_display, :front)
 
     {:noreply, socket}
   end
@@ -219,6 +216,20 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:back_local_upload, nil)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-product-display", _params, socket) do
+    product_display =
+      case socket.assigns.product_display do
+        :front -> :back
+        :back -> :front
+      end
+
+    socket =
+      socket
+      |> assign(:product_display, product_display)
 
     {:noreply, socket}
   end
@@ -361,7 +372,15 @@ defmodule PlazaWeb.UploadLive2 do
           <div style="display: flex; justify-content: center; margin-bottom: 25px;">
             Seu produto ficou assim:
           </div>
-          <div style="display: flex; justify-content: center;">
+          <div style="position: relative;">
+            <button phx-click="step" phx-value-step="7">
+              <img src="svg/yellow-ellipse.svg" />
+              <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
+                Próximo
+              </div>
+            </button>
+          </div>
+          <div>
             <div style="display: inline-block;">
               <.upload_preview local_url={@front_local_upload[:url]} />
               <div style="position: relative; bottom: 350px; left: 10px; font-size: 34px;">
@@ -374,16 +393,6 @@ defmodule PlazaWeb.UploadLive2 do
                 Costas
               </div>
             </div>
-            <div style="display: inline-block;">
-              <div style="position: relative; left: 50px; top: 800px;">
-                <button phx-click="step" phx-value-step="7">
-                  <img src="svg/yellow-ellipse.svg" />
-                  <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
-                    Próximo
-                  </div>
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -393,7 +402,52 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: 7} = assigns) do
     ~H"""
-    <PlazaWeb.UploadLive2.header step={@step} />
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
+      <PlazaWeb.UploadLive2.header step={@step} />
+      <div style="display: inline-block; margin-left: 50px;">
+        <div>
+          Foto do seu produto na loja:
+          <button
+            :if={@product_display == :front}
+            class="has-font-3"
+            style="border-bottom: 2px solid black; height: 45px;"
+          >
+            Frente
+          </button>
+          <button
+            :if={@product_display == :front}
+            class="has-font-3"
+            phx-click="change-product-display"
+          >
+            / Costas
+          </button>
+
+          <button
+            :if={@product_display == :back}
+            class="has-font-3"
+            phx-click="change-product-display"
+          >
+            Frente
+          </button>
+          <button
+            :if={@product_display == :back}
+            class="has-font-3"
+            style="border-bottom: 2px solid black; height: 45px;"
+          >
+            / Costas
+          </button>
+          <div style="margin-top: 10px;">
+            <div :if={@product_display == :front}>
+              <.upload_preview local_url={@front_local_upload[:url]} />
+            </div>
+
+            <div :if={@product_display == :back}>
+              <.upload_preview local_url={@back_local_upload[:url]} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     """
   end
 
