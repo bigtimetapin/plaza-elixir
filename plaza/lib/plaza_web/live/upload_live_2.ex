@@ -174,6 +174,14 @@ defmodule PlazaWeb.UploadLive2 do
     {:noreply, socket}
   end
 
+  def handle_event("step", %{"step" => "8"}, socket) do
+    socket =
+      socket
+      |> assign(:step, 8)
+
+    {:noreply, socket}
+  end
+
   def handle_event("upload-change", _params, socket) do
     IO.inspect(socket.assigns.uploads.front)
 
@@ -537,7 +545,6 @@ defmodule PlazaWeb.UploadLive2 do
             <div :if={@product_display == :front}>
               <.upload_preview local_url={@front_local_upload[:url]} />
             </div>
-
             <div :if={@product_display == :back}>
               <.upload_preview local_url={@back_local_upload[:url]} />
             </div>
@@ -546,6 +553,22 @@ defmodule PlazaWeb.UploadLive2 do
       </div>
       <div style="display: inline-block; position: absolute;">
         <div style="position: relative; left: 50px; top: 50px;">
+          <div style="position: absolute;">
+            <div
+              :if={
+                @product_form.data.name && @product_form.data.description &&
+                  @product_form.data.price
+              }
+              style="position: relative; top: 450px; left: 550px;"
+            >
+              <button phx-click="step" phx-value-step="8">
+                <img src="svg/yellow-ellipse.svg" />
+                <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
+                  Próximo
+                </div>
+              </button>
+            </div>
+          </div>
           <.form for={@product_form} phx-change="change-product-form" phx-submit="submit-product-form">
             <div style="display: inline-block;">
               <div>
@@ -570,27 +593,27 @@ defmodule PlazaWeb.UploadLive2 do
               </div>
             </div>
             <div style="display: inline-block; position: absolute;">
-              <div style="position: relative; left: 100px; width: 750px;">
-                <div style="position: absolute;">
-                  <div style="position: relative; top: 101px; left: 17px; background-color: #F8FC5F; width: 20px; z-index: 99;">
-                    R$
-                  </div>
-                </div>
+              <div style="position: relative; left: 10px; width: 750px;">
                 <div>
                   Defina o preço final de venda:
-                  <div style="position: relative;">
-                    <.input
-                      field={@product_form[:price]}
-                      value={@product_form.data.price}
-                      type="number"
-                      phx-change="change-product-price"
-                      class="has-font-3"
-                      style="font-size: 34px; border: 1px solid gray; background-color: #F8FC5F; width: 150px; height: 100px; border-radius: 50px; padding-left: 50px;"
-                    >
-                    </.input>
-                  </div>
                 </div>
-                <div style="position: relative;">
+                <div style="position: relative; bottom: 98px; left: 370px;">
+                  <div style="position: absolute;">
+                    <div style="position: relative; top: 26px; left: 17px; background-color: #F8FC5F; width: 20px; z-index: 99;">
+                      R$
+                    </div>
+                  </div>
+                  <.input
+                    field={@product_form[:price]}
+                    value={@product_form.data.price}
+                    type="number"
+                    phx-change="change-product-price"
+                    class="has-font-3"
+                    style="font-size: 34px; border: 1px solid gray; background-color: #F8FC5F; width: 150px; height: 100px; border-radius: 50px; padding-left: 50px;"
+                  >
+                  </.input>
+                </div>
+                <div style="position: relative; bottom: 50px;">
                   Se vender 30 unidades seu lucro será: R$<%= (@product_form.data.price - 50) * 30 %>
                 </div>
               </div>
@@ -598,6 +621,14 @@ defmodule PlazaWeb.UploadLive2 do
           </.form>
         </div>
       </div>
+    </div>
+    """
+  end
+
+  def render(%{step: 8} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
+      <PlazaWeb.UploadLive2.header step={@step} />
     </div>
     """
   end
