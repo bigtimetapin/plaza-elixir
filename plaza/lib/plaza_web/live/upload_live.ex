@@ -15,8 +15,9 @@ defmodule PlazaWeb.UploadLive do
     socket =
       socket
       |> assign(:page_title, "Upload")
-      |> assign(:header, :upload)
+      |> assign(:header, :my_store)
       |> assign(:design_url, nil)
+      |> assign(:seller, nil)
       |> allow_upload(:design, accept: ~w(.jpg .jpeg .png), max_entries: 1)
       |> allow_upload(:logo, accept: ~w(.jpg .jpeg .png), max_entries: 1)
       |> assign(:step, 1)

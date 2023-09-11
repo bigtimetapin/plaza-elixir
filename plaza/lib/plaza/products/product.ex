@@ -42,5 +42,30 @@ defmodule Plaza.Products.Product do
       :name
     ])
     |> validate_length(:description, max: 140)
+    |> validate_number(:price, greater_than_or_equal_to: 50)
+  end
+
+  def changeset_price(product, attrs) do
+    product
+    |> cast(attrs, [
+      :price
+    ])
+    |> validate_required([
+      :price
+    ])
+    |> validate_number(:price, greater_than_or_equal_to: 50)
+  end
+
+  def changeset_name_and_description(product, attrs) do
+    product
+    |> cast(attrs, [
+      :name,
+      :description
+    ])
+    |> validate_required([
+      :name,
+      :description
+    ])
+    |> validate_length(:description, max: 140)
   end
 end

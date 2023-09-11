@@ -1,6 +1,8 @@
 defmodule PlazaWeb.UploadLive2 do
   use PlazaWeb, :live_view
 
+  alias Ecto.Changeset
+
   alias Plaza.Accounts
   alias Plaza.Accounts.Seller
   alias Plaza.Products
@@ -57,7 +59,10 @@ defmodule PlazaWeb.UploadLive2 do
         :product_form,
         to_form(
           Product.changeset(
-            %Product{},
+            %Product{
+              user_id: socket.assigns.current_user.id,
+              price: 75
+            },
             %{}
           )
         )
@@ -245,17 +250,79 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   def handle_event("change-product-form", %{"product" => product}, socket) do
-    form =
-      Product.changeset(
-        %Product{},
+    IO.inspect(product)
+
+    changes =
+      Product.changeset_name_and_description(
+        socket.assigns.product_form.data,
         product
-        |> Map.put(
-          "user_id",
-          socket.assigns.current_user.id
-        )
       )
-      |> Map.put(:action, :validate)
-      |> to_form
+      |> Changeset.apply_action(:update)
+
+    IO.inspect(changes)
+
+    form =
+      case changes do
+        {:error, changeset} ->
+          to_form(changeset)
+
+        {:ok, product} ->
+          Product.changeset(
+            product,
+            %{}
+          )
+          |> Map.put(:action, :validate)
+          |> to_form
+      end
+
+    IO.inspect(form)
+
+    socket =
+      socket
+      |> assign(:product_form, form)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-product-price", %{"product" => %{"price" => price_as_string}}, socket) do
+    price_attr =
+      case price_as_string do
+        "" ->
+          %{}
+
+        nes ->
+          case Float.parse(nes) do
+            {float, ""} -> %{"price" => float}
+            _ -> %{}
+          end
+      end
+
+    IO.inspect(price_attr)
+
+    changes =
+      Product.changeset_price(
+        socket.assigns.product_form.data,
+        price_attr
+      )
+      |> Changeset.apply_action(:update)
+
+    IO.inspect(changes)
+
+    form =
+      case changes do
+        {:error, changeset} ->
+          to_form(changeset)
+
+        {:ok, product} ->
+          Product.changeset(
+            product,
+            %{}
+          )
+          |> Map.put(:action, :validate)
+          |> to_form
+      end
+
+    IO.inspect(form)
 
     socket =
       socket
@@ -496,13 +563,38 @@ defmodule PlazaWeb.UploadLive2 do
                   field={@product_form[:description]}
                   type="textarea"
                   placeholder="*Descrição"
-                  style="color: #707070;  font-size: 28px; text-decoration-line: underline; border: none; width: 500px; height: 250px;"
+                  style="color: #707070; font-size: 28px; text-decoration-line: underline; border: none; width: 500px; height: 250px;"
                   class="has-font-3"
                 >
                 </.input>
               </div>
             </div>
-            <div style="display: inline-block;"></div>
+            <div style="display: inline-block; position: absolute;">
+              <div style="position: relative; left: 100px; width: 750px;">
+                <div style="position: absolute;">
+                  <div style="position: relative; top: 101px; left: 17px; background-color: #F8FC5F; width: 20px; z-index: 99;">
+                    R$
+                  </div>
+                </div>
+                <div>
+                  Defina o preço final de venda:
+                  <div style="position: relative;">
+                    <.input
+                      field={@product_form[:price]}
+                      value={@product_form.data.price}
+                      type="number"
+                      phx-change="change-product-price"
+                      class="has-font-3"
+                      style="font-size: 34px; border: 1px solid gray; background-color: #F8FC5F; width: 150px; height: 100px; border-radius: 50px; padding-left: 50px;"
+                    >
+                    </.input>
+                  </div>
+                </div>
+                <div style="position: relative;">
+                  Se vender 30 unidades seu lucro será: R$<%= (@product_form.data.price - 50) * 30 %>
+                </div>
+              </div>
+            </div>
           </.form>
         </div>
       </div>
