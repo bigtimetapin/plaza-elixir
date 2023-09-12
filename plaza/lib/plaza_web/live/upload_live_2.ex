@@ -653,9 +653,30 @@ defmodule PlazaWeb.UploadLive2 do
         product_form={@product_form}
       />
       <div style="display: flex; justify-content: center;  margin-top: 50px;">
-        <.upload_preview local_url={
-          if @product_display == :front, do: @front_local_upload[:url], else: @back_local_upload[:url]
-        } />
+        <div style="display: inline-block;">
+          <.upload_preview
+            local_url={
+              if @product_display == :front,
+                do: @front_local_upload[:url],
+                else: @back_local_upload[:url]
+            }
+            size="small"
+          />
+        </div>
+        <div style="display: inline-block; margin-left: 50px;">
+          <div>
+            Quantos dias seu produto ficará no ar:
+          </div>
+          <div>
+            <button>
+              7
+            </button>
+
+            <button>
+              14
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     """
@@ -861,12 +882,19 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   attr :local_url, :string, default: nil
+  attr :size, :string, default: "big", values: ~w(big small)
 
   defp upload_preview(assigns) do
     ~H"""
-    <div>
+    <div :if={@size == "big"}>
       <img src="png/mockup-front.png" />
       <div style="overflow: hidden; width: 264px; height: 356px; position: relative; bottom: 560px; left: 205px; border: 1px dotted blue;">
+        <img src={@local_url} />
+      </div>
+    </div>
+    <div :if={@size == "small"} style="width: 416px;">
+      <img src="png/mockup-front.png" />
+      <div style="overflow: hidden; width: 164px; height: 220px; position: relative; bottom: 345px; left: 125px; border: 1px dotted blue;">
         <img src={@local_url} />
       </div>
     </div>
