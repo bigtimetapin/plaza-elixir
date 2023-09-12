@@ -778,6 +778,19 @@ defmodule PlazaWeb.UploadLive2 do
               </button>
             </div>
           </div>
+          <div style="display: flex; justify-content: center; margin-top: 50px;">
+            <div>
+              Você terminou de configurar seu produto, publicar na loja?
+              <div style="display: flex; justify-content: center; margin-top: 25px;">
+                <button phx-click="publish">
+                  <img src="svg/yellow-ellipse.svg" />
+                  <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                    Publicar
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
