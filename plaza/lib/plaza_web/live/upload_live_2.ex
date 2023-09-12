@@ -67,6 +67,7 @@ defmodule PlazaWeb.UploadLive2 do
           )
         )
       )
+      |> assign(:product_display, :front)
       |> assign(:step, step)
 
     {:ok, socket}
@@ -169,7 +170,6 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 7)
-      |> assign(:product_display, :front)
 
     {:noreply, socket}
   end
@@ -416,7 +416,13 @@ defmodule PlazaWeb.UploadLive2 do
     ~H"""
     <div style="margin-top: 100px;">
       <div style="opacity: 50%; margin-bottom: 100px;">
-        <PlazaWeb.UploadLive2.header step={@step} disabled={true} />
+        <PlazaWeb.UploadLive2.header
+          step={@step}
+          disabled={true}
+          front_local_upload={@front_local_upload}
+          back_local_upload={@back_local_upload}
+          product_form={@product_form}
+        />
       </div>
       <div class="has-font-3 is-size-5 mx-large">
         <div>
@@ -450,6 +456,7 @@ defmodule PlazaWeb.UploadLive2 do
       front_local_upload={@front_local_upload}
       back_local_upload={@back_local_upload}
       current_local_url={@front_local_upload[:url]}
+      product_form={@product_form}
     />
     """
   end
@@ -464,6 +471,7 @@ defmodule PlazaWeb.UploadLive2 do
       front_local_upload={@front_local_upload}
       back_local_upload={@back_local_upload}
       current_local_url={@back_local_upload[:url]}
+      product_form={@product_form}
     />
     """
   end
@@ -471,7 +479,12 @@ defmodule PlazaWeb.UploadLive2 do
   def render(%{step: 6} = assigns) do
     ~H"""
     <div style="margin-top: 150px; margin-bottom: 750px;">
-      <PlazaWeb.UploadLive2.header step={@step} />
+      <PlazaWeb.UploadLive2.header
+        step={@step}
+        front_local_upload={@front_local_upload}
+        back_local_upload={@back_local_upload}
+        product_form={@product_form}
+      />
       <div style="display: flex; justify-content: center;  margin-top: 50px;">
         <div class="has-font-3" style="font-size: 30px;">
           <div style="display: flex; justify-content: center; margin-bottom: 25px;">
@@ -508,7 +521,12 @@ defmodule PlazaWeb.UploadLive2 do
   def render(%{step: 7} = assigns) do
     ~H"""
     <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
-      <PlazaWeb.UploadLive2.header step={@step} />
+      <PlazaWeb.UploadLive2.header
+        step={@step}
+        front_local_upload={@front_local_upload}
+        back_local_upload={@back_local_upload}
+        product_form={@product_form}
+      />
       <div style="display: inline-block; margin-left: 50px;">
         <div>
           Foto do seu produto na loja:
@@ -628,13 +646,26 @@ defmodule PlazaWeb.UploadLive2 do
   def render(%{step: 8} = assigns) do
     ~H"""
     <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
-      <PlazaWeb.UploadLive2.header step={@step} />
+      <PlazaWeb.UploadLive2.header
+        step={@step}
+        front_local_upload={@front_local_upload}
+        back_local_upload={@back_local_upload}
+        product_form={@product_form}
+      />
+      <div style="display: flex; justify-content: center;  margin-top: 50px;">
+        <.upload_preview local_url={
+          if @product_display == :front, do: @front_local_upload[:url], else: @back_local_upload[:url]
+        } />
+      </div>
     </div>
     """
   end
 
   attr :step, :integer, required: true
   attr :disabled, :boolean, default: false
+  attr :front_local_upload, :map, required: true
+  attr :back_local_upload, :map, required: true
+  attr :product_form, :map, required: true
 
   def header(assigns) do
     ~H"""
@@ -656,7 +687,11 @@ defmodule PlazaWeb.UploadLive2 do
         <img src="svg/seperator.svg" class="mr-small" style="display: inline-block;" />
         <a
           phx-click="step"
-          phx-value-step={if @disabled, do: "noop", else: "7"}
+          phx-value-step={
+            if @disabled || !(@front_local_upload[:url] || @back_local_upload[:url]),
+              do: "noop",
+              else: "7"
+          }
           class="has-black-text mr-small"
           style="display: inline-block;"
         >
@@ -666,7 +701,13 @@ defmodule PlazaWeb.UploadLive2 do
         <img src="svg/seperator.svg" class="mr-small" style="display: inline-block;" />
         <a
           phx-click="step"
-          phx-value-step={if @disabled, do: "noop", else: "8"}
+          phx-value-step={
+            if @disabled ||
+                 !(@product_form.data.name && @product_form.data.description &&
+                     @product_form.data.price),
+               do: "noop",
+               else: "8"
+          }
           class="has-black-text"
           style="display: inline-block;"
         >
@@ -685,11 +726,18 @@ defmodule PlazaWeb.UploadLive2 do
   attr :front_local_upload, :map, default: nil
   attr :back_local_upload, :map, default: nil
   attr :current_local_url, :string, default: nil
+  attr :product_form, :map, required: true
 
   defp upload_generic(assigns) do
     ~H"""
     <div style="margin-top: 150px; margin-bottom: 750px;">
-      <PlazaWeb.UploadLive2.header step={@step} />
+      <PlazaWeb.UploadLive2.header
+        step={@step}
+        front_local_upload={@front_local_upload}
+        back_local_upload={@back_local_upload}
+        product_form={@product_form}
+      />
+
       <div style="display: inline-block; position: absolute; margin-left: 50px;">
         <div style="margin-top: 50px;">
           <.upload_form
@@ -703,7 +751,6 @@ defmodule PlazaWeb.UploadLive2 do
       </div>
       <div style="display: inline-block; position: relative; left: 900px; top: 50px;">
         <div style="display: inline-block;">
-          <%!-- flipping order in which elements are added to dom behaves as z-index --%>
           <.upload_preview local_url={@current_local_url} />
         </div>
         <div style="display: inline-block; position: absolute;">
