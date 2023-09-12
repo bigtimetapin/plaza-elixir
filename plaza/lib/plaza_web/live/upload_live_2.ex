@@ -18,21 +18,21 @@ defmodule PlazaWeb.UploadLive2 do
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    {seller, step} =
+    {seller, step, user_id} =
       case socket.assigns.current_user do
         nil ->
-          {nil, 1}
+          {nil, 1, nil}
 
         %{id: id} ->
           case Accounts.get_seller_by_id(id) do
             nil ->
-              {nil, 4}
+              {nil, 4, id}
 
             %Seller{stripe_id: nil} = seller ->
-              {seller, 5}
+              {seller, 5, id}
 
             seller ->
-              {seller, 6}
+              {seller, 6, id}
           end
       end
 
@@ -60,7 +60,7 @@ defmodule PlazaWeb.UploadLive2 do
         to_form(
           Product.changeset(
             %Product{
-              user_id: socket.assigns.current_user.id,
+              user_id: user_id,
               price: 75
             },
             %{}
@@ -178,6 +178,7 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 8)
+      |> assign(:campaign_duration, 7)
 
     {:noreply, socket}
   end
@@ -335,6 +336,23 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:product_form, form)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-campaign-duration", %{"duration" => duration_str}, socket) do
+    duration =
+      case duration_str do
+        "7" -> 7
+        "14" -> 14
+        "21" -> 21
+        "30" -> 30
+        "45" -> 45
+      end
+
+    socket =
+      socket
+      |> assign(:campaign_duration, duration)
 
     {:noreply, socket}
   end
@@ -662,19 +680,103 @@ defmodule PlazaWeb.UploadLive2 do
             }
             size="small"
           />
-        </div>
-        <div style="display: inline-block; margin-left: 50px;">
-          <div>
-            Quantos dias seu produto ficará no ar:
+          <div style="position: relative; bottom: 210px; right: 3px;">
+            <div style="display: flex; justify-content: right; font-size: 22px;">
+              R$ <%= @product_form.data.price %>
+              <div style="position: absolute;">
+                <div style="position: relative; top: 35px; font-size: 16px; color: #707070;">
+                  Disponível por mais <%= @campaign_duration %> dias
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <button>
-              7
-            </button>
-
-            <button>
-              14
-            </button>
+        </div>
+        <div style="display: inline-block; margin-left: 50px; width: 700px;">
+          <div style="position: relative; bottom: 50px;">
+            <div style="display: inline-block;">
+              Quantos dias seu produto ficará no ar:
+            </div>
+            <div style="display: inline-block;">
+              <button
+                class="has-font-3"
+                style="font-size: 34px;"
+                phx-click="change-campaign-duration"
+                phx-value-duration="7"
+              >
+                <img
+                  :if={@campaign_duration == 7}
+                  src="svg/yellow-circle.svg"
+                  style="position: relative; top: 47px;"
+                />
+                <div style="position: relative;">
+                  7
+                </div>
+              </button>
+              /
+              <button
+                class="has-font-3"
+                style="font-size: 34px;"
+                phx-click="change-campaign-duration"
+                phx-value-duration="14"
+              >
+                <img
+                  :if={@campaign_duration == 14}
+                  src="svg/yellow-circle.svg"
+                  style="position: relative; top: 47px;"
+                />
+                <div style="position: relative;">
+                  14
+                </div>
+              </button>
+              /
+              <button
+                class="has-font-3"
+                style="font-size: 34px;"
+                phx-click="change-campaign-duration"
+                phx-value-duration="21"
+              >
+                <img
+                  :if={@campaign_duration == 21}
+                  src="svg/yellow-circle.svg"
+                  style="position: relative; top: 47px;"
+                />
+                <div style="position: relative;">
+                  21
+                </div>
+              </button>
+              /
+              <button
+                class="has-font-3"
+                style="font-size: 34px;"
+                phx-click="change-campaign-duration"
+                phx-value-duration="30"
+              >
+                <img
+                  :if={@campaign_duration == 30}
+                  src="svg/yellow-circle.svg"
+                  style="position: relative; top: 47px;"
+                />
+                <div style="position: relative;">
+                  30
+                </div>
+              </button>
+              /
+              <button
+                class="has-font-3"
+                style="font-size: 34px;"
+                phx-click="change-campaign-duration"
+                phx-value-duration="45"
+              >
+                <img
+                  :if={@campaign_duration == 45}
+                  src="svg/yellow-circle.svg"
+                  style="position: relative; top: 47px;"
+                />
+                <div style="position: relative;">
+                  45
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </div>
