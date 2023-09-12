@@ -360,7 +360,7 @@ defmodule PlazaWeb.UploadLive2 do
     {:noreply, socket}
   end
 
-  def pubish_s3(local_url, atom) do
+  defp pubish_s3(local_url, atom) do
     url =
       case local_url do
         nil ->
@@ -392,16 +392,49 @@ defmodule PlazaWeb.UploadLive2 do
           "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{nes}"
       end
 
-    {url, atom}
+    {:publish, url, atom}
   end
 
   @impl Phoenix.LiveView
-  def handle_info({ref, {url, atom}}, socket) do
+  def handle_info({ref, {:publish, url, atom}}, socket) do
     Process.demonitor(ref, [:flush])
 
-    inc = socket.assigns.publish_status.inc
+    inc = socket.assigns.publish_status
 
     IO.inspect(inc)
+
+    designs = socket.assigns.product_form.data.designs
+
+    IO.inspect(designs)
+
+    designs =
+      case atom do
+        :front -> %{designs | front: url}
+        :back -> %{designs | back: url}
+      end
+
+    changes =
+      Product.changeset_designs(
+        socket.assigns.product_form.data,
+        %{"designs" => designs}
+      )
+      |> Changeset.apply_action(:update)
+
+    IO.inspect(changes)
+
+    form =
+      case changes do
+        {:error, changeset} ->
+          to_form(changeset)
+
+        {:ok, product} ->
+          Product.changeset(
+            product,
+            %{}
+          )
+          |> Map.put(:action, :validate)
+          |> to_form
+      end
 
     socket =
       if inc > 0 do
@@ -412,6 +445,10 @@ defmodule PlazaWeb.UploadLive2 do
           |> assign(
             :publish_status,
             inc + 1
+          )
+          |> assign(
+            :product_form,
+            form
           )
       end
 
