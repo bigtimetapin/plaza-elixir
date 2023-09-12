@@ -7,6 +7,7 @@ defmodule PlazaWeb.UploadLive2 do
   alias Plaza.Accounts.Seller
   alias Plaza.Products
   alias Plaza.Products.Product
+  alias Plaza.Products.Designs
 
   alias ExAws
   alias ExAws.S3
@@ -61,13 +62,18 @@ defmodule PlazaWeb.UploadLive2 do
           Product.changeset(
             %Product{
               user_id: user_id,
-              price: 75
+              price: 75,
+              designs: %{
+                front: nil,
+                back: nil,
+                display: 0
+              }
             },
             %{}
           )
         )
       )
-      |> assign(:product_display, :front)
+      |> assign(:publish_status, 0)
       |> assign(:step, step)
 
     {:ok, socket}
@@ -190,44 +196,6 @@ defmodule PlazaWeb.UploadLive2 do
     {:noreply, socket}
   end
 
-  def handle_event("upload-submit", params, socket) do
-    IO.inspect(params)
-    IO.inspect(socket.assigns.uploads.front)
-
-    IO.inspect(socket.assigns.uploads.back)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("tmp-submit", _params, socket) do
-    src =
-      Path.join([
-        :code.priv_dir(:plaza),
-        "static",
-        socket.assigns.front_local_upload.url
-      ])
-
-    request =
-      S3.put_object(
-        @aws_s3_bucket,
-        socket.assigns.front_local_upload.url,
-        File.read!(src)
-      )
-
-    response =
-      ExAws.request!(
-        request,
-        region: @aws_s3_region
-      )
-
-    IO.inspect(response)
-
-    url =
-      "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{socket.assigns.front_local_upload.url}"
-
-    {:noreply, socket}
-  end
-
   def handle_event("front-upload-cancel", _params, socket) do
     socket =
       socket
@@ -245,15 +213,44 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   def handle_event("change-product-display", _params, socket) do
+    product = socket.assigns.product_form.data
+
+    designs = product.designs
+
     product_display =
-      case socket.assigns.product_display do
-        :front -> :back
-        :back -> :front
+      case designs.display do
+        0 -> 1
+        1 -> 0
       end
+
+    designs = %{designs | display: product_display}
+
+    changes =
+      Product.changeset_designs(
+        product,
+        %{"designs" => designs}
+      )
+      |> Changeset.apply_action(:update)
+
+    form =
+      case changes do
+        {:error, changeset} ->
+          to_form(changeset)
+
+        {:ok, product} ->
+          Product.changeset(
+            product,
+            %{}
+          )
+          |> Map.put(:action, :validate)
+          |> to_form
+      end
+
+    IO.inspect(form)
 
     socket =
       socket
-      |> assign(:product_display, product_display)
+      |> assign(:product_form, form)
 
     {:noreply, socket}
   end
@@ -353,6 +350,70 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:campaign_duration, duration)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("publish", _params, socket) do
+    Task.async(fn -> pubish_s3(socket.assigns.front_local_upload[:url], :front) end)
+    Task.async(fn -> pubish_s3(socket.assigns.back_local_upload[:url], :back) end)
+    {:noreply, socket}
+  end
+
+  def pubish_s3(local_url, atom) do
+    url =
+      case local_url do
+        nil ->
+          nil
+
+        nes ->
+          src =
+            Path.join([
+              :code.priv_dir(:plaza),
+              "static",
+              nes
+            ])
+
+          request =
+            S3.put_object(
+              @aws_s3_bucket,
+              nes,
+              File.read!(src)
+            )
+
+          response =
+            ExAws.request!(
+              request,
+              region: @aws_s3_region
+            )
+
+          IO.inspect(response)
+
+          "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{nes}"
+      end
+
+    {url, atom}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({ref, {url, atom}}, socket) do
+    Process.demonitor(ref, [:flush])
+
+    inc = socket.assigns.publish_status.inc
+
+    IO.inspect(inc)
+
+    socket =
+      if inc > 0 do
+        socket
+      else
+        socket =
+          socket
+          |> assign(
+            :publish_status,
+            inc + 1
+          )
+      end
 
     {:noreply, socket}
   end
@@ -549,14 +610,14 @@ defmodule PlazaWeb.UploadLive2 do
         <div>
           Foto do seu produto na loja:
           <button
-            :if={@product_display == :front}
+            :if={@product_form.data.designs.display == 0}
             class="has-font-3"
             style="border-bottom: 2px solid black; height: 45px;"
           >
             Frente
           </button>
           <button
-            :if={@product_display == :front}
+            :if={@product_form.data.designs.display == 0}
             class="has-font-3"
             phx-click="change-product-display"
           >
@@ -564,24 +625,24 @@ defmodule PlazaWeb.UploadLive2 do
           </button>
 
           <button
-            :if={@product_display == :back}
+            :if={@product_form.data.designs.display == 1}
             class="has-font-3"
             phx-click="change-product-display"
           >
             Frente
           </button>
           <button
-            :if={@product_display == :back}
+            :if={@product_form.data.designs.display == 1}
             class="has-font-3"
             style="border-bottom: 2px solid black; height: 45px;"
           >
             / Costas
           </button>
           <div style="margin-top: 10px;">
-            <div :if={@product_display == :front}>
+            <div :if={@product_form.data.designs.display == 0}>
               <.upload_preview local_url={@front_local_upload[:url]} />
             </div>
-            <div :if={@product_display == :back}>
+            <div :if={@product_form.data.designs.display == 1}>
               <.upload_preview local_url={@back_local_upload[:url]} />
             </div>
           </div>
@@ -674,7 +735,7 @@ defmodule PlazaWeb.UploadLive2 do
         <div style="display: inline-block;">
           <.upload_preview
             local_url={
-              if @product_display == :front,
+              if @product_form.data.designs.display == 0,
                 do: @front_local_upload[:url],
                 else: @back_local_upload[:url]
             }

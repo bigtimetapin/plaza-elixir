@@ -4,11 +4,11 @@ defmodule Plaza.Products.EctoDesigns do
 
   alias Plaza.Products.Designs
 
+  def cast(%Designs{} = data), do: {:ok, data}
+
   def cast(data) when is_map(data) do
     {:ok, struct(Designs, data)}
   end
-
-  def cast(%Designs{} = data), do: {:ok, data}
 
   def cast(_), do: :error
 

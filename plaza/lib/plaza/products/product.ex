@@ -68,4 +68,12 @@ defmodule Plaza.Products.Product do
     ])
     |> validate_length(:description, max: 140)
   end
+
+  def changeset_designs(product, attrs) do
+    product
+    |> cast(attrs, [
+      :designs
+    ])
+    |> validate_required(:designs)
+  end
 end
