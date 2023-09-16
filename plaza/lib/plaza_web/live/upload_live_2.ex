@@ -930,18 +930,58 @@ defmodule PlazaWeb.UploadLive2 do
     """
   end
 
-  def render(%{step: 9, write_status: :local_storage} = assigns) do
+  def render(%{step: 9, write_status: :db_storage} = assigns) do
+    product = assigns.product_form.data
+    product_params = %{"user_id" => product.user_id, "name" => product.name}
+
+    assigns =
+      assigns
+      |> assign(:product_params, product_params)
+
     ~H"""
-    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
-      local storage
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px;">
+      <div style="display: flex; justify-content: center;">
+        <div style="font-size: 40px;">
+          Produto publicado com sucesso!
+          <div style="display: flex; justify-content: center; font-size: 34px; margin-top: 25px;">
+            <.link navigate={"/product?#{URI.encode_query(@product_params)}"}>
+              <div style="display: inline-block; border-bottom: 2px solid black; height: 45px;">
+                V
+              </div>
+              <div style="display: inline-block; position: relative; right: 6px;">
+                isitar página do produto
+              </div>
+            </.link>
+          </div>
+          <div style="display: flex; justify-content: center; margin-top: 75px; font-size: 34px;">
+            Copiar link para compartilhar
+          </div>
+        </div>
+      </div>
     </div>
     """
   end
 
-  def render(%{step: 9, write_status: :db_storage} = assigns) do
+  def render(%{step: 9, write_status: :local_storage} = assigns) do
     ~H"""
-    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
-      db storage
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px;">
+      <div style="display: flex; justify-content: center;">
+        <div style="font-size: 40px;">
+          <div style="display: flex; justify-content: center;">
+            Produto publicado com sucesso!
+          </div>
+          <div style=" font-size: 34px; margin-top: 25px;">
+            <.link navigate="/my-store">
+              <div style="display: inline-block; border-bottom: 2px solid black; height: 45px;">
+                V
+              </div>
+              <div style="display: inline-block; position: relative; right: 6px;">
+                isitar your store to finish registering before this product is live
+              </div>
+            </.link>
+          </div>
+        </div>
+      </div>
     </div>
     """
   end
