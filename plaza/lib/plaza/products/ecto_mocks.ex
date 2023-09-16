@@ -4,11 +4,11 @@ defmodule Plaza.Products.EctoMocks do
 
   alias Plaza.Products.Mocks
 
+  def cast(%Mocks{} = data), do: {:ok, data}
+
   def cast(data) when is_map(data) do
     {:ok, struct(Mocks, data)}
   end
-
-  def cast(%Mocks{} = data), do: {:ok, data}
 
   def cast(_), do: :error
 

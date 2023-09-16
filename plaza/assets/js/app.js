@@ -25,8 +25,30 @@ import topbar from "../vendor/topbar";
 
 // csrf token 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+
 // hooks 
 let Hooks = {};
+Hooks.LocalStorage = {
+  mounted() {
+    this.handleEvent("write", (obj) => this.write(obj))
+    this.handleEvent("clear", (obj) => this.clear(obj))
+    this.handleEvent("read", (obj) => this.read(obj))
+  },
+
+  write(obj) {
+    localStorage.setItem(obj.key, obj.data)
+  },
+
+  read(obj) {
+    var data = localStorage.getItem(obj.key)
+    this.pushEvent(obj.event, data)
+  },
+
+  clear(obj) {
+    localStorage.removeItem(obj.key)
+  }
+};
+
 // live socket 
 let liveSocket = new LiveSocket("/live", Socket, { params: { _csrf_token: csrfToken }, hooks: Hooks });
 

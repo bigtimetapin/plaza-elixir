@@ -45,6 +45,12 @@ defmodule Plaza.Products do
   def get_product(seller_id, product_name) do
   end
 
+  def create_product(%Product{} = product) do
+    product
+    |> Product.changeset(%{})
+    |> Repo.insert()
+  end
+
   @doc """
   Creates a product.
 

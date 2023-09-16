@@ -13,6 +13,7 @@ defmodule PlazaWeb.UploadLive2 do
   alias ExAws.S3
 
   @site "https://plazaaaaa.fly.dev"
+  @local_storage_key "plaza-product-form"
 
   @aws_s3_region "us-west-2"
   @aws_s3_bucket "plaza-static-dev"
@@ -67,7 +68,8 @@ defmodule PlazaWeb.UploadLive2 do
                 front: nil,
                 back: nil,
                 display: 0
-              }
+              },
+              mocks: %{}
             },
             %{}
           )
@@ -398,14 +400,8 @@ defmodule PlazaWeb.UploadLive2 do
   @impl Phoenix.LiveView
   def handle_info({ref, {:publish, url, atom}}, socket) do
     Process.demonitor(ref, [:flush])
-
-    inc = socket.assigns.publish_status
-
-    IO.inspect(inc)
-
+    inc = socket.assigns.publish_status + 1
     designs = socket.assigns.product_form.data.designs
-
-    IO.inspect(designs)
 
     designs =
       case atom do
@@ -419,8 +415,6 @@ defmodule PlazaWeb.UploadLive2 do
         %{"designs" => designs}
       )
       |> Changeset.apply_action(:update)
-
-    IO.inspect(changes)
 
     form =
       case changes do
@@ -437,22 +431,58 @@ defmodule PlazaWeb.UploadLive2 do
       end
 
     socket =
-      if inc > 0 do
-        socket
-      else
-        socket =
+      socket =
+      socket
+      |> assign(
+        :publish_status,
+        inc
+      )
+      |> assign(
+        :product_form,
+        form
+      )
+
+    if inc == 2 do
+      send(self(), :write)
+    end
+
+    {:noreply, socket}
+  end
+
+  def handle_info(:write, socket) do
+    product = socket.assigns.product_form.data
+
+    socket =
+      case socket.assigns.seller do
+        nil ->
           socket
-          |> assign(
-            :publish_status,
-            inc + 1
-          )
-          |> assign(
-            :product_form,
-            form
-          )
+          |> assign(:write_status, :local_storage)
+          |> assign(:step, 9)
+          |> push_event("write", %{
+            key: @local_storage_key,
+            data: serialize_to_token(product)
+          })
+
+        seller ->
+          case Products.create_product(product) do
+            {:ok, inserted} ->
+              socket
+              |> assign(:write_status, :db_storage)
+              |> assign(:step, 9)
+
+            {:error, changeset} ->
+              socket
+              |> assign(:write_status, :error)
+              |> assign(:step, 9)
+          end
       end
 
     {:noreply, socket}
+  end
+
+  defp serialize_to_token(state_data) do
+    salt = Application.get_env(:plaza, PlazaWeb.Endpoint)[:live_view][:signing_salt]
+    Phoenix.Token.encrypt(PlazaWeb.Endpoint, salt, state_data)
   end
 
   @impl Phoenix.LiveView
@@ -761,7 +791,12 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: 8} = assigns) do
     ~H"""
-    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
+    <div
+      class="has-font-3"
+      style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;"
+      id="plaza-product-writer"
+      phx-hook="LocalStorage"
+    >
       <PlazaWeb.UploadLive2.header
         step={@step}
         front_local_upload={@front_local_upload}
@@ -891,6 +926,30 @@ defmodule PlazaWeb.UploadLive2 do
           </div>
         </div>
       </div>
+    </div>
+    """
+  end
+
+  def render(%{step: 9, write_status: :local_storage} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
+      local storage
+    </div>
+    """
+  end
+
+  def render(%{step: 9, write_status: :db_storage} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
+      db storage
+    </div>
+    """
+  end
+
+  def render(%{step: 9, write_status: :error} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
+      error
     </div>
     """
   end
