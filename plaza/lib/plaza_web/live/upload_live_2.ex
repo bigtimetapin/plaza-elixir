@@ -791,12 +791,7 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: 8} = assigns) do
     ~H"""
-    <div
-      class="has-font-3"
-      style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;"
-      id="plaza-product-writer"
-      phx-hook="LocalStorage"
-    >
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
       <PlazaWeb.UploadLive2.header
         step={@step}
         front_local_upload={@front_local_upload}

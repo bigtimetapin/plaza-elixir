@@ -1,10 +1,14 @@
 defmodule PlazaWeb.MyStoreLive do
   use PlazaWeb, :live_view
 
+  require Logger
+
   alias Plaza.Accounts
   alias Plaza.Accounts.Seller
   alias Plaza.Products
   alias PlazaWeb.ProductComponent
+
+  @local_storage_key "plaza-product-form"
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
@@ -20,10 +24,78 @@ defmodule PlazaWeb.MyStoreLive do
       |> allow_upload(:logo, accept: ~w(.png .jpg .jpeg .svg .gif), max_entries: 1)
       |> assign(:seller_form, to_form(Seller.changeset(%Seller{}, %{})))
 
+    socket =
+      case seller do
+        nil ->
+          if connected?(socket) do
+            socket
+            |> push_event(
+              "read",
+              %{
+                key: @local_storage_key,
+                event: "read-product-form"
+              }
+            )
+          else
+            socket
+          end
+
+        _ ->
+          socket
+      end
+
     {:ok, socket}
   end
 
   @impl Phoenix.LiveView
+  def handle_event("read-product-form", token_data, socket) when is_binary(token_data) do
+    socket =
+      case restore_from_token(token_data) do
+        {:ok, nil} ->
+          # do nothing with the previous state
+          socket
+
+        {:ok, restored} ->
+          IO.inspect(restored)
+          socket
+
+        {:error, reason} ->
+          # We don't continue checking. Display error.
+          # Clear the token so it doesn't keep showing an error.
+          socket
+          |> put_flash(:error, reason)
+          |> clear_browser_storage()
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("read-product-form", _token_data, socket) do
+    Logger.debug("No (valid) prodouct-form to restore")
+    {:noreply, socket}
+  end
+
+  defp restore_from_token(nil), do: {:ok, nil}
+
+  defp restore_from_token(token) do
+    salt = Application.get_env(:plaza, PlazaWeb.Endpoint)[:live_view][:signing_salt]
+    # Max age is 1 day. 86,400 seconds
+    case Phoenix.Token.decrypt(PlazaWeb.Endpoint, salt, token, max_age: 86_400) do
+      {:ok, data} ->
+        {:ok, data}
+
+      {:error, reason} ->
+        # handles `:invalid`, `:expired` and possibly other things?
+        {:error, "Failed to restore previous state. Reason: #{inspect(reason)}."}
+    end
+  end
+
+  # Push a websocket event down to the browser's JS hook.
+  # Clear any settings for the current my_storage_key.
+  defp clear_browser_storage(socket) do
+    push_event(socket, "clear", %{key: @local_storage_key})
+  end
+
   def handle_event("product-href", %{"product-name" => product_name}, socket) do
     seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
     params = %{"seller_name" => seller.user_name, "product-name" => product_name}
@@ -72,6 +144,12 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   @impl Phoenix.LiveView
+  def render(%{seller: nil} = assigns) do
+    ~H"""
+    <div id="plaza-product-reader" phx-hook="LocalStorage"></div>
+    """
+  end
+
   def render(assigns) do
     ~H"""
     <div style="margin-bottom: 50px;">
