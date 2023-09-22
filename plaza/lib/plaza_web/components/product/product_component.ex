@@ -64,7 +64,7 @@ defmodule PlazaWeb.ProductComponent do
       {@rest}
     >
       <div>
-        <img src={Map.get(@product, :front_url)} style="width: 100%;" />
+        <img src={Map.get(@product.designs, :front)} style="width: 100%;" />
       </div>
       <div style="position: absolute; bottom: 25px; left: 10px;"><%= @product.name %></div>
       <div class="pr-xsmall" style="position: absolute; bottom: 25px; right: 0px;">

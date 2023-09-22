@@ -52,12 +52,15 @@ defmodule PlazaWeb.MyStoreLive do
     socket =
       case restore_from_token(token_data) do
         {:ok, nil} ->
+          IO.inspect("nothing")
           # do nothing with the previous state
           socket
 
         {:ok, restored} ->
           IO.inspect(restored)
+
           socket
+          |> assign(:my_products, [restored])
 
         {:error, reason} ->
           # We don't continue checking. Display error.
@@ -144,9 +147,31 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   @impl Phoenix.LiveView
+  def render(%{seller: nil, my_products: []} = assigns) do
+    ~H"""
+    <div id="plaza-product-reader" phx-hook="LocalStorage" class="has-font-3" style="font-size: 34px;">
+      <div>
+        <.link navigate="/upload">
+          go upload some stuff
+        </.link>
+      </div>
+      <div>
+        or create your store first
+      </div>
+    </div>
+    """
+  end
+
   def render(%{seller: nil} = assigns) do
     ~H"""
-    <div id="plaza-product-reader" phx-hook="LocalStorage"></div>
+    <div id="plaza-product-reader" phx-hook="LocalStorage" class="has-font-3" style="font-size: 34px;">
+      <div>
+        create your store before your product goes live
+      </div>
+      <div>
+        <ProductComponent.products3 products={@my_products} />
+      </div>
+    </div>
     """
   end
 

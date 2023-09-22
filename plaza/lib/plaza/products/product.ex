@@ -76,4 +76,7 @@ defmodule Plaza.Products.Product do
     ])
     |> validate_required(:designs)
   end
+
+  def changeset_campaign_duration(product, attrs) do
+  end
 end

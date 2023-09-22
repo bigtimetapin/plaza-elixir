@@ -21,11 +21,11 @@ defmodule PlazaWeb.LandingLive do
       |> assign(
         :products,
         [
-          %{name: "camiseta", price: "99"},
-          %{name: "outra camiseta", price: "79"},
-          %{name: "sua camiseta", price: "89"},
-          %{name: "tu tranqi", price: "59"},
-          %{name: "bastante", price: "199"}
+          %{name: "camiseta", price: "99", designs: %{}},
+          %{name: "outra camiseta", price: "79", designs: %{}},
+          %{name: "sua camiseta", price: "89", designs: %{}},
+          %{name: "tu tranqi", price: "59", designs: %{}},
+          %{name: "bastante", price: "199", designs: %{}}
         ]
       )
       |> assign(:seller, seller)
