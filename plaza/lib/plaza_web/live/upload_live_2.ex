@@ -64,6 +64,7 @@ defmodule PlazaWeb.UploadLive2 do
             %Product{
               user_id: user_id,
               price: 75,
+              campaign_duration: 7,
               designs: %{
                 front: nil,
                 back: nil,
@@ -186,7 +187,6 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 8)
-      |> assign(:campaign_duration, 7)
 
     {:noreply, socket}
   end
@@ -349,9 +349,36 @@ defmodule PlazaWeb.UploadLive2 do
         "45" -> 45
       end
 
+    duration_attr = %{"campaign_duration" => duration}
+
+    changes =
+      Product.changeset_campaign_duration(
+        socket.assigns.product_form.data,
+        duration_attr
+      )
+      |> Changeset.apply_action(:update)
+
+    IO.inspect(changes)
+
+    form =
+      case changes do
+        {:error, changeset} ->
+          to_form(changeset)
+
+        {:ok, product} ->
+          Product.changeset(
+            product,
+            %{}
+          )
+          |> Map.put(:action, :validate)
+          |> to_form
+      end
+
+    IO.inspect(form)
+
     socket =
       socket
-      |> assign(:campaign_duration, duration)
+      |> assign(:product_form, form)
 
     {:noreply, socket}
   end
@@ -813,7 +840,7 @@ defmodule PlazaWeb.UploadLive2 do
               R$ <%= @product_form.data.price %>
               <div style="position: absolute;">
                 <div style="position: relative; top: 35px; font-size: 16px; color: #707070;">
-                  Disponível por mais <%= @campaign_duration %> dias
+                  Disponível por mais <%= @product_form.data.campaign_duration %> dias
                 </div>
               </div>
             </div>
@@ -832,7 +859,7 @@ defmodule PlazaWeb.UploadLive2 do
                 phx-value-duration="7"
               >
                 <img
-                  :if={@campaign_duration == 7}
+                  :if={@product_form.data.campaign_duration == 7}
                   src="svg/yellow-circle.svg"
                   style="position: relative; top: 47px;"
                 />
@@ -848,7 +875,7 @@ defmodule PlazaWeb.UploadLive2 do
                 phx-value-duration="14"
               >
                 <img
-                  :if={@campaign_duration == 14}
+                  :if={@product_form.data.campaign_duration == 14}
                   src="svg/yellow-circle.svg"
                   style="position: relative; top: 47px;"
                 />
@@ -864,7 +891,7 @@ defmodule PlazaWeb.UploadLive2 do
                 phx-value-duration="21"
               >
                 <img
-                  :if={@campaign_duration == 21}
+                  :if={@product_form.data.campaign_duration == 21}
                   src="svg/yellow-circle.svg"
                   style="position: relative; top: 47px;"
                 />
@@ -880,7 +907,7 @@ defmodule PlazaWeb.UploadLive2 do
                 phx-value-duration="30"
               >
                 <img
-                  :if={@campaign_duration == 30}
+                  :if={@product_form.data.campaign_duration == 30}
                   src="svg/yellow-circle.svg"
                   style="position: relative; top: 47px;"
                 />
@@ -896,7 +923,7 @@ defmodule PlazaWeb.UploadLive2 do
                 phx-value-duration="45"
               >
                 <img
-                  :if={@campaign_duration == 45}
+                  :if={@product_form.data.campaign_duration == 45}
                   src="svg/yellow-circle.svg"
                   style="position: relative; top: 47px;"
                 />

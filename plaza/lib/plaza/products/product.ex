@@ -78,5 +78,10 @@ defmodule Plaza.Products.Product do
   end
 
   def changeset_campaign_duration(product, attrs) do
+    product
+    |> cast(attrs, [
+      :campaign_duration
+    ])
+    |> validate_required(:campaign_duration)
   end
 end
