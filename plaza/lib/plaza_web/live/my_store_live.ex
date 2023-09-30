@@ -67,9 +67,12 @@ defmodule PlazaWeb.MyStoreLive do
       |> assign(:header, :my_store)
       |> assign(:seller, seller)
       |> assign(:my_products, my_products)
+      |> assign(:local_logo_upload, nil)
       |> allow_upload(:logo,
         accept: ~w(.png .jpg .jpeg .svg .gif),
-        max_entries: 1
+        max_entries: 1,
+        auto_upload: true,
+        progress: &handle_progress/3
       )
       |> assign(
         :seller_form,
@@ -101,6 +104,44 @@ defmodule PlazaWeb.MyStoreLive do
       end
 
     {:ok, socket}
+  end
+
+  defp handle_progress(:logo, entry, socket) do
+    socket =
+      if entry.done? do
+        {local_url, file_name} =
+          consume_uploaded_entry(socket, entry, fn %{path: path} ->
+            IO.inspect(path)
+            unique_file_name = "#{entry.uuid}-#{entry.client_name}"
+
+            dest =
+              Path.join([
+                :code.priv_dir(:plaza),
+                "static",
+                "uploads",
+                unique_file_name
+              ])
+
+            File.cp!(path, dest)
+            {:ok, {"uploads/#{unique_file_name}", entry.client_name}}
+          end)
+
+        IO.inspect(local_url)
+
+        socket =
+          socket
+          |> assign(
+            :local_logo_upload,
+            %{
+              url: local_url,
+              file_name: file_name
+            }
+          )
+      else
+        socket
+      end
+
+    {:noreply, socket}
   end
 
   @impl Phoenix.LiveView
@@ -187,8 +228,12 @@ defmodule PlazaWeb.MyStoreLive do
     {:noreply, socket}
   end
 
-  def handle_event("logo-upload-cancel", %{"ref" => ref}, socket) do
-    {:noreply, Phoenix.LiveView.cancel_upload(socket, :logo, ref)}
+  def handle_event("logo-upload-cancel", _params, socket) do
+    socket =
+      socket
+      |> assign(local_logo_upload: nil)
+
+    {:noreply, socket}
   end
 
   def handle_event("submit-seller-form", %{"seller_form" => attrs}, socket) do
@@ -314,17 +359,26 @@ defmodule PlazaWeb.MyStoreLive do
   @impl Phoenix.LiveView
   def render(%{seller: nil, my_products: []} = assigns) do
     ~H"""
-    <div id="plaza-product-reader" phx-hook="LocalStorage" class="has-font-3" style="font-size: 34px;">
-      <div>
-        <.link navigate="/upload">
+    <div
+      id="plaza-product-reader"
+      phx-hook="LocalStorage"
+      class="has-font-3"
+      style="margin-top: 150px; margin-bottom: 250px; font-size: 34px;"
+    >
+      <div style="display: flex; justify-content: center; margin-bottom: 100px;">
+        <.link navigate="/upload" style="text-decoration: underline;">
           go upload some stuff
         </.link>
       </div>
-      <div>
-        or create your store first
-        <div>
-          <.seller_form seller_form={@seller_form} uploads={@uploads} />
-        </div>
+      <div style="display: flex; justify-content: center;">
+        or create your own store
+      </div>
+      <div style="position: relative; top: 50px; display: flex; justify-content: center;">
+        <.seller_form
+          seller_form={@seller_form}
+          uploads={@uploads}
+          local_logo_upload={@local_logo_upload}
+        />
       </div>
     </div>
     """
@@ -332,11 +386,15 @@ defmodule PlazaWeb.MyStoreLive do
 
   def render(%{seller: nil} = assigns) do
     ~H"""
-    <div id="plaza-product-reader" phx-hook="LocalStorage" class="has-font-3" style="font-size: 34px;">
+    <div class="has-font-3" style="font-size: 34px;">
       <div>
         create your store before your product goes live
         <div>
-          <.seller_form seller_form={@seller_form} uploads={@uploads} />
+          <.seller_form
+            seller_form={@seller_form}
+            uploads={@uploads}
+            local_logo_upload={@local_logo_upload}
+          />
         </div>
       </div>
       <div>
@@ -418,115 +476,91 @@ defmodule PlazaWeb.MyStoreLive do
 
   defp seller_form(assigns) do
     ~H"""
-    <div style="display: flex; justify-content: center;">
-      <div style="display: inline-block;">
-        <form>
-          <div>
-            <label
-              class="has-font-3 is-size-4"
-              style="width: 312px; height: 300px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
-            >
-              <.live_file_input
-                upload={@uploads.logo}
-                style="display: none;"
-                phx-change="change-seller-logo"
-              />
-              <div style="text-align: center; text-decoration: underline; font-size: 24px;">
-                Upload
-                <div>
-                  Logo/Foto de Perfil
-                </div>
-              </div>
-            </label>
-          </div>
-          <div>
-            <.upload_item upload={@uploads.logo} />
-          </div>
-        </form>
-      </div>
-      <div style="display: inline-block;">
-        <div>
-          <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
-            <.input
-              field={@seller_form[:user_name]}
-              type="text"
-              placeholder="username / nome da loja *"
-              class="text-input-1"
-            >
-            </.input>
-            <.input
-              field={@seller_form[:website]}
-              type="text"
-              placeholder="website"
-              class="text-input-1"
-            >
-            </.input>
-            <.input
-              field={@seller_form[:instagram]}
-              type="text"
-              placeholder="instagram"
-              class="text-input-1"
-            >
-            </.input>
-            <.input
-              field={@seller_form[:twitter]}
-              type="text"
-              placeholder="twitter"
-              class="text-input-1"
-            >
-            </.input>
-            <.input
-              field={@seller_form[:soundcloud]}
-              type="text"
-              placeholder="soundcloud"
-              class="text-input-1"
-            >
-            </.input>
-            <div style="position: relative;">
-              <button>
-                <img src="svg/yellow-ellipse.svg" />
-                <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                  Criar Conta
-                </div>
-              </button>
-            </div>
-          </.form>
-        </div>
-      </div>
-    </div>
-    """
-  end
-
-  attr :upload, Phoenix.LiveView.UploadConfig, required: true
-  attr :no_file_yet, :string, default: nil
-
-  defp upload_item(assigns) do
-    map =
-      case assigns.upload.entries do
-        [head | []] ->
-          head
-
-        _ ->
-          %{client_name: assigns.no_file_yet, client_size: 0}
-      end
-
-    assigns =
-      assigns
-      |> assign(entry: map)
-
-    ~H"""
     <div>
-      <div class="has-font-3 is-size-6">
-        <%= @entry.client_name %>
-        <button
-          :if={@entry.client_size > 0}
-          type="button"
-          phx-click={"#{@entry.upload_config}-upload-cancel"}
-          phx-value-ref={@entry.ref}
-          aria-label="cancel"
+      <form>
+        <div :if={!@local_logo_upload}>
+          <label
+            class="has-font-3 is-size-4"
+            style="width: 312px; height: 300px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
+          >
+            <.live_file_input
+              upload={@uploads.logo}
+              style="display: none;"
+              phx-change="change-seller-logo"
+            />
+            <div style="text-align: center; text-decoration: underline; font-size: 24px;">
+              Upload
+              <div>
+                Logo/Foto de Perfil
+              </div>
+            </div>
+          </label>
+        </div>
+        <div
+          :if={@local_logo_upload}
+          style="width: 312px; height: 300px; overflow: hidden; border: 1px solid black;"
         >
-          &times;
-        </button>
+          <img src={@local_logo_upload.url} />
+        </div>
+        <div :if={@local_logo_upload} style="position: relative; left: 5px;">
+          <div style="display: inline-block; width: 270px; font-size: 24px; color: gray;">
+            <%= @local_logo_upload.file_name %>
+          </div>
+          <div style="display: inline-block;">
+            <button type="button" phx-click="logo-upload-cancel">
+              &times;
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div>
+      <div style="position: relative; left: 50px; bottom: 40px;">
+        <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
+          <.input
+            field={@seller_form[:user_name]}
+            type="text"
+            placeholder="username / nome da loja *"
+            class="text-input-1"
+          >
+          </.input>
+          <.input
+            field={@seller_form[:website]}
+            type="text"
+            placeholder="website"
+            class="text-input-1"
+          >
+          </.input>
+          <.input
+            field={@seller_form[:instagram]}
+            type="text"
+            placeholder="instagram"
+            class="text-input-1"
+          >
+          </.input>
+          <.input
+            field={@seller_form[:twitter]}
+            type="text"
+            placeholder="twitter"
+            class="text-input-1"
+          >
+          </.input>
+          <.input
+            field={@seller_form[:soundcloud]}
+            type="text"
+            placeholder="soundcloud"
+            class="text-input-1"
+          >
+          </.input>
+          <div style="position: relative; top: 100px;">
+            <button>
+              <img src="svg/yellow-ellipse.svg" />
+              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                Criar Loja
+              </div>
+            </button>
+          </div>
+        </.form>
       </div>
     </div>
     """
