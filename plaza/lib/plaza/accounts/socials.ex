@@ -1,5 +1,3 @@
 defmodule Plaza.Accounts.Socials do
-  defstruct instagram: :string,
-            soundcould: :string,
-            twitter: :string
+  defstruct [:instagram, :soundcould, :twitter]
 end

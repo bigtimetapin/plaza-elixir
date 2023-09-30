@@ -3,26 +3,82 @@ defmodule PlazaWeb.MyStoreLive do
 
   require Logger
 
+  alias Ecto.Changeset
+
   alias Plaza.Accounts
   alias Plaza.Accounts.Seller
+  alias Plaza.Accounts.SellerForm
+  alias Plaza.Accounts.Socials
   alias Plaza.Products
   alias PlazaWeb.ProductComponent
 
+  @site "https://plazaaaaa.fly.dev"
   @local_storage_key "plaza-product-form"
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
+    user_id = socket.assigns.current_user.id
+    seller = Accounts.get_seller_by_id(user_id)
     IO.inspect(seller)
-    my_products = Products.list_products_by_user_id(socket.assigns.current_user.id)
+    my_products = Products.list_products_by_user_id(user_id)
+
+    payouts_enabled =
+      case seller do
+        nil ->
+          nil
+
+        %Seller{stripe_id: stripe_id} ->
+          case stripe_id do
+            nil ->
+              nil
+
+            defined ->
+              case Stripe.Account.retrieve(defined) do
+                {:ok, %Stripe.Account{payouts_enabled: bool}} ->
+                  bool
+
+                _ ->
+                  false
+              end
+          end
+      end
+
+    seller_form =
+      case seller do
+        nil ->
+          to_form(
+            SellerForm.changeset(
+              %SellerForm{},
+              %{}
+            )
+          )
+
+        _ ->
+          to_form(
+            SellerForm.changeset(
+              SellerForm.from_seller(seller),
+              %{}
+            )
+          )
+      end
 
     socket =
       socket
       |> assign(:header, :my_store)
       |> assign(:seller, seller)
       |> assign(:my_products, my_products)
-      |> allow_upload(:logo, accept: ~w(.png .jpg .jpeg .svg .gif), max_entries: 1)
-      |> assign(:seller_form, to_form(Seller.changeset(%Seller{}, %{})))
+      |> allow_upload(:logo,
+        accept: ~w(.png .jpg .jpeg .svg .gif),
+        max_entries: 1
+      )
+      |> assign(
+        :seller_form,
+        seller_form
+      )
+      |> assign(
+        :payouts_enabled,
+        payouts_enabled
+      )
 
     socket =
       case seller do
@@ -107,26 +163,20 @@ defmodule PlazaWeb.MyStoreLive do
     {:noreply, push_navigate(socket, to: "/product?#{url}")}
   end
 
-  def handle_event("change-seller-form", %{"seller" => seller}, socket) do
+  def handle_event("change-seller-form", %{"seller_form" => attrs}, socket) do
+    IO.inspect(socket.assigns.seller_form)
+
     form =
-      Seller.changeset(
-        %Seller{},
-        seller
-        |> Map.put(
-          "user_id",
-          socket.assigns.current_user.id
-        )
+      SellerForm.changeset(
+        socket.assigns.seller_form.data,
+        attrs
       )
       |> Map.put(:action, :validate)
       |> to_form
 
-    IO.inspect(form)
-
     socket =
       socket
       |> assign(seller_form: form)
-
-    IO.inspect(socket.assigns.seller_form[:user_name])
 
     {:noreply, socket}
   end
@@ -141,8 +191,123 @@ defmodule PlazaWeb.MyStoreLive do
     {:noreply, Phoenix.LiveView.cancel_upload(socket, :logo, ref)}
   end
 
-  def handle_event("submit-seller-form", %{"seller" => seller}, socket) do
+  def handle_event("submit-seller-form", %{"seller_form" => attrs}, socket) do
     IO.inspect(socket.assigns.seller_form)
+
+    changes =
+      SellerForm.changeset(
+        socket.assigns.seller_form.data,
+        attrs
+      )
+      |> Changeset.apply_action(:update)
+
+    IO.inspect(changes)
+
+    form =
+      case changes do
+        {:error, changeset} ->
+          to_form(changeset)
+
+        {:ok, seller_form} ->
+          seller = SellerForm.to_seller(seller_form)
+          IO.inspect(seller)
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("stripe-link-account", _params, socket) do
+    {:ok, %Stripe.Account{id: stripe_id}} = Stripe.Account.create(%{type: :express})
+
+    {:ok, %Stripe.AccountLink{url: stripe_account_link_url}} =
+      Stripe.AccountLink.create(%{
+        account: stripe_id,
+        refresh_url: "#{@site}/my-account?stripe-setup-refresh=#{stripe_id}",
+        return_url: "#{@site}/my-account?stripe-setup-return=#{stripe_id}",
+        type: :account_onboarding
+      })
+
+    IO.inspect(stripe_account_link_url)
+
+    socket =
+      socket
+      |> redirect(external: stripe_account_link_url)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("stripe-enable-payouts", %{"stripe-id" => stripe_id}, socket) do
+    {:noreply, push_patch(socket, to: "/my-account?stripe-setup-refresh=#{stripe_id}")}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_params(%{"stripe-setup-refresh" => stripe_id}, _uri, socket) do
+    socket =
+      case connected?(socket) do
+        true ->
+          {:ok, %Stripe.AccountLink{url: stripe_account_link_url}} =
+            Stripe.AccountLink.create(%{
+              account: stripe_id,
+              refresh_url: "#{@site}/my-account?stripe-setup-refresh=#{stripe_id}",
+              return_url: "#{@site}/my-account?stripe-setup-return=#{stripe_id}",
+              type: :account_onboarding
+            })
+
+          IO.inspect(stripe_account_link_url)
+
+          socket
+          |> redirect(external: stripe_account_link_url)
+
+        false ->
+          socket
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_params(%{"stripe-setup-return" => stripe_id}, _uri, socket) do
+    socket =
+      case connected?(socket) do
+        true ->
+          IO.inspect(stripe_id)
+
+          {:ok,
+           %Stripe.Account{
+             details_submitted: details_submitted,
+             payouts_enabled: payouts_enabled
+           } = stripe_account} = Stripe.Account.retrieve(stripe_id)
+
+          IO.inspect(details_submitted)
+          IO.inspect(payouts_enabled)
+
+          seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
+
+          IO.inspect(seller)
+
+          seller =
+            case details_submitted do
+              true ->
+                {:ok, seller} = Accounts.update_seller(seller, %{"stripe_id" => stripe_id})
+                seller
+
+              false ->
+                seller
+            end
+
+          IO.inspect(seller)
+
+          socket
+          |> assign(:seller, seller)
+          |> assign(:payouts_enabled, payouts_enabled)
+
+        false ->
+          socket
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_params(_params, _uri, socket) do
     {:noreply, socket}
   end
 
@@ -157,6 +322,9 @@ defmodule PlazaWeb.MyStoreLive do
       </div>
       <div>
         or create your store first
+        <div>
+          <.seller_form seller_form={@seller_form} uploads={@uploads} />
+        </div>
       </div>
     </div>
     """
@@ -167,6 +335,9 @@ defmodule PlazaWeb.MyStoreLive do
     <div id="plaza-product-reader" phx-hook="LocalStorage" class="has-font-3" style="font-size: 34px;">
       <div>
         create your store before your product goes live
+        <div>
+          <.seller_form seller_form={@seller_form} uploads={@uploads} />
+        </div>
       </div>
       <div>
         <ProductComponent.products3 products={@my_products} />
@@ -245,75 +416,83 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
-  defp seller_form_wip(assigns) do
+  defp seller_form(assigns) do
     ~H"""
     <div style="display: flex; justify-content: center;">
-      <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
-        <div style="display: inline-block;">
-          <div style="position: absolute;">
-            <div style="position: relative; bottom: 335px; right: 315px;">
-              <div>
-                <label
-                  class="has-font-3 is-size-4"
-                  style="width: 312px; height: 300px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
-                >
-                  <.live_file_input
-                    upload={@uploads.logo}
-                    style="display: none;"
-                    phx-change="change-seller-logo"
-                  />
-                  <div style="text-align: center; text-decoration: underline; font-size: 24px;">
-                    Upload
-                    <div>
-                      Logo/Foto de Perfil
-                    </div>
-                  </div>
-                </label>
+      <div style="display: inline-block;">
+        <form>
+          <div>
+            <label
+              class="has-font-3 is-size-4"
+              style="width: 312px; height: 300px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
+            >
+              <.live_file_input
+                upload={@uploads.logo}
+                style="display: none;"
+                phx-change="change-seller-logo"
+              />
+              <div style="text-align: center; text-decoration: underline; font-size: 24px;">
+                Upload
+                <div>
+                  Logo/Foto de Perfil
+                </div>
               </div>
-              <div>
-                <.upload_item upload={@uploads.logo} />
-              </div>
-            </div>
+            </label>
           </div>
+          <div>
+            <.upload_item upload={@uploads.logo} />
+          </div>
+        </form>
+      </div>
+      <div style="display: inline-block;">
+        <div>
+          <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
+            <.input
+              field={@seller_form[:user_name]}
+              type="text"
+              placeholder="username / nome da loja *"
+              class="text-input-1"
+            >
+            </.input>
+            <.input
+              field={@seller_form[:website]}
+              type="text"
+              placeholder="website"
+              class="text-input-1"
+            >
+            </.input>
+            <.input
+              field={@seller_form[:instagram]}
+              type="text"
+              placeholder="instagram"
+              class="text-input-1"
+            >
+            </.input>
+            <.input
+              field={@seller_form[:twitter]}
+              type="text"
+              placeholder="twitter"
+              class="text-input-1"
+            >
+            </.input>
+            <.input
+              field={@seller_form[:soundcloud]}
+              type="text"
+              placeholder="soundcloud"
+              class="text-input-1"
+            >
+            </.input>
+            <div style="position: relative;">
+              <button>
+                <img src="svg/yellow-ellipse.svg" />
+                <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                  Criar Conta
+                </div>
+              </button>
+            </div>
+          </.form>
         </div>
-        <div style="display: inline-block; position: relative;left: 50px;">
-          <.input
-            field={@seller_form[:user_name]}
-            type="text"
-            placeholder="username / nome da loja *"
-            class="text-input-1"
-          >
-          </.input>
-          <.input
-            field={@seller_form[:website]}
-            type="text"
-            placeholder="website"
-            class="text-input-1"
-          >
-          </.input>
-          <.input
-            field={@seller_form[:instagram]}
-            type="text"
-            placeholder="instagram"
-            class="text-input-1"
-          >
-          </.input>
-          <.input
-            field={@seller_form[:twitter]}
-            type="text"
-            placeholder="twitter"
-            class="text-input-1"
-          >
-          </.input>
-          <.input
-            field={@seller_form[:soundcloud]}
-            type="text"
-            placeholder="soundcloud"
-            class="text-input-1"
-          >
-          </.input>
-        </div>
-      </.form>
+      </div>
     </div>
     """
   end

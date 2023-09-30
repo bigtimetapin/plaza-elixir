@@ -1,6 +1,5 @@
 defmodule Plaza.Accounts.Seller do
   use Ecto.Schema
-  import Ecto.Changeset
   alias Plaza.Accounts.EctoSocials
 
   schema "sellers" do
@@ -16,24 +15,23 @@ defmodule Plaza.Accounts.Seller do
     timestamps()
   end
 
-  def changeset(seller, attrs) do
-    seller
-    |> cast(attrs, [
-      :user_id,
-      :user_name,
-      :profile_photo_url,
-      :description,
-      :location,
-      :website,
-      :socials,
-      :stripe_id
-    ])
-    |> validate_required([
-      :user_id,
-      :user_name
-    ])
-    |> unique_constraint(:user_id)
-    |> unique_constraint(:user_name)
-    |> validate_length(:description, max: 140)
-  end
+  ## def changeset(seller, attrs) do
+  ##   seller
+  ##   |> cast(attrs, [
+  ##     :user_id,
+  ##     :user_name,
+  ##     :profile_photo_url,
+  ##     :description,
+  ##     :location,
+  ##     :website,
+  ##     :stripe_id
+  ##   ])
+  ##   |> validate_required([
+  ##     :user_id,
+  ##     :user_name
+  ##   ])
+  ##   |> unique_constraint(:user_id)
+  ##   |> unique_constraint(:user_name)
+  ##   |> validate_length(:description, max: 140)
+  ## end
 end

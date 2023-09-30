@@ -4,11 +4,11 @@ defmodule Plaza.Accounts.EctoSocials do
 
   alias Plaza.Accounts.Socials
 
+  def cast(%Socials{} = data), do: {:ok, data}
+
   def cast(data) when is_map(data) do
     {:ok, struct(Socials, data)}
   end
-
-  def cast(%Socials{} = data), do: {:ok, data}
 
   def cast(_), do: :error
 
