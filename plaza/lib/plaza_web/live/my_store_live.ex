@@ -12,8 +12,13 @@ defmodule PlazaWeb.MyStoreLive do
   alias Plaza.Products
   alias PlazaWeb.ProductComponent
 
+  alias ExAws.S3
+
   @site "https://plazaaaaa.fly.dev"
   @local_storage_key "plaza-product-form"
+
+  @aws_s3_region "us-west-2"
+  @aws_s3_bucket "plaza-static-dev"
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
@@ -48,7 +53,9 @@ defmodule PlazaWeb.MyStoreLive do
         nil ->
           to_form(
             SellerForm.changeset(
-              %SellerForm{},
+              %SellerForm{
+                user_id: user_id
+              },
               %{}
             )
           )
@@ -82,6 +89,7 @@ defmodule PlazaWeb.MyStoreLive do
         :payouts_enabled,
         payouts_enabled
       )
+      |> assign(waiting: false)
 
     socket =
       case seller do
@@ -223,8 +231,6 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   def handle_event("change-seller-logo", _params, socket) do
-    IO.inspect(socket.assigns.uploads.logo)
-    IO.inspect(socket.assigns.seller_form)
     {:noreply, socket}
   end
 
@@ -248,17 +254,61 @@ defmodule PlazaWeb.MyStoreLive do
 
     IO.inspect(changes)
 
-    form =
+    socket =
       case changes do
         {:error, changeset} ->
-          to_form(changeset)
+          socket = socket |> assign(seller_form: changeset |> to_form)
 
         {:ok, seller_form} ->
           seller = SellerForm.to_seller(seller_form)
           IO.inspect(seller)
+
+          Task.async(fn ->
+            pubish_s3(socket.assigns.local_logo_upload)
+          end)
+
+          socket =
+            socket
+            |> assign(seller: seller)
+            |> assign(waiting: true)
       end
 
     {:noreply, socket}
+  end
+
+  defp pubish_s3(local_upload) do
+    url =
+      case local_upload do
+        nil ->
+          nil
+
+        %{url: nes} ->
+          src =
+            Path.join([
+              :code.priv_dir(:plaza),
+              "static",
+              nes
+            ])
+
+          request =
+            S3.put_object(
+              @aws_s3_bucket,
+              nes,
+              File.read!(src)
+            )
+
+          response =
+            ExAws.request!(
+              request,
+              region: @aws_s3_region
+            )
+
+          IO.inspect(response)
+
+          "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{nes}"
+      end
+
+    {:publish, url}
   end
 
   def handle_event("stripe-link-account", _params, socket) do
@@ -357,6 +407,27 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   @impl Phoenix.LiveView
+  def handle_info({ref, {:publish, url}}, socket) do
+    Process.demonitor(ref, [:flush])
+
+    seller = socket.assigns.seller
+    seller = %{seller | profile_photo_url: url}
+    IO.inspect(seller)
+
+    result = Accounts.create_seller(seller)
+    IO.inspect(result)
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def render(%{waiting: true} = assigns) do
+    ~H"""
+    <div style="margin-top: 200px; display: flex; justify-content: center;">
+      waiting
+    </div>
+    """
+  end
+
   def render(%{seller: nil, my_products: []} = assigns) do
     ~H"""
     <div
@@ -371,7 +442,7 @@ defmodule PlazaWeb.MyStoreLive do
         </.link>
       </div>
       <div style="display: flex; justify-content: center;">
-        or create your own store
+        Ou preencha para criar seu perfil de loja
       </div>
       <div style="position: relative; top: 50px; display: flex; justify-content: center;">
         <.seller_form

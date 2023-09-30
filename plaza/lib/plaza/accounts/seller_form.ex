@@ -1,6 +1,9 @@
 defmodule Plaza.Accounts.SellerForm do
   import Ecto.Changeset
 
+  alias Plaza.Accounts.Seller
+  alias Plaza.Accounts.Socials
+
   defstruct [
     :user_id,
     :user_name,
@@ -15,7 +18,7 @@ defmodule Plaza.Accounts.SellerForm do
   ]
 
   def from_seller(seller) do
-    %{
+    %__MODULE__{
       user_id: seller.user_id,
       user_name: seller.user_name,
       profile_photo_url: seller.profile_photo_url,
@@ -30,14 +33,14 @@ defmodule Plaza.Accounts.SellerForm do
   end
 
   def to_seller(seller_form) do
-    %{
+    %Seller{
       user_id: seller_form.user_id,
       user_name: seller_form.user_name,
       profile_photo_url: seller_form.profile_photo_url,
       description: seller_form.description,
       location: seller_form.location,
       website: seller_form.website,
-      socials: %{
+      socials: %Socials{
         instagram: seller_form.instagram,
         soundcloud: seller_form.soundcloud,
         twitter: seller_form.twitter

@@ -9,7 +9,6 @@ defmodule PlazaWeb.UploadLive2 do
   alias Plaza.Products.Product
   alias Plaza.Products.Designs
 
-  alias ExAws
   alias ExAws.S3
 
   @site "https://plazaaaaa.fly.dev"
