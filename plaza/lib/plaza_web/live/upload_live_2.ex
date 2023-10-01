@@ -8,6 +8,7 @@ defmodule PlazaWeb.UploadLive2 do
   alias Plaza.Products
   alias Plaza.Products.Product
   alias Plaza.Products.Designs
+  alias Plaza.Products.Mocks
 
   alias ExAws.S3
 
@@ -64,12 +65,10 @@ defmodule PlazaWeb.UploadLive2 do
               user_id: user_id,
               price: 75,
               campaign_duration: 7,
-              designs: %{
-                front: nil,
-                back: nil,
+              designs: %Designs{
                 display: 0
               },
-              mocks: %{}
+              mocks: %Mocks{}
             },
             %{}
           )

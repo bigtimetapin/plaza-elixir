@@ -414,8 +414,32 @@ defmodule PlazaWeb.MyStoreLive do
     seller = %{seller | profile_photo_url: url}
     IO.inspect(seller)
 
-    result = Accounts.create_seller(seller)
-    IO.inspect(result)
+    socket =
+      case Accounts.create_seller(seller) do
+        {:ok, seller} ->
+          case socket.assigns.my_products do
+            [product] ->
+              product = %{product | user_id: seller.user_id}
+              result = Products.create_product(product)
+              IO.inspect(result)
+
+            _ ->
+              nil
+          end
+
+          socket =
+            socket
+            |> assign(seller: seller)
+
+        {:error, changeset} ->
+          socket
+          |> assign(seller_form: changeset |> to_form)
+      end
+
+    socket =
+      socket
+      |> assign(waiting: false)
+
     {:noreply, socket}
   end
 
@@ -455,21 +479,26 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
-  def render(%{seller: nil} = assigns) do
+  def render(%{seller: nil, my_products: [product]} = assigns) do
     ~H"""
-    <div class="has-font-3" style="font-size: 34px;">
-      <div>
-        create your store before your product goes live
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 250px;">
+      <div style="display: flex; justify-content: center;">
         <div>
-          <.seller_form
-            seller_form={@seller_form}
-            uploads={@uploads}
-            local_logo_upload={@local_logo_upload}
-          />
+          you've uploaded your first product
+          <div>
+            <ProductComponent.product product={product} />
+          </div>
         </div>
       </div>
-      <div>
-        <ProductComponent.products3 products={@my_products} />
+      <div style="display: flex; justify-content: center; margin-top: 100px; margin-bottom: 50px;">
+        create your store before the product goes live
+      </div>
+      <div style="display: flex; justify-content: center;">
+        <.seller_form
+          seller_form={@seller_form}
+          uploads={@uploads}
+          local_logo_upload={@local_logo_upload}
+        />
       </div>
     </div>
     """

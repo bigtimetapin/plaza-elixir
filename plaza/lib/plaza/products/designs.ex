@@ -1,5 +1,3 @@
 defmodule Plaza.Products.Designs do
-  defstruct front: :string,
-            back: :string,
-            display: :integer
+  defstruct [:front, :back, :display]
 end
