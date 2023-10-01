@@ -24,18 +24,17 @@ defmodule PlazaWeb.MyStoreLive do
   def mount(_params, _session, socket) do
     user_id = socket.assigns.current_user.id
     seller = Accounts.get_seller_by_id(user_id)
-    IO.inspect(seller)
     my_products = Products.list_products_by_user_id(user_id)
 
     payouts_enabled =
       case seller do
         nil ->
-          nil
+          false
 
         %Seller{stripe_id: stripe_id} ->
           case stripe_id do
             nil ->
-              nil
+              false
 
             defined ->
               case Stripe.Account.retrieve(defined) do
@@ -317,8 +316,8 @@ defmodule PlazaWeb.MyStoreLive do
     {:ok, %Stripe.AccountLink{url: stripe_account_link_url}} =
       Stripe.AccountLink.create(%{
         account: stripe_id,
-        refresh_url: "#{@site}/my-account?stripe-setup-refresh=#{stripe_id}",
-        return_url: "#{@site}/my-account?stripe-setup-return=#{stripe_id}",
+        refresh_url: "#{@site}/my-store?stripe-setup-refresh=#{stripe_id}",
+        return_url: "#{@site}/my-store?stripe-setup-return=#{stripe_id}",
         type: :account_onboarding
       })
 
@@ -332,7 +331,7 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   def handle_event("stripe-enable-payouts", %{"stripe-id" => stripe_id}, socket) do
-    {:noreply, push_patch(socket, to: "/my-account?stripe-setup-refresh=#{stripe_id}")}
+    {:noreply, push_patch(socket, to: "/my-store?stripe-setup-refresh=#{stripe_id}")}
   end
 
   @impl Phoenix.LiveView
@@ -343,8 +342,8 @@ defmodule PlazaWeb.MyStoreLive do
           {:ok, %Stripe.AccountLink{url: stripe_account_link_url}} =
             Stripe.AccountLink.create(%{
               account: stripe_id,
-              refresh_url: "#{@site}/my-account?stripe-setup-refresh=#{stripe_id}",
-              return_url: "#{@site}/my-account?stripe-setup-return=#{stripe_id}",
+              refresh_url: "#{@site}/my-store?stripe-setup-refresh=#{stripe_id}",
+              return_url: "#{@site}/my-store?stripe-setup-return=#{stripe_id}",
               type: :account_onboarding
             })
 
@@ -504,48 +503,129 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
+  ## def render(%{seller: %Seller{stripe_id: nil}} = assigns) do
+  ##   ~H"""
+  ##   <div class="has-font-3" style="font-size: 34px;">
+  ##     <div style="display: flex; justify-content: center;">
+  ##       <button phx-click="stripe-link-account">link stripe account</button>
+  ##     </div>
+  ##   </div>
+  ##   """
+  ## end
+
   def render(assigns) do
     ~H"""
     <div style="margin-bottom: 50px;">
-      <.left />
+      <.left seller={@seller} />
       <.right my_products={@my_products} />
     </div>
     """
   end
 
   defp left(assigns) do
+    seller = assigns.seller
+
+    description =
+      case seller.description do
+        nil ->
+          "Breve descrição do artista. Maximo 140 caracteres."
+
+        nn ->
+          nn
+      end
+
+    location =
+      case seller.location do
+        nil ->
+          "Localização do artista"
+
+        nn ->
+          nn
+      end
+
+    website =
+      case seller.website do
+        nil ->
+          {:default, "Website"}
+
+        nn ->
+          {:url, nn}
+      end
+
+    instagram =
+      case seller.socials.instagram do
+        nil ->
+          {:default, "Instagram"}
+
+        nn ->
+          {:url, nn}
+      end
+
+    twitter =
+      case seller.socials.twitter do
+        nil ->
+          {:default, "Twitter"}
+
+        nn ->
+          {:url, nn}
+      end
+
+    soundcloud =
+      case seller.socials.soundcloud do
+        nil ->
+          {:default, "Soundcloud"}
+
+        nn ->
+          {:url, nn}
+      end
+
+    urls = [
+      website,
+      instagram,
+      twitter,
+      soundcloud
+    ]
+
+    assigns =
+      assigns
+      |> assign(user_description: description)
+      |> assign(user_location: location)
+      |> assign(user_urls: urls)
+
     ~H"""
     <div class="has-font-3" style="display: inline-block; position: relative; top: 50px;">
-      <div>
-        <img src="png/pep.png" style="width: 377px;" />
+      <div style="width: 377px; height: 377px; overflow: hidden;">
+        <img src={if @seller.profile_photo_url, do: @seller.profile_photo_url, else: "png/pep.png"} />
       </div>
       <div style="position: relative; left: 61px; width: 316px; height: 423px; border-right: 1px solid #707070;">
         <div class="is-size-6 mb-small" style="text-decoration: underline;">
-          username
+          <%= @seller.user_name %>
         </div>
         <div class="is-size-6 mb-xsmall" style="line-height: 34px; width: 267px;">
-          Breve descrição do artista. Maximo 140 caracteres.
+          <%= @user_description %>
         </div>
         <div class="is-size-6 mb-small has-dark-gray-text">
-          Localização do artista.
+          <%= @user_location %>
         </div>
-        <div class="is-size-6" style="text-decoration: underline;">
-          Instagram
-        </div>
-        <div class="is-size-6" style="text-decoration: underline;">
-          Email
-        </div>
-        <div class="is-size-6" style="text-decoration: underline;">
-          Soundcloud
-        </div>
-        <div class="is-size-6" style="text-decoration: underline;">
-          Website
-        </div>
-        <div class="is-size-6" style="text-decoration: underline;">
-          Twitter
+        <div :for={url <- @user_urls} class="is-size-6" style="text-decoration: underline;">
+          <.url_or url={url} />
         </div>
       </div>
     </div>
+    """
+  end
+
+  defp url_or(%{url: {:default, default}} = assigns) do
+    ~H"""
+    <%= default %>
+    """
+  end
+
+  defp url_or(%{url: {:url, url}} = assigns) do
+    ~H"""
+    <a href={url} target="_blank">
+      <%= url %>
+    </a>
     """
   end
 
