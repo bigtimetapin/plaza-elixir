@@ -503,15 +503,70 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
-  ## def render(%{seller: %Seller{stripe_id: nil}} = assigns) do
-  ##   ~H"""
-  ##   <div class="has-font-3" style="font-size: 34px;">
-  ##     <div style="display: flex; justify-content: center;">
-  ##       <button phx-click="stripe-link-account">link stripe account</button>
-  ##     </div>
-  ##   </div>
-  ##   """
-  ## end
+  def render(%{seller: %Seller{stripe_id: nil}, my_products: []} = assigns) do
+    ~H"""
+    <div style="margin-bottom: 50px;">
+      <.left seller={@seller} />
+      <div style="display: inline-block; position: absolute; margin-left: 150px; margin-top: 150px;">
+        <div class="has-font-3" style="font-size: 34px;">
+          <div style="display: flex; justify-content: center;">
+            <div style="text-align: center;">
+              <div style="margin-bottom: 50px;">
+                Ok you've created your seller (loja) profile
+              </div>
+              <div style="margin-bottom: 50px;">
+                Go upload your first product
+                <div style="text-decoration: underline;">
+                  <.link navigate="/upload">
+                    upload
+                  </.link>
+                </div>
+              </div>
+              <div style="width: 785px;">
+                Or link your bank info with stripe so you can get paid for every sale.
+                You'll need to do this before your products go live.
+                <div style="text-decoration: underline;">
+                  <button phx-click="stripe-link-account">link stripe account</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{seller: %Seller{stripe_id: nil}, my_products: [product]} = assigns) do
+    ~H"""
+    <div style="margin-bottom: 50px;">
+      <.left seller={@seller} />
+      <div style="display: inline-block; position: absolute; margin-left: 150px; margin-top: 150px;">
+        <div class="has-font-3" style="font-size: 34px;">
+          <div style="display: flex; justify-content: center;">
+            <div style="text-align: center;">
+              <div style="margin-bottom: 50px;">
+                Ok you've created your seller (loja) profile
+              </div>
+              <div style="margin-bottom: 50px;">
+                and you've uploaded your first product
+                <div style="text-decoration: underline;">
+                  <ProductComponent.product product={product} />
+                </div>
+              </div>
+            </div>
+            <div style="width: 500px; margin-left: 50px; border: 1px dotted black; text-align: center;">
+              You just need to link your bank info with stripe so you can get paid for every sale.
+              <div style="text-decoration: underline; margin-top: 50px;">
+                <button phx-click="stripe-link-account">link stripe account</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
 
   def render(assigns) do
     ~H"""
