@@ -25,8 +25,10 @@ defmodule Plaza.Accounts do
 
   def update_seller(%Seller{} = seller, attrs) do
     seller
-    |> Seller.changeset(attrs)
-    |> Repo.update()
+    |> Repo.insert(
+      on_conflict: :replace_all,
+      conflict_target: :id
+    )
   end
 
   ## Database getters

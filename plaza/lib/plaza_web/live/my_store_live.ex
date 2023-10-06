@@ -381,7 +381,8 @@ defmodule PlazaWeb.MyStoreLive do
           seller =
             case details_submitted do
               true ->
-                {:ok, seller} = Accounts.update_seller(seller, %{"stripe_id" => stripe_id})
+                seller = %{seller | stripe_id: stripe_id}
+                {:ok, seller} = Accounts.update_seller(seller, %{})
                 seller
 
               false ->
