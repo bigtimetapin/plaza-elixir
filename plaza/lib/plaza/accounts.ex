@@ -14,6 +14,10 @@ defmodule Plaza.Accounts do
     Repo.get_by(Seller, user_id: id)
   end
 
+  def get_seller_by_user_name(user_name) do
+    Repo.get_by(Seller, user_name: user_name)
+  end
+
   def create_seller(seller) do
     seller
     |> Repo.insert()

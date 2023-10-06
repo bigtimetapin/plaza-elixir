@@ -41,8 +41,8 @@ defmodule Plaza.Products do
   """
   def get_product!(id), do: Repo.get!(Product, id)
 
-  # TODO
   def get_product(seller_id, product_name) do
+    Repo.get_by(Product, user_id: seller_id, name: product_name)
   end
 
   def create_product(%Product{} = product) do

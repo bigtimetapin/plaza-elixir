@@ -204,8 +204,8 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   def handle_event("product-href", %{"product-name" => product_name}, socket) do
-    seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
-    params = %{"seller_name" => seller.user_name, "product-name" => product_name}
+    seller = socket.assigns.seller
+    params = %{"user-name" => seller.user_name, "product-name" => product_name}
     url = URI.encode_query(params)
     IO.inspect(url)
     {:noreply, push_navigate(socket, to: "/product?#{url}")}
@@ -550,8 +550,8 @@ defmodule PlazaWeb.MyStoreLive do
               </div>
               <div style="margin-bottom: 50px;">
                 and you've uploaded your first product
-                <div style="text-decoration: underline;">
-                  <ProductComponent.product product={product} />
+                <div>
+                  <ProductComponent.selectable product={product} href={true} />
                 </div>
               </div>
             </div>
