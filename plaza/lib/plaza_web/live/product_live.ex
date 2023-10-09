@@ -1,7 +1,10 @@
 defmodule PlazaWeb.ProductLive do
   use PlazaWeb, :live_view
 
+  alias Ecto.Changeset
+
   alias Plaza.Accounts
+  alias Plaza.Accounts.Address
   alias Plaza.Accounts.Seller
   alias Plaza.Dimona
   alias Plaza.Products
@@ -55,34 +58,110 @@ defmodule PlazaWeb.ProductLive do
 
   @impl Phoenix.LiveView
   def handle_event("step", %{"step" => "2"}, socket) do
-    socket =
-      socket
-      |> assign(step: 2)
-      |> assign(cep: nil)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("change-cep-input", %{"cep" => cep}, socket) do
-    cep =
-      case cep do
-        "" ->
-          nil
-
-        nes ->
-          nes
+    user_id =
+      case socket.assigns.current_user do
+        nil -> nil
+        current_user -> current_user.id
       end
 
     socket =
       socket
-      |> assign(cep: cep)
+      |> assign(step: 2)
+      |> assign(
+        address_form:
+          to_form(
+            Address.changeset(
+              %Address{
+                user_id: user_id
+              },
+              %{}
+            )
+          )
+      )
 
     {:noreply, socket}
   end
 
-  def handle_event("submit-cep-input", _params, socket) do
-    params = %{"zipcode" => socket.assigns.cep}
-    result = Dimona.Requests.Shipping.post(params)
+  def handle_event("change-address-form", params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("submit-address-form", %{"address" => attrs}, socket) do
+    changes =
+      Address.changeset(
+        %Address{},
+        attrs
+      )
+      |> Changeset.apply_action(:update)
+
+    socket =
+      case changes do
+        {:error, changeset} ->
+          socket
+          |> assign(address_form: changeset |> to_form)
+
+        {:ok, address} ->
+          Task.async(fn ->
+            {
+              :shipping_quote,
+              Dimona.Requests.Shipping.post(%{
+                "zipcode" => address.postal_code,
+                "quantity" => 1
+              })
+            }
+          end)
+
+          socket
+          |> assign(shipping_address: address)
+          |> assign(waiting: true)
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("select-shipping-option", %{"id" => id, "price" => price}, socket) do
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({ref, {:shipping_quote, result}}, socket) do
+    Process.demonitor(ref, [:flush])
+
+    result =
+      case result do
+        {:error, payload} ->
+          IO.inspect(payload)
+
+          :error
+
+        {:ok, many} ->
+          case many do
+            [] ->
+              :error
+
+            nel ->
+              {:ok, nel}
+          end
+      end
+
+    socket =
+      case result do
+        :error ->
+          socket
+          |> assign(error: "unable to resolve cep, try again")
+          |> assign(shipping_options: nil)
+
+        {:ok, nel} ->
+          socket
+          |> assign(shipping_options: nel)
+          |> assign(error: nil)
+      end
+
+    socket =
+      socket
+      |> assign(step: 3)
+      |> assign(waiting: false)
+
     {:noreply, socket}
   end
 
@@ -109,14 +188,19 @@ defmodule PlazaWeb.ProductLive do
 
   def render(%{product: product, step: 1} = assigns) do
     ~H"""
-    <div class="has-font-3" style="font-size: 34px;">
-      <div>
-        <ProductComponent.product product={product} />
-      </div>
-      <div>
-        <button phx-click="step" phx-value-step="2">
-          purchase
-        </button>
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column;">
+          <ProductComponent.product product={product} />
+          <div style="align-self: center;">
+            <button phx-click="step" phx-value-step="2">
+              <img src="svg/yellow-ellipse.svg" />
+              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                Purchase
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     """
@@ -124,30 +208,97 @@ defmodule PlazaWeb.ProductLive do
 
   def render(%{product: product, step: 2} = assigns) do
     ~H"""
-    <div class="has-font-3" style="font-size: 34px;">
-      <div>
-        <ProductComponent.product product={product} />
-      </div>
-      <div>
-        <div>
-          we need your cep to figure out shipping costs
-        </div>
-        <div>
-          <form>
-            <.input
-              type="text"
-              name="cep"
-              value={@cep}
-              placeholder="cep"
-              class="text-input-1"
-              phx-change="change-cep-input"
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column;">
+          <div>
+            <ProductComponent.product product={product} />
+          </div>
+          <div style="align-self: center;">
+            shipping address
+          </div>
+          <div>
+            <.form
+              for={@address_form}
+              phx-change="change-address-form"
+              phx-submit="submit-address-form"
             >
-            </.input>
-          </form>
+              <.input
+                field={@address_form[:line1]}
+                type="text"
+                placeholder="endereço"
+                class="text-input-1"
+                autocomplete="shipping address-line1"
+              >
+              </.input>
+              <.input
+                field={@address_form[:line2]}
+                type="text"
+                placeholder="complemento"
+                class="text-input-1"
+                autocomplete="shipping address-line2"
+              >
+              </.input>
+              <.input
+                field={@address_form[:postal_code]}
+                type="text"
+                placeholder="cep"
+                class="text-input-1"
+                autocomplete="shipping postal-code"
+              >
+              </.input>
+              <div style="display: flex; justify-content: center; margin-top: 50px;">
+                <button>
+                  <img src="svg/yellow-ellipse.svg" />
+                  <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                    Submit
+                  </div>
+                </button>
+              </div>
+            </.form>
+          </div>
         </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{product: product, step: 3, shipping_options: nil, error: error} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
         <div>
-          <button disabled={!@cep} phx-click="submit-cep-input" style={if !@cep, do: "opacity: 50%;"}>
-            submit
+          <ProductComponent.product product={product} />
+        </div>
+        <div style="display: flex; flex-direction: column;">
+          <div>
+            here
+          </div>
+          <div>
+            and here
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{product: product, step: 3, shipping_options: shipping_options} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div>
+          <ProductComponent.product product={product} />
+        </div>
+        <div style="display: flex; flex-direction: column; position: relative; top: 100px; left: 50px;">
+          <button
+            :for={opt <- shipping_options}
+            phx-click="select-shipping-option"
+            phx-value-id={opt.delivery_method_id}
+            phx-value-price={opt.value}
+            style="margin-top: 15px;"
+          >
+            <%= "#{opt.name}: #{opt.value}" %>
           </button>
         </div>
       </div>

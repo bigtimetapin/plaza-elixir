@@ -1,9 +1,34 @@
 defmodule Plaza.Accounts.Address do
-  defstruct street: :string,
-            number: :string,
-            city: :string,
-            state: :string,
-            zipcode: :string,
-            neighborhood: :string,
-            country: :string
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  schema "addresses" do
+    field :user_id, :id
+    field :line1, :string
+    field :line2, :string
+    field :city, :string
+    field :state, :string
+    field :postal_code, :string
+    field :country, :string
+    timestamps()
+  end
+
+  def changeset(address, attrs) do
+    address
+    |> cast(attrs, [
+      :user_id,
+      :line1,
+      :line2,
+      :city,
+      :state,
+      :postal_code,
+      :country
+    ])
+    |> validate_required([
+      :line1,
+      :postal_code
+    ])
+    |> validate_length(:postal_code, min: 5)
+    |> validate_length(:country, min: 2, max: 2)
+  end
 end
