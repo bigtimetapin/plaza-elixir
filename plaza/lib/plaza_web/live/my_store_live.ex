@@ -24,28 +24,8 @@ defmodule PlazaWeb.MyStoreLive do
   def mount(_params, _session, socket) do
     user_id = socket.assigns.current_user.id
     seller = Accounts.get_seller_by_id(user_id)
+    IO.inspect(seller)
     my_products = Products.list_products_by_user_id(user_id)
-
-    payouts_enabled =
-      case seller do
-        nil ->
-          false
-
-        %Seller{stripe_id: stripe_id} ->
-          case stripe_id do
-            nil ->
-              false
-
-            defined ->
-              case Stripe.Account.retrieve(defined) do
-                {:ok, %Stripe.Account{payouts_enabled: bool}} ->
-                  bool
-
-                _ ->
-                  false
-              end
-          end
-      end
 
     seller_form =
       case seller do
@@ -83,10 +63,6 @@ defmodule PlazaWeb.MyStoreLive do
       |> assign(
         :seller_form,
         seller_form
-      )
-      |> assign(
-        :payouts_enabled,
-        payouts_enabled
       )
       |> assign(waiting: false)
 
@@ -330,10 +306,6 @@ defmodule PlazaWeb.MyStoreLive do
     {:noreply, socket}
   end
 
-  def handle_event("stripe-enable-payouts", %{"stripe-id" => stripe_id}, socket) do
-    {:noreply, push_patch(socket, to: "/my-store?stripe-setup-refresh=#{stripe_id}")}
-  end
-
   @impl Phoenix.LiveView
   def handle_params(%{"stripe-setup-refresh" => stripe_id}, _uri, socket) do
     socket =
@@ -367,12 +339,10 @@ defmodule PlazaWeb.MyStoreLive do
 
           {:ok,
            %Stripe.Account{
-             details_submitted: details_submitted,
-             payouts_enabled: payouts_enabled
+             details_submitted: details_submitted
            } = stripe_account} = Stripe.Account.retrieve(stripe_id)
 
           IO.inspect(details_submitted)
-          IO.inspect(payouts_enabled)
 
           seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
 
@@ -393,7 +363,6 @@ defmodule PlazaWeb.MyStoreLive do
 
           socket
           |> assign(:seller, seller)
-          |> assign(:payouts_enabled, payouts_enabled)
 
         false ->
           socket
