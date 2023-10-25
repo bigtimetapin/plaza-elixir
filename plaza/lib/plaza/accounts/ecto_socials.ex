@@ -4,6 +4,8 @@ defmodule Plaza.Accounts.EctoSocials do
 
   alias Plaza.Accounts.Socials
 
+  @fields [:instagram, :soundcloud, :twitter]
+
   def cast(%Socials{} = data), do: {:ok, data}
 
   def cast(data) when is_map(data) do

@@ -4,6 +4,8 @@ defmodule Plaza.Products.EctoMocks do
 
   alias Plaza.Products.Mocks
 
+  @fields [:front, :back]
+
   def cast(%Mocks{} = data), do: {:ok, data}
 
   def cast(data) when is_map(data) do

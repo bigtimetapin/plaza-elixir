@@ -4,6 +4,8 @@ defmodule Plaza.Products.EctoDesigns do
 
   alias Plaza.Products.Designs
 
+  @fields [:front, :back, :display]
+
   def cast(%Designs{} = data), do: {:ok, data}
 
   def cast(data) when is_map(data) do
