@@ -45,9 +45,6 @@ defmodule PlazaWeb.Auth.Login do
             Forgot your password?
           </.link>
         </:actions>
-        <:actions :if={!@full}>
-          <.input field={@form[:topic]} style="display: none;" />
-        </:actions>
         <:actions>
           <.button phx-disable-with="Signing in..." class="w-full">
             Sign in <span aria-hidden="true">→</span>
