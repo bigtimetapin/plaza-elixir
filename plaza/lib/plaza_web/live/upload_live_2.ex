@@ -30,11 +30,8 @@ defmodule PlazaWeb.UploadLive2 do
             nil ->
               {nil, 4, id}
 
-            %Seller{stripe_id: nil} = seller ->
-              {seller, 5, id}
-
             seller ->
-              {seller, 6, id}
+              {seller, 4, id}
           end
       end
 
@@ -94,7 +91,7 @@ defmodule PlazaWeb.UploadLive2 do
         {local_url, file_name} =
           consume_uploaded_entry(socket, entry, fn %{path: path} ->
             IO.inspect(path)
-            unique_file_name = "#{entry.uuid}-#{entry.client_name}"
+            unique_file_name = "#{entry.uuid}-#{entry.client_name}" |> String.replace(" ", "")
 
             dest =
               Path.join([
@@ -952,7 +949,7 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: 9, write_status: :db_storage} = assigns) do
     product = assigns.product_form.data
-    product_params = %{"user_id" => product.user_id, "name" => product.name}
+    product_params = %{"user-name" => assigns.seller.user_name, "product-name" => product.name}
 
     assigns =
       assigns

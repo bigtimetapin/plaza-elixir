@@ -1,7 +1,6 @@
 defmodule Plaza.Repo.Migrations.AddProductsTable do
   use Ecto.Migration
 
-  # TODO; activity, stats
   def change do
     create table(:products) do
       add :user_id, references(:users, on_delete: :delete_all), null: false

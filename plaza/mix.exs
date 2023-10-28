@@ -57,7 +57,8 @@ defmodule Plaza.MixProject do
       {:configparser_ex, "~> 4.0"},
       {:httpoison, "~> 2.0"},
       {:poison, "5.0.0"},
-      {:stripity_stripe, "~> 2.17.2"}
+      {:stripity_stripe, "~> 2.17.2"},
+      {:navigation_history, "~> 0.4"}
     ]
   end
 

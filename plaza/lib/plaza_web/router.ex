@@ -11,6 +11,7 @@ defmodule PlazaWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
+    plug NavigationHistory.Tracker
   end
 
   pipeline :api do
@@ -64,6 +65,7 @@ defmodule PlazaWeb.Router do
     end
 
     post "/users/log_in", UserSessionController, :create
+    post "/users/log_in_quick", UserSessionController, :create_quick
   end
 
   scope "/", PlazaWeb do

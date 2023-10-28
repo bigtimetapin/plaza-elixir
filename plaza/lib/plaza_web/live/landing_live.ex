@@ -30,8 +30,6 @@ defmodule PlazaWeb.LandingLive do
       )
       |> assign(:seller, seller)
 
-    IO.inspect(socket.assigns)
-
     {:ok, socket}
   end
 

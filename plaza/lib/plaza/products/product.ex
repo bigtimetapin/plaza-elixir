@@ -16,6 +16,10 @@ defmodule Plaza.Products.Product do
     timestamps()
   end
 
+  def price_unit_amount(product) do
+    Kernel.round(product.price * 100)
+  end
+
   @doc false
   def changeset(product, attrs) do
     product

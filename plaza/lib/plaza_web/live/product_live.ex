@@ -8,13 +8,36 @@ defmodule PlazaWeb.ProductLive do
   alias Plaza.Accounts.Seller
   alias Plaza.Dimona
   alias Plaza.Products
+  alias Plaza.Products.Product
+  alias Plaza.Purchases.Purchase
   alias PlazaWeb.ProductComponent
 
   @impl Phoenix.LiveView
   def mount(params, _session, socket) do
     socket =
       if connected?(socket) do
-        socket
+        case socket.assigns.current_user do
+          nil ->
+            email =
+              live_flash(
+                socket.assigns.flash,
+                :email
+              )
+
+            socket
+            |> assign(
+              login_form:
+                to_form(
+                  %{
+                    "email" => email
+                  },
+                  as: "user"
+                )
+            )
+
+          _ ->
+            socket
+        end
       else
         socket
         |> assign(waiting: true)
@@ -24,11 +47,10 @@ defmodule PlazaWeb.ProductLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_params(%{"user-name" => user_name, "product-name" => product_name}, _uri, socket) do
+  def handle_params(%{"user-name" => user_name, "product-name" => product_name}, uri, socket) do
     socket =
       if connected?(socket) do
         seller = Accounts.get_seller_by_user_name(user_name)
-        IO.inspect(seller)
 
         product =
           case seller do
@@ -42,11 +64,10 @@ defmodule PlazaWeb.ProductLive do
               )
           end
 
-        IO.inspect(product)
-
         socket
         |> assign(seller: seller)
         |> assign(product: product)
+        |> assign(uri: uri)
         |> assign(step: 1)
         |> assign(waiting: false)
       else
@@ -78,6 +99,46 @@ defmodule PlazaWeb.ProductLive do
             )
           )
       )
+
+    {:noreply, socket}
+  end
+
+  def handle_event("step", %{"step" => "5"}, socket) do
+    socket =
+      socket
+      |> assign(step: 5)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("step", %{"step" => "6"}, socket) do
+    product = socket.assigns.product
+
+    user_id =
+      case socket.assigns.current_user do
+        nil -> nil
+        current_user -> current_user.id
+      end
+
+    {:ok, purchase} = Purchase.create(%{user_id: user_id, product_id: product.id})
+
+    case Stripe.Product.create(%{
+           images:
+             [product.designs.front, product.designs.back]
+             |> Enum.filter(&(!is_nil(&1))),
+           name: product.name,
+           url: socket.assigns.uri,
+           default_price_data: %{
+             unit_amount: Product.price_unit_amount(product),
+             currency: "brl"
+           }
+         }) do
+      {:ok, stripe_product} ->
+        IO.inspect(stripe_product)
+
+      {:error, error} ->
+        IO.inspect(error)
+    end
 
     {:noreply, socket}
   end
@@ -119,7 +180,22 @@ defmodule PlazaWeb.ProductLive do
     {:noreply, socket}
   end
 
-  def handle_event("select-shipping-option", %{"id" => id, "price" => price}, socket) do
+  def handle_event(
+        "select-delivery-method",
+        %{"id" => id, "price" => price, "name" => name},
+        socket
+      ) do
+    socket =
+      socket
+      |> assign(
+        delivery_method: %{
+          id: id,
+          price: price,
+          name: name
+        }
+      )
+      |> assign(step: 4)
+
     {:noreply, socket}
   end
 
@@ -149,11 +225,11 @@ defmodule PlazaWeb.ProductLive do
         :error ->
           socket
           |> assign(error: "unable to resolve cep, try again")
-          |> assign(shipping_options: nil)
+          |> assign(delivery_methods: nil)
 
         {:ok, nel} ->
           socket
-          |> assign(shipping_options: nel)
+          |> assign(delivery_methods: nel)
           |> assign(error: nil)
       end
 
@@ -181,6 +257,21 @@ defmodule PlazaWeb.ProductLive do
     <div>
       <div style="display: flex; justify-content: center;">
         product does not exist
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{product: product, current_user: nil, step: 1} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column;">
+          <ProductComponent.product product={product} />
+          <div style="align-self: center;">
+            <PlazaWeb.Auth.Login.login_quick form={@login_form} />
+          </div>
+        </div>
       </div>
     </div>
     """
@@ -263,7 +354,7 @@ defmodule PlazaWeb.ProductLive do
     """
   end
 
-  def render(%{product: product, step: 3, shipping_options: nil, error: error} = assigns) do
+  def render(%{product: product, step: 3, delivery_methods: nil, error: error} = assigns) do
     ~H"""
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
@@ -272,10 +363,10 @@ defmodule PlazaWeb.ProductLive do
         </div>
         <div style="display: flex; flex-direction: column;">
           <div>
-            here
+            error
           </div>
           <div>
-            and here
+            try again
           </div>
         </div>
       </div>
@@ -283,7 +374,7 @@ defmodule PlazaWeb.ProductLive do
     """
   end
 
-  def render(%{product: product, step: 3, shipping_options: shipping_options} = assigns) do
+  def render(%{product: product, step: 3, delivery_methods: delivery_methods} = assigns) do
     ~H"""
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
@@ -292,14 +383,40 @@ defmodule PlazaWeb.ProductLive do
         </div>
         <div style="display: flex; flex-direction: column; position: relative; top: 100px; left: 50px;">
           <button
-            :for={opt <- shipping_options}
-            phx-click="select-shipping-option"
+            :for={opt <- delivery_methods}
+            phx-click="select-delivery-method"
             phx-value-id={opt.delivery_method_id}
             phx-value-price={opt.value}
+            phx-value-name={opt.name}
             style="margin-top: 15px;"
           >
             <%= "#{opt.name}: #{opt.value}" %>
           </button>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{product: product, step: 4} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div>
+          <ProductComponent.product product={product} />
+        </div>
+        <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
+          <div>
+            <%= "#{@delivery_method.name}: R$ #{@delivery_method.price}" %>
+          </div>
+          <div>
+            <button phx-click="step" phx-value-step="5">
+              <img src="svg/yellow-ellipse.svg" />
+              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                Checkout
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
