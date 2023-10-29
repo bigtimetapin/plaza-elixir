@@ -504,10 +504,15 @@ defmodule PlazaWeb.ProductLive do
         </div>
         <div style="display: flex; flex-direction: column;">
           <div>
-            error
+            could not resolve your shipping address
           </div>
           <div>
-            try again
+            <button phx-click="step" phx-value-step="2">
+              <img src="svg/yellow-ellipse.svg" />
+              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                Try Again
+              </div>
+            </button>
           </div>
         </div>
       </div>
