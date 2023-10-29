@@ -16,28 +16,55 @@ defmodule PlazaWeb.ProductLive do
   def mount(params, _session, socket) do
     socket =
       if connected?(socket) do
-        case socket.assigns.current_user do
-          nil ->
-            email =
-              live_flash(
-                socket.assigns.flash,
-                :email
-              )
-
-            socket
-            |> assign(
-              login_form:
-                to_form(
-                  %{
-                    "email" => email
-                  },
-                  as: "user"
+        {socket, user_id} =
+          case socket.assigns.current_user do
+            nil ->
+              {
+                socket
+                |> assign(
+                  login_form:
+                    to_form(
+                      %{
+                        "email" => nil
+                      },
+                      as: "user"
+                    )
                 )
-            )
+                |> assign(
+                  email_form:
+                    to_form(
+                      %{
+                        "email" => nil
+                      },
+                      as: "email-form"
+                    )
+                )
+                |> assign(email: nil)
+                |> assign(email_form_is_empty: true),
+                nil
+              }
 
-          _ ->
-            socket
-        end
+            current_user ->
+              {
+                socket
+                |> assign(email: current_user.email),
+                current_user.id
+              }
+          end
+
+        socket =
+          socket
+          |> assign(
+            address_form:
+              to_form(
+                Address.changeset(
+                  %Address{
+                    user_id: user_id
+                  },
+                  %{}
+                )
+              )
+          )
       else
         socket
         |> assign(waiting: true)
@@ -79,26 +106,9 @@ defmodule PlazaWeb.ProductLive do
 
   @impl Phoenix.LiveView
   def handle_event("step", %{"step" => "2"}, socket) do
-    user_id =
-      case socket.assigns.current_user do
-        nil -> nil
-        current_user -> current_user.id
-      end
-
     socket =
       socket
       |> assign(step: 2)
-      |> assign(
-        address_form:
-          to_form(
-            Address.changeset(
-              %Address{
-                user_id: user_id
-              },
-              %{}
-            )
-          )
-      )
 
     {:noreply, socket}
   end
@@ -139,6 +149,29 @@ defmodule PlazaWeb.ProductLive do
       {:error, error} ->
         IO.inspect(error)
     end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-email-form", %{"email-form" => %{"email" => email}}, socket) do
+    is_empty =
+      case email do
+        "" -> true
+        _ -> false
+      end
+
+    socket =
+      socket
+      |> assign(email_form_is_empty: is_empty)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("submit-email-form", %{"email-form" => %{"email" => email}}, socket) do
+    socket =
+      socket
+      |> assign(email: email)
+      |> assign(step: 2)
 
     {:noreply, socket}
   end
@@ -262,14 +295,44 @@ defmodule PlazaWeb.ProductLive do
     """
   end
 
-  def render(%{product: product, current_user: nil, step: 1} = assigns) do
+  def render(%{product: product, email: nil, step: 1} = assigns) do
     ~H"""
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column;">
+        <div>
           <ProductComponent.product product={product} />
-          <div style="align-self: center;">
+        </div>
+        <div style="position: relative; top: 50px; margin-left: 50px;">
+          <div>
+            Press login to continue
+          </div>
+          <div>
             <PlazaWeb.Auth.Login.login_quick form={@login_form} />
+          </div>
+        </div>
+        <div style="position: relative; top: 50px; margin-left: 50px; margin-right: 50px;">
+          <div>
+            or continue as guest
+          </div>
+          <div>
+            <.form for={@email_form} phx-change="change-email-form" phx-submit="submit-email-form">
+              <.input
+                field={@email_form[:email]}
+                type="email"
+                placeholder="email"
+                autocomplete="email"
+              />
+              <div style={if @email_form_is_empty, do: "opacity: 50%;"}>
+                <div style="display: flex; justify-content: center; margin-top: 50px;">
+                  <button disabled={@email_form_is_empty}>
+                    <img src="svg/yellow-ellipse.svg" />
+                    <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                      Continue
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </.form>
           </div>
         </div>
       </div>

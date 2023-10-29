@@ -3,7 +3,7 @@ defmodule PlazaWeb.UserLoginLive do
 
   def render(assigns) do
     ~H"""
-    <PlazaWeb.Auth.Login.login form={@form} />
+    <PlazaWeb.Auth.Login.login_full form={@form} />
     """
   end
 
