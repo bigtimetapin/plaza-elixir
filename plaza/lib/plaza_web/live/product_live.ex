@@ -12,6 +12,8 @@ defmodule PlazaWeb.ProductLive do
   alias Plaza.Purchases.Purchase
   alias PlazaWeb.ProductComponent
 
+  @site "http://localhost:4000"
+
   @impl Phoenix.LiveView
   def mount(params, _session, socket) do
     socket =
@@ -74,7 +76,11 @@ defmodule PlazaWeb.ProductLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_params(%{"user-name" => user_name, "product-name" => product_name}, uri, socket) do
+  def handle_params(
+        %{"user-name" => user_name, "product-name" => product_name} = params,
+        uri,
+        socket
+      ) do
     socket =
       if connected?(socket) do
         seller = Accounts.get_seller_by_user_name(user_name)
@@ -91,12 +97,30 @@ defmodule PlazaWeb.ProductLive do
               )
           end
 
-        socket
-        |> assign(seller: seller)
-        |> assign(product: product)
-        |> assign(uri: uri)
-        |> assign(step: 1)
-        |> assign(waiting: false)
+        socket =
+          socket
+          |> assign(seller: seller)
+          |> assign(product: product)
+          |> assign(uri: uri)
+
+        case params do
+          %{"success" => "true", "email" => email} ->
+            socket
+            |> assign(email: email)
+            |> assign(step: 5)
+            |> assign(waiting: false)
+
+          %{"cancel" => "true", "email" => email} ->
+            socket
+            |> assign(email: email)
+            |> assign(step: 2)
+            |> assign(waiting: false)
+
+          _ ->
+            socket
+            |> assign(step: 1)
+            |> assign(waiting: false)
+        end
       else
         socket
       end
@@ -113,16 +137,9 @@ defmodule PlazaWeb.ProductLive do
     {:noreply, socket}
   end
 
-  def handle_event("step", %{"step" => "5"}, socket) do
-    socket =
-      socket
-      |> assign(step: 5)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("step", %{"step" => "6"}, socket) do
+  def handle_event("checkout", _params, socket) do
     product = socket.assigns.product
+    delivery_method = socket.assigns.delivery_method
 
     user_id =
       case socket.assigns.current_user do
@@ -130,25 +147,80 @@ defmodule PlazaWeb.ProductLive do
         current_user -> current_user.id
       end
 
-    {:ok, purchase} = Purchase.create(%{user_id: user_id, product_id: product.id})
+    ## {:ok, purchase} =
+    ##   Purchase.create(%{
+    ##     user_id: user_id,
+    ##     emai: socket.assigns.email,
+    ##     product_id: product.id,
+    ##     status: "session-started"
+    ##   })
 
-    case Stripe.Product.create(%{
-           images:
-             [product.designs.front, product.designs.back]
-             |> Enum.filter(&(!is_nil(&1))),
-           name: product.name,
-           url: socket.assigns.uri,
-           default_price_data: %{
-             unit_amount: Product.price_unit_amount(product),
-             currency: "brl"
-           }
-         }) do
-      {:ok, stripe_product} ->
-        IO.inspect(stripe_product)
+    {:ok, stripe_product} =
+      Stripe.Product.create(%{
+        images:
+          [product.designs.front, product.designs.back]
+          |> Enum.filter(&(!is_nil(&1))),
+        name: product.name,
+        url: socket.assigns.uri,
+        default_price_data: %{
+          unit_amount: Product.price_unit_amount(product),
+          currency: "brl"
+        }
+      })
 
-      {:error, error} ->
-        IO.inspect(error)
-    end
+    IO.inspect(stripe_product)
+
+    params = %{
+      "user-name" => socket.assigns.seller.user_name,
+      "product-name" => product.name,
+      "email" => socket.assigns.email
+    }
+
+    success_query_params = URI.encode_query(Map.put(params, "success", true))
+    cancel_query_params = URI.encode_query(Map.put(params, "cancel", true))
+
+    {:ok, stripe_session} =
+      Stripe.Session.create(%{
+        mode: "payment",
+        line_items: [
+          %{
+            price: stripe_product.default_price,
+            quantity: 1
+          }
+        ],
+        payment_intent_data: %{
+          application_fee_amount: 50,
+          transfer_data: %{
+            destination: socket.assigns.seller.stripe_id
+          }
+        },
+        shipping_options: [
+          %{
+            shipping_rate_data: %{
+              type: "fixed_amount",
+              fixed_amount: %{
+                amount: delivery_method.price,
+                currency: "brl"
+              },
+              display_name: delivery_method.name,
+              delivery_estimate: %{
+                maximum: %{
+                  unit: "business_day",
+                  value: delivery_method.days
+                }
+              }
+            }
+          }
+        ],
+        success_url: "#{@site}/product?#{success_query_params}",
+        cancel_url: "#{@site}/product?#{cancel_query_params}"
+      })
+
+    IO.inspect(stripe_session)
+
+    socket =
+      socket
+      |> redirect(external: stripe_session.url)
 
     {:noreply, socket}
   end
@@ -215,16 +287,20 @@ defmodule PlazaWeb.ProductLive do
 
   def handle_event(
         "select-delivery-method",
-        %{"id" => id, "price" => price, "name" => name},
+        %{"id" => id, "price" => price, "name" => name, "days" => days},
         socket
       ) do
+    {price, _} = Float.parse(price)
+    price = (price * 100) |> Kernel.round()
+
     socket =
       socket
       |> assign(
         delivery_method: %{
           id: id,
           price: price,
-          name: name
+          name: name,
+          days: days
         }
       )
       |> assign(step: 4)
@@ -261,6 +337,8 @@ defmodule PlazaWeb.ProductLive do
           |> assign(delivery_methods: nil)
 
         {:ok, nel} ->
+          IO.inspect(nel)
+
           socket
           |> assign(delivery_methods: nel)
           |> assign(error: nil)
@@ -451,9 +529,10 @@ defmodule PlazaWeb.ProductLive do
             phx-value-id={opt.delivery_method_id}
             phx-value-price={opt.value}
             phx-value-name={opt.name}
+            phx-value-days={opt.business_days}
             style="margin-top: 15px;"
           >
-            <%= "#{opt.name}: #{opt.value}" %>
+            <%= "#{opt.name}: R$ #{opt.value} at #{opt.business_days} days" %>
           </button>
         </div>
       </div>
@@ -470,10 +549,10 @@ defmodule PlazaWeb.ProductLive do
         </div>
         <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
           <div>
-            <%= "#{@delivery_method.name}: R$ #{@delivery_method.price}" %>
+            <%= "#{@delivery_method.name}: R$ #{@delivery_method.price / 100.0}" %>
           </div>
           <div>
-            <button phx-click="step" phx-value-step="5">
+            <button phx-click="checkout">
               <img src="svg/yellow-ellipse.svg" />
               <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
                 Checkout
