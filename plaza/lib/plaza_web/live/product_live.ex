@@ -147,14 +147,6 @@ defmodule PlazaWeb.ProductLive do
         current_user -> current_user.id
       end
 
-    ## {:ok, purchase} =
-    ##   Purchase.create(%{
-    ##     user_id: user_id,
-    ##     emai: socket.assigns.email,
-    ##     product_id: product.id,
-    ##     status: "session-started"
-    ##   })
-
     {:ok, stripe_product} =
       Stripe.Product.create(%{
         images:
@@ -212,9 +204,19 @@ defmodule PlazaWeb.ProductLive do
             }
           }
         ],
+        customer_email: socket.assigns.email,
         success_url: "#{@site}/product?#{success_query_params}",
         cancel_url: "#{@site}/product?#{cancel_query_params}"
       })
+
+    ## TODO; add stripe-session-id
+    ## {:ok, purchase} =
+    ##   Purchase.create(%{
+    ##     user_id: user_id,
+    ##     emai: socket.assigns.email,
+    ##     product_id: product.id,
+    ##     status: "unpaid"
+    ##   })
 
     IO.inspect(stripe_session)
 
@@ -564,6 +566,21 @@ defmodule PlazaWeb.ProductLive do
               </div>
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{product: product, step: 5} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div>
+          <ProductComponent.product product={product} />
+        </div>
+        <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
+          success
         </div>
       </div>
     </div>
