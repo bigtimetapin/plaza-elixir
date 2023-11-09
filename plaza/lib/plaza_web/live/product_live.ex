@@ -9,7 +9,7 @@ defmodule PlazaWeb.ProductLive do
   alias Plaza.Dimona
   alias Plaza.Products
   alias Plaza.Products.Product
-  alias Plaza.Purchases.Purchase
+  alias Plaza.Purchases
   alias PlazaWeb.ProductComponent
 
   @site "http://localhost:4000"
@@ -67,6 +67,16 @@ defmodule PlazaWeb.ProductLive do
                 )
               )
           )
+          |> assign(
+            name_form:
+              to_form(
+                %{
+                  "name" => nil
+                },
+                as: "name-form"
+              )
+          )
+          |> assign(name: nil)
       else
         socket
         |> assign(waiting: true)
@@ -110,10 +120,18 @@ defmodule PlazaWeb.ProductLive do
             |> assign(step: 5)
             |> assign(waiting: false)
 
-          %{"cancel" => "true", "email" => email} ->
+          %{"cancel" => "true", "email" => email, "purchase-id" => purchase_id} ->
+            purchase = Purchases.get!(purchase_id)
+
+            {:ok, purchase} =
+              Purchases.update(
+                purchase,
+                %{"status" => "cancelled"}
+              )
+
             socket
             |> assign(email: email)
-            |> assign(step: 2)
+            |> assign(step: 1)
             |> assign(waiting: false)
 
           _ ->
@@ -140,12 +158,54 @@ defmodule PlazaWeb.ProductLive do
   def handle_event("checkout", _params, socket) do
     product = socket.assigns.product
     delivery_method = socket.assigns.delivery_method
+    shipping_address = socket.assigns.shipping_address
 
     user_id =
       case socket.assigns.current_user do
         nil -> nil
         current_user -> current_user.id
       end
+
+    {:ok, purchase} =
+      Purchases.create(%{
+        user_id: user_id,
+        product_id: product.id,
+        email: socket.assigns.email,
+        status: "unpaid",
+        stripe_session_id: "pending",
+        dimona_delivery_method_id: delivery_method.id,
+        shipping_address_line1: shipping_address.line1,
+        shipping_address_line2: shipping_address.line2,
+        shipping_address_city: shipping_address.city,
+        shipping_address_state: shipping_address.state,
+        shipping_address_postal_code: shipping_address.postal_code,
+        shipping_address_country: shipping_address.country
+      })
+
+    params = %{
+      "purchase-id" => purchase.id,
+      "user-name" => socket.assigns.seller.user_name,
+      "product-name" => product.name,
+      "email" => socket.assigns.email
+    }
+
+    success_query_params =
+      URI.encode_query(
+        Map.put(
+          params,
+          "success",
+          true
+        )
+      )
+
+    cancel_query_params =
+      URI.encode_query(
+        Map.put(
+          params,
+          "cancel",
+          true
+        )
+      )
 
     {:ok, stripe_product} =
       Stripe.Product.create(%{
@@ -160,20 +220,10 @@ defmodule PlazaWeb.ProductLive do
         }
       })
 
-    IO.inspect(stripe_product)
-
-    params = %{
-      "user-name" => socket.assigns.seller.user_name,
-      "product-name" => product.name,
-      "email" => socket.assigns.email
-    }
-
-    success_query_params = URI.encode_query(Map.put(params, "success", true))
-    cancel_query_params = URI.encode_query(Map.put(params, "cancel", true))
-
     {:ok, stripe_session} =
       Stripe.Session.create(%{
         mode: "payment",
+        client_reference_id: purchase.id,
         line_items: [
           %{
             price: stripe_product.default_price,
@@ -209,16 +259,11 @@ defmodule PlazaWeb.ProductLive do
         cancel_url: "#{@site}/product?#{cancel_query_params}"
       })
 
-    ## TODO; add stripe-session-id
-    ## {:ok, purchase} =
-    ##   Purchase.create(%{
-    ##     user_id: user_id,
-    ##     emai: socket.assigns.email,
-    ##     product_id: product.id,
-    ##     status: "unpaid"
-    ##   })
-
-    IO.inspect(stripe_session)
+    {:ok, purchase} =
+      Purchases.update(
+        purchase,
+        %{"stripe_session_id" => stripe_session.id}
+      )
 
     socket =
       socket
@@ -246,6 +291,14 @@ defmodule PlazaWeb.ProductLive do
       socket
       |> assign(email: email)
       |> assign(step: 2)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-name-form", %{"name-form" => %{"name" => name}}, socket) do
+    socket =
+      socket
+      |> assign(name: name)
 
     {:noreply, socket}
   end
@@ -317,8 +370,6 @@ defmodule PlazaWeb.ProductLive do
     result =
       case result do
         {:error, payload} ->
-          IO.inspect(payload)
-
           :error
 
         {:ok, many} ->
@@ -339,8 +390,6 @@ defmodule PlazaWeb.ProductLive do
           |> assign(delivery_methods: nil)
 
         {:ok, nel} ->
-          IO.inspect(nel)
-
           socket
           |> assign(delivery_methods: nel)
           |> assign(error: nil)
@@ -447,6 +496,21 @@ defmodule PlazaWeb.ProductLive do
         <div style="display: flex; flex-direction: column;">
           <div>
             <ProductComponent.product product={product} />
+          </div>
+          <div style="align-self: center;">
+            add name for the shipping label
+          </div>
+          <div style="margin-bottom: 50px;">
+            <.form for={@name_form} phx-change="change-name-form">
+              <.input
+                field={@name_form[:name]}
+                type="text"
+                placeholder="name"
+                class="text-input-1"
+                autocomplete="name"
+              >
+              </.input>
+            </.form>
           </div>
           <div style="align-self: center;">
             shipping address
@@ -580,7 +644,7 @@ defmodule PlazaWeb.ProductLive do
           <ProductComponent.product product={product} />
         </div>
         <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
-          success
+          payment submitted. just waiting for approval.
         </div>
       </div>
     </div>

@@ -31,4 +31,14 @@ defmodule Plaza.Accounts.Address do
     |> validate_length(:postal_code, min: 5)
     |> validate_length(:country, min: 2, max: 2)
   end
+
+  def to_dimona_form(address) do
+    %{
+      "street" => address.line1,
+      "complement" => address.line2,
+      "city" => address.city,
+      "state" => address.state,
+      "zipcode" => address.postal_code
+    }
+  end
 end
