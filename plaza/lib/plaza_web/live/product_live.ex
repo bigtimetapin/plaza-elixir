@@ -13,6 +13,7 @@ defmodule PlazaWeb.ProductLive do
   alias PlazaWeb.ProductComponent
 
   @site "http://localhost:4000"
+  ## @site "https://plazaaaaa.fly.dev"
 
   @impl Phoenix.LiveView
   def mount(params, _session, socket) do
@@ -114,20 +115,38 @@ defmodule PlazaWeb.ProductLive do
           |> assign(uri: uri)
 
         case params do
-          %{"success" => "true", "email" => email} ->
+          %{"success" => "true", "email" => email, "purchase-id" => purchase_id} ->
+            purchase = Purchases.get!(purchase_id)
+
+            Phoenix.PubSub.subscribe(
+              Plaza.PubSub,
+              "payment-status-#{purchase.id}"
+            )
+
+            Task.async(fn ->
+              {:ok, stripe_session} =
+                stripe_session = Stripe.Session.retrieve(purchase.stripe_session_id)
+
+              {:ok, payment_intent} =
+                Stripe.PaymentIntent.retrieve(stripe_session.payment_intent, %{})
+
+              IO.inspect(payment_intent)
+
+              IO.inspect(stripe_session)
+
+              payment_status = payment_intent.status
+              payment_status = Purchases.normalize_payment_status(payment_status)
+              {:payment_status, payment_status}
+            end)
+
             socket
             |> assign(email: email)
             |> assign(step: 5)
+            |> assign(payment_status: "processing")
             |> assign(waiting: false)
 
           %{"cancel" => "true", "email" => email, "purchase-id" => purchase_id} ->
             purchase = Purchases.get!(purchase_id)
-
-            {:ok, purchase} =
-              Purchases.update(
-                purchase,
-                %{"status" => "cancelled"}
-              )
 
             socket
             |> assign(email: email)
@@ -171,7 +190,6 @@ defmodule PlazaWeb.ProductLive do
         user_id: user_id,
         product_id: product.id,
         email: socket.assigns.email,
-        status: "unpaid",
         stripe_session_id: "pending",
         dimona_delivery_method_id: delivery_method.id,
         shipping_address_line1: shipping_address.line1,
@@ -223,7 +241,7 @@ defmodule PlazaWeb.ProductLive do
     {:ok, stripe_session} =
       Stripe.Session.create(%{
         mode: "payment",
-        client_reference_id: purchase.id,
+        payment_intent_data: %{metadata: %{"purchase_id" => purchase.id}},
         line_items: [
           %{
             price: stripe_product.default_price,
@@ -399,6 +417,29 @@ defmodule PlazaWeb.ProductLive do
       socket
       |> assign(step: 3)
       |> assign(waiting: false)
+
+    {:noreply, socket}
+  end
+
+  ## from task
+  def handle_info({ref, {:payment_status, payment_status}}, socket) do
+    Process.demonitor(
+      ref,
+      [:flush]
+    )
+
+    socket =
+      socket
+      |> assign(payment_status: payment_status)
+
+    {:noreply, socket}
+  end
+
+  ## from pubsub
+  def handle_info({:payment_status, payment_status}, socket) do
+    socket =
+      socket
+      |> assign(payment_status: payment_status)
 
     {:noreply, socket}
   end
@@ -636,7 +677,7 @@ defmodule PlazaWeb.ProductLive do
     """
   end
 
-  def render(%{product: product, step: 5} = assigns) do
+  def render(%{product: product, step: 5, payment_status: "processing"} = assigns) do
     ~H"""
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
@@ -645,6 +686,51 @@ defmodule PlazaWeb.ProductLive do
         </div>
         <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
           payment submitted. just waiting for approval.
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{product: product, step: 5, payment_status: "succeeded"} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div>
+          <ProductComponent.product product={product} />
+        </div>
+        <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
+          payment approved. your t-shirt is on the way! be on the lookout for emails.
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{product: product, step: 5, payment_status: "canceled"} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div>
+          <ProductComponent.product product={product} />
+        </div>
+        <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
+          payment canceled
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{product: product, step: 5, payment_status: "error"} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div>
+          <ProductComponent.product product={product} />
+        </div>
+        <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
+          there was an issue with your payment. be on the lookout for emails.
         </div>
       </div>
     </div>

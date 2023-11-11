@@ -6,7 +6,6 @@ defmodule Plaza.Purchases.Purchase do
     field :user_id, :id
     field :product_id, :id
     field :email, :string
-    field :status, :string
     field :stripe_session_id, :string
     field :dimona_delivery_method_id, :integer
     field :shipping_address_line1, :string
@@ -24,7 +23,6 @@ defmodule Plaza.Purchases.Purchase do
       :user_id,
       :product_id,
       :email,
-      :status,
       :stripe_session_id,
       :dimona_delivery_method_id,
       :shipping_address_line1,
@@ -37,7 +35,6 @@ defmodule Plaza.Purchases.Purchase do
     |> validate_required([
       :product_id,
       :email,
-      :status,
       :stripe_session_id,
       :dimona_delivery_method_id,
       :shipping_address_line1,

@@ -17,4 +17,13 @@ defmodule Plaza.Purchases do
     |> Purchase.changeset(attrs)
     |> Repo.update()
   end
+
+  def normalize_payment_status(status) do
+    case status do
+      "succeeded" -> status
+      "canceled" -> status
+      "processing" -> status
+      _ -> "error"
+    end
+  end
 end
