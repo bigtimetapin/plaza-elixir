@@ -178,6 +178,7 @@ defmodule PlazaWeb.ProductLive do
     product = socket.assigns.product
     delivery_method = socket.assigns.delivery_method
     shipping_address = socket.assigns.shipping_address
+    email = socket.assigns.email
 
     user_id =
       case socket.assigns.current_user do
@@ -189,7 +190,7 @@ defmodule PlazaWeb.ProductLive do
       Purchases.create(%{
         user_id: user_id,
         product_id: product.id,
-        email: socket.assigns.email,
+        email: email,
         stripe_session_id: "pending",
         dimona_delivery_method_id: delivery_method.id,
         shipping_address_line1: shipping_address.line1,
@@ -204,7 +205,7 @@ defmodule PlazaWeb.ProductLive do
       "purchase-id" => purchase.id,
       "user-name" => socket.assigns.seller.user_name,
       "product-name" => product.name,
-      "email" => socket.assigns.email
+      "email" => email
     }
 
     success_query_params =
@@ -241,7 +242,6 @@ defmodule PlazaWeb.ProductLive do
     {:ok, stripe_session} =
       Stripe.Session.create(%{
         mode: "payment",
-        payment_intent_data: %{metadata: %{"purchase_id" => purchase.id}},
         line_items: [
           %{
             price: stripe_product.default_price,
@@ -252,7 +252,9 @@ defmodule PlazaWeb.ProductLive do
           application_fee_amount: 50,
           transfer_data: %{
             destination: socket.assigns.seller.stripe_id
-          }
+          },
+          receipt_email: email,
+          metadata: %{"purchase_id" => purchase.id}
         },
         shipping_options: [
           %{
@@ -272,10 +274,12 @@ defmodule PlazaWeb.ProductLive do
             }
           }
         ],
-        customer_email: socket.assigns.email,
+        customer_email: email,
         success_url: "#{@site}/product?#{success_query_params}",
         cancel_url: "#{@site}/product?#{cancel_query_params}"
       })
+
+    IO.inspect(stripe_session)
 
     {:ok, purchase} =
       Purchases.update(
