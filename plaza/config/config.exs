@@ -29,6 +29,13 @@ config :plaza, PlazaWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :plaza, Plaza.Mailer, adapter: Swoosh.Adapters.Local
 
+# Configure the Cron Scheduler
+config :plaza, Plaza.Scheduler,
+  jobs: [
+    # Every minute
+    {"* * * * *", {Plaza.Products, :expire_products, []}}
+  ]
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.14.41",

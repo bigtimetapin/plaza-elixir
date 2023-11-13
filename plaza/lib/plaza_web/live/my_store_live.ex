@@ -27,10 +27,6 @@ defmodule PlazaWeb.MyStoreLive do
     IO.inspect(seller)
     my_products = Products.list_products_by_user_id(user_id)
     IO.inspect(my_products)
-    result = Products.expire_products()
-    IO.inspect(result)
-    my_products = Products.list_products_by_user_id(user_id)
-    IO.inspect(my_products)
 
     seller_form =
       case seller do

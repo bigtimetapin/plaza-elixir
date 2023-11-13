@@ -17,7 +17,9 @@ defmodule Plaza.Application do
       # Start Finch
       {Finch, name: Plaza.Finch},
       # Start the Endpoint (http/https)
-      PlazaWeb.Endpoint
+      PlazaWeb.Endpoint,
+      # Start the Cron Scheduler 
+      Plaza.Scheduler
       # Start a worker by calling: Plaza.Worker.start_link(arg)
       # {Plaza.Worker, arg}
     ]
