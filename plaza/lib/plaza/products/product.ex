@@ -13,6 +13,7 @@ defmodule Plaza.Products.Product do
     field :designs, EctoDesigns
     field :mocks, EctoMocks
     field :campaign_duration, :integer
+    field :campaign_duration_timestamp, :naive_datetime
     field :active, :boolean
     timestamps()
   end
@@ -32,6 +33,7 @@ defmodule Plaza.Products.Product do
       :designs,
       :mocks,
       :campaign_duration,
+      :campaign_duration_timestamp,
       :active
     ])
     |> validate_required([
@@ -42,6 +44,7 @@ defmodule Plaza.Products.Product do
       :designs,
       :mocks,
       :campaign_duration,
+      :campaign_duration_timestamp,
       :active
     ])
     |> unique_constraint([
@@ -87,8 +90,12 @@ defmodule Plaza.Products.Product do
   def changeset_campaign_duration(product, attrs) do
     product
     |> cast(attrs, [
-      :campaign_duration
+      :campaign_duration,
+      :campaign_duration_timestamp
     ])
-    |> validate_required(:campaign_duration)
+    |> validate_required([
+      :campaign_duration,
+      :campaign_duration_timestamp
+    ])
   end
 end

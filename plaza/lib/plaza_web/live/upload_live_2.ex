@@ -35,6 +35,14 @@ defmodule PlazaWeb.UploadLive2 do
           end
       end
 
+    ## days
+    campaign_duration = 7
+
+    campaign_duration_timestamp =
+      NaiveDateTime.utc_now()
+      |> NaiveDateTime.add(campaign_duration, :second)
+      |> NaiveDateTime.truncate(:second)
+
     socket =
       socket
       |> assign(:page_title, "Upload")
@@ -65,7 +73,8 @@ defmodule PlazaWeb.UploadLive2 do
                 display: 0
               },
               mocks: %Mocks{},
-              campaign_duration: 7,
+              campaign_duration: campaign_duration,
+              campaign_duration_timestamp: campaign_duration_timestamp,
               active: true
             },
             %{}
@@ -345,7 +354,14 @@ defmodule PlazaWeb.UploadLive2 do
         "45" -> 45
       end
 
-    duration_attr = %{"campaign_duration" => duration}
+    duration_timestap =
+      NaiveDateTime.utc_now()
+      |> NaiveDateTime.add(duration, :second)
+
+    duration_attr = %{
+      "campaign_duration" => duration,
+      "campaign_duration_timestamp" => duration_timestap
+    }
 
     changes =
       Product.changeset_campaign_duration(

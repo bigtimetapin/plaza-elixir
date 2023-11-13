@@ -10,6 +10,7 @@ defmodule Plaza.Repo.Migrations.AddProductsTable do
       add :designs, :map, null: false
       add :mocks, :map, null: false
       add :campaign_duration, :integer, null: false
+      add :campaign_duration_timestamp, :naive_datetime, null: false
       add :active, :boolean, null: false
       timestamps()
     end

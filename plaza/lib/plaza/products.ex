@@ -96,6 +96,15 @@ defmodule Plaza.Products do
     |> Repo.update()
   end
 
+  def expire_products do
+    now = NaiveDateTime.utc_now()
+
+    from(p in Product,
+      where: p.campaign_duration_timestamp < ^now and p.active == true
+    )
+    |> Repo.update_all(set: [active: false])
+  end
+
   @doc """
   Deletes a product.
 
