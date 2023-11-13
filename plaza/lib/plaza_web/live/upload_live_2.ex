@@ -40,7 +40,7 @@ defmodule PlazaWeb.UploadLive2 do
 
     campaign_duration_timestamp =
       NaiveDateTime.utc_now()
-      |> NaiveDateTime.add(campaign_duration, :second)
+      |> NaiveDateTime.add(campaign_duration, :day)
       |> NaiveDateTime.truncate(:second)
 
     socket =
@@ -356,7 +356,8 @@ defmodule PlazaWeb.UploadLive2 do
 
     duration_timestap =
       NaiveDateTime.utc_now()
-      |> NaiveDateTime.add(duration, :second)
+      |> NaiveDateTime.add(duration, :day)
+      |> NaiveDateTime.truncate(:second)
 
     duration_attr = %{
       "campaign_duration" => duration,
