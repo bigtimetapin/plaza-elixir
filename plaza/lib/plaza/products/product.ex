@@ -9,10 +9,11 @@ defmodule Plaza.Products.Product do
     field :user_id, :id
     field :name, :string
     field :price, :float
-    field :campaign_duration, :integer
     field :description, :string
     field :designs, EctoDesigns
     field :mocks, EctoMocks
+    field :campaign_duration, :integer
+    field :active, :boolean
     timestamps()
   end
 
@@ -27,19 +28,21 @@ defmodule Plaza.Products.Product do
       :user_id,
       :name,
       :price,
-      :campaign_duration,
       :description,
       :designs,
-      :mocks
+      :mocks,
+      :campaign_duration,
+      :active
     ])
     |> validate_required([
       :user_id,
       :name,
       :price,
-      :campaign_duration,
       :description,
       :designs,
-      :mocks
+      :mocks,
+      :campaign_duration,
+      :active
     ])
     |> unique_constraint([
       :user_id,

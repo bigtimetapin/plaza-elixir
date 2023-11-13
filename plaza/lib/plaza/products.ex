@@ -8,6 +8,15 @@ defmodule Plaza.Products do
 
   alias Plaza.Products.Product
 
+  def top_10 do
+    Repo.all(
+      from Product,
+        where: [active: true],
+        order_by: [desc: :updated_at],
+        limit: 10
+    )
+  end
+
   @doc """
   Returns the list of products.
 

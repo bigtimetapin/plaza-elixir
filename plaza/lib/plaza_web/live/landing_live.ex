@@ -2,9 +2,13 @@ defmodule PlazaWeb.LandingLive do
   use PlazaWeb, :live_view
 
   alias Plaza.Accounts
+  alias Plaza.Products
   alias PlazaWeb.ProductComponent
 
   def mount(_params, session, socket) do
+    products = Products.top_10()
+    IO.inspect(products)
+
     seller =
       case socket.assigns.current_user do
         nil ->
@@ -16,19 +20,10 @@ defmodule PlazaWeb.LandingLive do
 
     socket =
       socket
-      |> assign(:page_title, "Hello Plaza")
-      |> assign(:header, :landing)
-      |> assign(
-        :products,
-        [
-          %{name: "camiseta", price: "99", designs: %{}},
-          %{name: "outra camiseta", price: "79", designs: %{}},
-          %{name: "sua camiseta", price: "89", designs: %{}},
-          %{name: "tu tranqi", price: "59", designs: %{}},
-          %{name: "bastante", price: "199", designs: %{}}
-        ]
-      )
-      |> assign(:seller, seller)
+      |> assign(products: products)
+      |> assign(page_title: "Hello Plaza")
+      |> assign(header: :landing)
+      |> assign(seller: seller)
 
     {:ok, socket}
   end

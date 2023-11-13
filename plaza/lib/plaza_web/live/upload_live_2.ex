@@ -61,11 +61,12 @@ defmodule PlazaWeb.UploadLive2 do
             %Product{
               user_id: user_id,
               price: 75,
-              campaign_duration: 7,
               designs: %Designs{
                 display: 0
               },
-              mocks: %Mocks{}
+              mocks: %Mocks{},
+              campaign_duration: 7,
+              active: true
             },
             %{}
           )
