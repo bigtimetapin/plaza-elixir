@@ -35,10 +35,6 @@ config :plaza, Plaza.Scheduler,
     {"@hourly", {Plaza.Products, :expire_products, []}}
   ]
 
-# Configure NX
-config :nx,
-  default_backend: EXLA.Backend
-
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.14.41",

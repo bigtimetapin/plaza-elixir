@@ -100,19 +100,41 @@ defmodule PlazaWeb.UploadLive2 do
   defp handle_progress_generic(local_upload_atom, entry, socket) do
     socket =
       if entry.done? do
-        {local_url, file_name} =
-          consume_uploaded_entry(socket, entry, fn %{path: path} ->
-            unique_file_name = "#{entry.uuid}-#{entry.client_name}" |> String.replace(" ", "")
+        {local_design_url, local_mock_url, file_name} =
+          consume_uploaded_entry(socket, entry, fn %{path: design_src_path} ->
+            design_file_name =
+              "#{entry.uuid}-#{entry.client_name}"
+              |> String.replace(" ", "")
 
-            dest =
+            mock_file_name =
+              "#{entry.uuid}-mock-#{entry.client_name}"
+              |> String.replace(" ", "")
+
+            design_write_path =
               Path.join([
                 :code.priv_dir(:plaza),
                 "static",
                 "uploads",
-                unique_file_name
+                design_file_name
               ])
 
-            {:ok, img} = Image.open(path)
+            mock_write_path =
+              Path.join([
+                :code.priv_dir(:plaza),
+                "static",
+                "uploads",
+                mock_file_name
+              ])
+
+            mock_src_path =
+              Path.join([
+                :code.priv_dir(:plaza),
+                "static",
+                "png",
+                "mockup-front.png"
+              ])
+
+            {:ok, img} = Image.open(design_src_path)
             width = Image.width(img)
             height = Image.height(img)
             width = @aspect_ratio * height / width
@@ -126,20 +148,41 @@ defmodule PlazaWeb.UploadLive2 do
                 height
               )
 
+            {:ok, mock} = Image.open(mock_src_path)
+
+            {:ok, mock} =
+              Image.compose(
+                mock,
+                img,
+                x: :middle,
+                y: :top
+              )
+
             {:ok, _} =
               Image.write(
                 img,
-                dest
+                design_write_path
               )
 
-            {:ok, {"uploads/#{unique_file_name}", entry.client_name}}
-          end)
+            {:ok, _} =
+              Image.write(
+                mock,
+                mock_write_path
+              )
 
-        IO.inspect(local_url)
+            {:ok, {"uploads/#{design_file_name}", "uploads/#{mock_file_name}", entry.client_name}}
+          end)
 
         socket =
           socket
-          |> assign(local_upload_atom, %{url: local_url, file_name: file_name})
+          |> assign(
+            local_upload_atom,
+            %{
+              design_url: local_design_url,
+              mock_url: local_mock_url,
+              file_name: file_name
+            }
+          )
       else
         socket
       end
@@ -417,62 +460,103 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   def handle_event("publish", _params, socket) do
-    Task.async(fn -> pubish_s3(socket.assigns.front_local_upload[:url], :front) end)
-    Task.async(fn -> pubish_s3(socket.assigns.back_local_upload[:url], :back) end)
+    Task.async(fn -> pubish_s3(socket.assigns.front_local_upload, :front) end)
+    Task.async(fn -> pubish_s3(socket.assigns.back_local_upload, :back) end)
     {:noreply, socket}
   end
 
-  defp pubish_s3(local_url, atom) do
-    url =
-      case local_url do
+  defp pubish_s3(local_upload, atom) do
+    urls =
+      case local_upload do
         nil ->
           nil
 
-        nes ->
-          src =
+        %{design_url: design_url, mock_url: mock_url} ->
+          design_read_path =
             Path.join([
               :code.priv_dir(:plaza),
               "static",
-              nes
+              design_url
             ])
 
-          request =
+          mock_read_path =
+            Path.join([
+              :code.priv_dir(:plaza),
+              "static",
+              mock_url
+            ])
+
+          put_design_request =
             S3.put_object(
               @aws_s3_bucket,
-              nes,
-              File.read!(src)
+              design_url,
+              File.read!(design_read_path)
             )
 
-          response =
+          put_mock_request =
+            S3.put_object(
+              @aws_s3_bucket,
+              mock_url,
+              File.read!(mock_read_path)
+            )
+
+          put_design_response =
             ExAws.request!(
-              request,
+              put_design_request,
               region: @aws_s3_region
             )
 
-          IO.inspect(response)
+          put_mock_response =
+            ExAws.request!(
+              put_mock_request,
+              region: @aws_s3_region
+            )
 
-          "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{nes}"
+          IO.inspect(put_design_response)
+          IO.inspect(put_mock_response)
+
+          %{
+            design_url: "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{design_url}",
+            mock_url: "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{mock_url}"
+          }
       end
 
-    {:publish, url, atom}
+    {:publish, urls, atom}
   end
 
   @impl Phoenix.LiveView
-  def handle_info({ref, {:publish, url, atom}}, socket) do
+  def handle_info({ref, {:publish, urls, atom}}, socket) do
     Process.demonitor(ref, [:flush])
     inc = socket.assigns.publish_status + 1
     designs = socket.assigns.product_form.data.designs
+    mocks = socket.assigns.product_form.data.mocks
 
-    designs =
-      case atom do
-        :front -> %{designs | front: url}
-        :back -> %{designs | back: url}
+    {designs, mocks} =
+      case urls do
+        nil ->
+          {designs, mocks}
+
+        %{design_url: design_url, mock_url: mock_url} ->
+          case atom do
+            :front ->
+              {
+                %{designs | front: design_url},
+                %{mocks | front: mock_url}
+              }
+
+            :back ->
+              {
+                %{designs | back: design_url},
+                %{mocks | back: mock_url}
+              }
+          end
       end
 
     changes =
       Product.changeset_designs(
         socket.assigns.product_form.data,
-        %{"designs" => designs}
+        %{"designs" => designs},
+        %{"mocks" => mocks}
       )
       |> Changeset.apply_action(:update)
 
@@ -661,7 +745,7 @@ defmodule PlazaWeb.UploadLive2 do
       back={@uploads.back}
       front_local_upload={@front_local_upload}
       back_local_upload={@back_local_upload}
-      current_local_url={@front_local_upload[:url]}
+      current_local_url={@front_local_upload[:mock_url]}
       product_form={@product_form}
     />
     """
@@ -676,7 +760,7 @@ defmodule PlazaWeb.UploadLive2 do
       back={@uploads.back}
       front_local_upload={@front_local_upload}
       back_local_upload={@back_local_upload}
-      current_local_url={@back_local_upload[:url]}
+      current_local_url={@back_local_upload[:mock_url]}
       product_form={@product_form}
     />
     """
@@ -706,13 +790,13 @@ defmodule PlazaWeb.UploadLive2 do
           </div>
           <div>
             <div style="display: inline-block;">
-              <.upload_preview local_url={@front_local_upload[:url]} />
+              <.upload_preview local_url={@front_local_upload[:mock_url]} />
               <div style="position: relative; bottom: 350px; left: 10px; font-size: 34px;">
                 Frente
               </div>
             </div>
             <div style="display: inline-block; margin-left: 150px;">
-              <.upload_preview local_url={@back_local_upload[:url]} />
+              <.upload_preview local_url={@back_local_upload[:mock_url]} />
               <div style="position: relative; bottom: 350px; left: 10px; font-size: 34px;">
                 Costas
               </div>
@@ -767,10 +851,10 @@ defmodule PlazaWeb.UploadLive2 do
           </button>
           <div style="margin-top: 10px;">
             <div :if={@product_form.data.designs.display == 0}>
-              <.upload_preview local_url={@front_local_upload[:url]} />
+              <.upload_preview local_url={@front_local_upload[:mock_url]} />
             </div>
             <div :if={@product_form.data.designs.display == 1}>
-              <.upload_preview local_url={@back_local_upload[:url]} />
+              <.upload_preview local_url={@back_local_upload[:mock_url]} />
             </div>
           </div>
         </div>
@@ -863,8 +947,8 @@ defmodule PlazaWeb.UploadLive2 do
           <.upload_preview
             local_url={
               if @product_form.data.designs.display == 0,
-                do: @front_local_upload[:url],
-                else: @back_local_upload[:url]
+                do: @front_local_upload[:mock_url],
+                else: @back_local_upload[:mock_url]
             }
             size="small"
           />
@@ -1076,7 +1160,7 @@ defmodule PlazaWeb.UploadLive2 do
         <a
           phx-click="step"
           phx-value-step={
-            if @disabled || !(@front_local_upload[:url] || @back_local_upload[:url]),
+            if @disabled || !(@front_local_upload[:mock_url] || @back_local_upload[:mock_url]),
               do: "noop",
               else: "7"
           }
@@ -1254,15 +1338,13 @@ defmodule PlazaWeb.UploadLive2 do
   defp upload_preview(assigns) do
     ~H"""
     <div :if={@size == "big"}>
-      <img src="png/mockup-front.png" />
-      <div style="width: 246px; height: 356px; position: relative; bottom: 560px; left: 213px; border: 1px dotted blue;">
-        <img :if={@local_url} src={@local_url} />
+      <div :if={@local_url}>
+        <img src={@local_url} />
       </div>
     </div>
-    <div :if={@size == "small"} style="width: 416px;">
-      <img src="png/mockup-front.png" />
-      <div style="width: 152px; height: 220px; position: relative; bottom: 345px; left: 131px; border: 1px dotted blue;">
-        <img :if={@local_url} src={@local_url} />
+    <div :if={@size == "small"}>
+      <div :if={@local_url}>
+        <img src={@local_url} />
       </div>
     </div>
     """

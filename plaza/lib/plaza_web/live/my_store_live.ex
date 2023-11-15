@@ -95,8 +95,9 @@ defmodule PlazaWeb.MyStoreLive do
       if entry.done? do
         {local_url, file_name} =
           consume_uploaded_entry(socket, entry, fn %{path: path} ->
-            IO.inspect(path)
-            unique_file_name = "#{entry.uuid}-#{entry.client_name}"
+            unique_file_name =
+              "#{entry.uuid}-#{entry.client_name}"
+              |> String.replace(" ", "")
 
             dest =
               Path.join([
