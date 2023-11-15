@@ -18,12 +18,14 @@ defmodule PlazaWeb.UploadLive2 do
   @aws_s3_region "us-west-2"
   @aws_s3_bucket "plaza-static-dev"
 
+  @aspect_ratio 29.0 / 42.0
+
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     {seller, step, user_id} =
       case socket.assigns.current_user do
         nil ->
-          {nil, 1, nil}
+          {nil, 1, -1}
 
         %{id: id} ->
           case Accounts.get_seller_by_id(id) do
@@ -100,7 +102,6 @@ defmodule PlazaWeb.UploadLive2 do
       if entry.done? do
         {local_url, file_name} =
           consume_uploaded_entry(socket, entry, fn %{path: path} ->
-            IO.inspect(path)
             unique_file_name = "#{entry.uuid}-#{entry.client_name}" |> String.replace(" ", "")
 
             dest =
@@ -111,7 +112,26 @@ defmodule PlazaWeb.UploadLive2 do
                 unique_file_name
               ])
 
-            File.cp!(path, dest)
+            {:ok, img} = Image.open(path)
+            width = Image.width(img)
+            height = Image.height(img)
+            width = @aspect_ratio * height / width
+
+            {:ok, img} =
+              Image.crop(
+                img,
+                :center,
+                :middle,
+                width,
+                height
+              )
+
+            {:ok, _} =
+              Image.write(
+                img,
+                dest
+              )
+
             {:ok, {"uploads/#{unique_file_name}", entry.client_name}}
           end)
 
@@ -1235,14 +1255,14 @@ defmodule PlazaWeb.UploadLive2 do
     ~H"""
     <div :if={@size == "big"}>
       <img src="png/mockup-front.png" />
-      <div style="overflow: hidden; width: 264px; height: 356px; position: relative; bottom: 560px; left: 205px; border: 1px dotted blue;">
-        <img src={@local_url} />
+      <div style="width: 246px; height: 356px; position: relative; bottom: 560px; left: 213px; border: 1px dotted blue;">
+        <img :if={@local_url} src={@local_url} />
       </div>
     </div>
     <div :if={@size == "small"} style="width: 416px;">
       <img src="png/mockup-front.png" />
-      <div style="overflow: hidden; width: 164px; height: 220px; position: relative; bottom: 345px; left: 125px; border: 1px dotted blue;">
-        <img src={@local_url} />
+      <div style="width: 152px; height: 220px; position: relative; bottom: 345px; left: 131px; border: 1px dotted blue;">
+        <img :if={@local_url} src={@local_url} />
       </div>
     </div>
     """

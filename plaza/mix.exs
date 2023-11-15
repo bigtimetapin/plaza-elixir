@@ -59,7 +59,8 @@ defmodule Plaza.MixProject do
       {:poison, "5.0.0"},
       {:stripity_stripe, "~> 2.17.2"},
       {:navigation_history, "~> 0.4"},
-      {:quantum, "~> 3.0"}
+      {:quantum, "~> 3.0"},
+      {:image, "~> 0.37"}
     ]
   end
 
