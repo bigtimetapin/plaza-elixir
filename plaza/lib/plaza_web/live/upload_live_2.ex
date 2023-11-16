@@ -102,6 +102,8 @@ defmodule PlazaWeb.UploadLive2 do
       if entry.done? do
         {local_design_url, local_mock_url, file_name} =
           consume_uploaded_entry(socket, entry, fn %{path: design_src_path} ->
+            #############################################################
+            ## pathing ##################################################
             design_file_name =
               "#{entry.uuid}-#{entry.client_name}"
               |> String.replace(" ", "")
@@ -134,10 +136,14 @@ defmodule PlazaWeb.UploadLive2 do
                 "mockup-front.png"
               ])
 
+            #############################################################
+            ## resize design ############################################
             {:ok, img} = Image.open(design_src_path)
             width = Image.width(img)
             height = Image.height(img)
-            width = @aspect_ratio * height / width
+            IO.inspect("#{width}, #{height}")
+            width = Kernel.trunc(@aspect_ratio * height)
+            IO.inspect("#{width}, #{height}")
 
             {:ok, img} =
               Image.crop(
@@ -148,20 +154,25 @@ defmodule PlazaWeb.UploadLive2 do
                 height
               )
 
+            {:ok, _} =
+              Image.write(
+                img,
+                design_write_path
+              )
+
+            #############################################################
+            ## overlay design on mock ###################################
             {:ok, mock} = Image.open(mock_src_path)
+
+            ratio = 0.37 * Image.width(mock) / Image.width(img)
+            {:ok, img} = Image.resize(img, ratio)
 
             {:ok, mock} =
               Image.compose(
                 mock,
                 img,
                 x: :middle,
-                y: :top
-              )
-
-            {:ok, _} =
-              Image.write(
-                img,
-                design_write_path
+                y: 245
               )
 
             {:ok, _} =
