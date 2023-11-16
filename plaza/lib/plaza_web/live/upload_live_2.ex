@@ -74,7 +74,12 @@ defmodule PlazaWeb.UploadLive2 do
               designs: %Designs{
                 display: 0
               },
-              mocks: %Mocks{},
+              mocks: %Mocks{
+                front:
+                  "https://plaza-static-dev.s3.us-west-2.amazonaws.com/uploads/mockup-front.png",
+                back:
+                  "https://plaza-static-dev.s3.us-west-2.amazonaws.com/uploads/mockup-back.png"
+              },
               campaign_duration: campaign_duration,
               campaign_duration_timestamp: campaign_duration_timestamp,
               active: true
@@ -135,7 +140,7 @@ defmodule PlazaWeb.UploadLive2 do
                 "png",
                 if(local_upload_atom == :front_local_upload,
                   do: "mockup-front.png",
-                  else: "mockup-back.png"
+                  else: "mockup-front.png"
                 )
               ])
 
@@ -968,7 +973,7 @@ defmodule PlazaWeb.UploadLive2 do
             side={if @product_form.data.designs.display == 0, do: "front", else: "back"}
             size="small"
           />
-          <div style="position: relative; bottom: 210px; right: 3px;">
+          <div style="position: relative; right: 3px;">
             <div style="display: flex; justify-content: right; font-size: 22px;">
               R$ <%= @product_form.data.price %>
               <div style="position: absolute;">
@@ -1355,11 +1360,11 @@ defmodule PlazaWeb.UploadLive2 do
 
   defp upload_preview(assigns) do
     ~H"""
-    <div style={if @size == "small", do: "width: 100px;"}>
+    <div style={if @size == "small", do: "width: 400px;"}>
       <img src={
         if @local_url,
           do: @local_url,
-          else: if(@side == "front", do: "png/mockup-front.png", else: "png/mockup-back.png")
+          else: if(@side == "front", do: "png/mockup-front.png", else: "png/mockup-front.png")
       } />
     </div>
     """

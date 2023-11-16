@@ -659,7 +659,12 @@ defmodule PlazaWeb.MyStoreLive do
   defp right(assigns) do
     ~H"""
     <div style="display: inline-block;">
-      <div style="position: relative; left: 75px; bottom: 175px;">
+      <div style="position: relative; left: 100px;">
+        <.link navigate="/upload" style="text-decoration: underline;" class="has-font-3 is-size-6">
+          upload more stuff
+        </.link>
+      </div>
+      <div style="position: relative; left: 75px;">
         <ProductComponent.products3 disabled={false} products={@my_products} href={true} />
       </div>
       <div

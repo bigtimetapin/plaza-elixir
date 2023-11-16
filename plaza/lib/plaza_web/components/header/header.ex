@@ -105,7 +105,7 @@ defmodule PlazaWeb.Header do
       </:login>
       <:store>
         <div>
-          minha loja
+          <.my_store_href />
           <div style="position: absolute;">
             <div style="position: relative; left: 35px;">
               <img src="svg/yellow-circle.svg" />

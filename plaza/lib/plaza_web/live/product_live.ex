@@ -249,7 +249,8 @@ defmodule PlazaWeb.ProductLive do
           }
         ],
         payment_intent_data: %{
-          application_fee_amount: 50,
+          ## 50 cents times 100 == 50
+          application_fee_amount: 50 * 100,
           transfer_data: %{
             destination: socket.assigns.seller.stripe_id
           },
