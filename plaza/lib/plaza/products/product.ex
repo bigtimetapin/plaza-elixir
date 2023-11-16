@@ -87,6 +87,18 @@ defmodule Plaza.Products.Product do
     |> validate_required(:designs)
   end
 
+  def changeset_designs_and_mocks(product, attrs) do
+    product
+    |> cast(attrs, [
+      :designs,
+      :mocks
+    ])
+    |> validate_required([
+      :designs,
+      :mocks
+    ])
+  end
+
   def changeset_campaign_duration(product, attrs) do
     product
     |> cast(attrs, [

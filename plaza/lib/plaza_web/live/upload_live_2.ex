@@ -133,7 +133,10 @@ defmodule PlazaWeb.UploadLive2 do
                 :code.priv_dir(:plaza),
                 "static",
                 "png",
-                "mockup-front.png"
+                if(local_upload_atom == :front_local_upload,
+                  do: "mockup-front.png",
+                  else: "mockup-back.png"
+                )
               ])
 
             #############################################################
@@ -564,10 +567,9 @@ defmodule PlazaWeb.UploadLive2 do
       end
 
     changes =
-      Product.changeset_designs(
+      Product.changeset_designs_and_mocks(
         socket.assigns.product_form.data,
-        %{"designs" => designs},
-        %{"mocks" => mocks}
+        %{"designs" => designs, "mocks" => mocks}
       )
       |> Changeset.apply_action(:update)
 
@@ -757,6 +759,7 @@ defmodule PlazaWeb.UploadLive2 do
       front_local_upload={@front_local_upload}
       back_local_upload={@back_local_upload}
       current_local_url={@front_local_upload[:mock_url]}
+      current_side="front"
       product_form={@product_form}
     />
     """
@@ -772,6 +775,7 @@ defmodule PlazaWeb.UploadLive2 do
       front_local_upload={@front_local_upload}
       back_local_upload={@back_local_upload}
       current_local_url={@back_local_upload[:mock_url]}
+      current_side="back"
       product_form={@product_form}
     />
     """
@@ -801,13 +805,13 @@ defmodule PlazaWeb.UploadLive2 do
           </div>
           <div>
             <div style="display: inline-block;">
-              <.upload_preview local_url={@front_local_upload[:mock_url]} />
+              <.upload_preview local_url={@front_local_upload[:mock_url]} side="front" />
               <div style="position: relative; bottom: 350px; left: 10px; font-size: 34px;">
                 Frente
               </div>
             </div>
             <div style="display: inline-block; margin-left: 150px;">
-              <.upload_preview local_url={@back_local_upload[:mock_url]} />
+              <.upload_preview local_url={@back_local_upload[:mock_url]} side="back" />
               <div style="position: relative; bottom: 350px; left: 10px; font-size: 34px;">
                 Costas
               </div>
@@ -862,10 +866,10 @@ defmodule PlazaWeb.UploadLive2 do
           </button>
           <div style="margin-top: 10px;">
             <div :if={@product_form.data.designs.display == 0}>
-              <.upload_preview local_url={@front_local_upload[:mock_url]} />
+              <.upload_preview local_url={@front_local_upload[:mock_url]} side="front" />
             </div>
             <div :if={@product_form.data.designs.display == 1}>
-              <.upload_preview local_url={@back_local_upload[:mock_url]} />
+              <.upload_preview local_url={@back_local_upload[:mock_url]} side="back" />
             </div>
           </div>
         </div>
@@ -961,6 +965,7 @@ defmodule PlazaWeb.UploadLive2 do
                 do: @front_local_upload[:mock_url],
                 else: @back_local_upload[:mock_url]
             }
+            side={if @product_form.data.designs.display == 0, do: "front", else: "back"}
             size="small"
           />
           <div style="position: relative; bottom: 210px; right: 3px;">
@@ -1209,6 +1214,7 @@ defmodule PlazaWeb.UploadLive2 do
   attr :front_local_upload, :map, default: nil
   attr :back_local_upload, :map, default: nil
   attr :current_local_url, :string, default: nil
+  attr :current_side, :string, required: true
   attr :product_form, :map, required: true
 
   defp upload_generic(assigns) do
@@ -1234,7 +1240,7 @@ defmodule PlazaWeb.UploadLive2 do
       </div>
       <div style="display: inline-block; position: relative; left: 900px; top: 50px;">
         <div style="display: inline-block;">
-          <.upload_preview local_url={@current_local_url} />
+          <.upload_preview local_url={@current_local_url} side={@current_side} />
         </div>
         <div style="display: inline-block; position: absolute;">
           <div style="position: relative; left: 25px;">
@@ -1344,19 +1350,17 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   attr :local_url, :string, default: nil
+  attr :side, :string, values: ~w(front back)
   attr :size, :string, default: "big", values: ~w(big small)
 
   defp upload_preview(assigns) do
     ~H"""
-    <div :if={@size == "big"}>
-      <div :if={@local_url}>
-        <img src={@local_url} />
-      </div>
-    </div>
-    <div :if={@size == "small"}>
-      <div :if={@local_url}>
-        <img src={@local_url} />
-      </div>
+    <div style={if @size == "small", do: "width: 100px;"}>
+      <img src={
+        if @local_url,
+          do: @local_url,
+          else: if(@side == "front", do: "png/mockup-front.png", else: "png/mockup-back.png")
+      } />
     </div>
     """
   end
