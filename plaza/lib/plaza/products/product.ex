@@ -7,6 +7,7 @@ defmodule Plaza.Products.Product do
 
   schema "products" do
     field :user_id, :id
+    field :user_name, :string
     field :name, :string
     field :price, :float
     field :description, :string
@@ -27,6 +28,7 @@ defmodule Plaza.Products.Product do
     product
     |> cast(attrs, [
       :user_id,
+      :user_name,
       :name,
       :price,
       :description,
@@ -38,6 +40,7 @@ defmodule Plaza.Products.Product do
     ])
     |> validate_required([
       :user_id,
+      :user_name,
       :name,
       :price,
       :description,

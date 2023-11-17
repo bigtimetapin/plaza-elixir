@@ -475,7 +475,7 @@ defmodule PlazaWeb.ProductLive do
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <div>
-          <ProductComponent.product product={product} />
+          <ProductComponent.product product={product} meta={true} />
         </div>
         <div style="position: relative; top: 50px; margin-left: 50px;">
           <div>
@@ -520,7 +520,7 @@ defmodule PlazaWeb.ProductLive do
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; flex-direction: column;">
-          <ProductComponent.product product={product} />
+          <ProductComponent.product product={product} meta={true} />
           <div style="align-self: center;">
             <button phx-click="step" phx-value-step="2">
               <img src="svg/yellow-ellipse.svg" />
@@ -541,7 +541,7 @@ defmodule PlazaWeb.ProductLive do
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; flex-direction: column;">
           <div>
-            <ProductComponent.product product={product} />
+            <ProductComponent.product product={product} meta={true} />
           </div>
           <div style="align-self: center;">
             add name for the shipping label
@@ -612,7 +612,7 @@ defmodule PlazaWeb.ProductLive do
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <div>
-          <ProductComponent.product product={product} />
+          <ProductComponent.product product={product} meta={true} />
         </div>
         <div style="display: flex; flex-direction: column;">
           <div>
@@ -637,7 +637,7 @@ defmodule PlazaWeb.ProductLive do
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <div>
-          <ProductComponent.product product={product} />
+          <ProductComponent.product product={product} meta={true} />
         </div>
         <div style="display: flex; flex-direction: column; position: relative; top: 100px; left: 50px;">
           <button
@@ -662,7 +662,7 @@ defmodule PlazaWeb.ProductLive do
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <div>
-          <ProductComponent.product product={product} />
+          <ProductComponent.product product={product} meta={true} />
         </div>
         <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
           <div>
@@ -687,7 +687,7 @@ defmodule PlazaWeb.ProductLive do
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <div>
-          <ProductComponent.product product={product} />
+          <ProductComponent.product product={product} meta={true} />
         </div>
         <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
           payment submitted. just waiting for approval.
@@ -702,7 +702,7 @@ defmodule PlazaWeb.ProductLive do
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <div>
-          <ProductComponent.product product={product} />
+          <ProductComponent.product product={product} meta={true} />
         </div>
         <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
           payment approved. your t-shirt is on the way! be on the lookout for emails.
@@ -717,7 +717,7 @@ defmodule PlazaWeb.ProductLive do
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <div>
-          <ProductComponent.product product={product} />
+          <ProductComponent.product product={product} meta={true} />
         </div>
         <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
           payment canceled
@@ -732,7 +732,7 @@ defmodule PlazaWeb.ProductLive do
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <div>
-          <ProductComponent.product product={product} />
+          <ProductComponent.product product={product} meta={true} />
         </div>
         <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
           there was an issue with your payment. be on the lookout for emails.

@@ -457,7 +457,7 @@ defmodule PlazaWeb.MyStoreLive do
         <div>
           you've uploaded your first product
           <div>
-            <ProductComponent.product product={product} />
+            <ProductComponent.product product={product} meta={false} />
           </div>
         </div>
       </div>
@@ -523,7 +523,7 @@ defmodule PlazaWeb.MyStoreLive do
               <div style="margin-bottom: 50px;">
                 and you've uploaded your first product
                 <div>
-                  <ProductComponent.selectable product={product} href={true} />
+                  <ProductComponent.product product={product} meta={false} />
                 </div>
               </div>
             </div>
@@ -665,7 +665,7 @@ defmodule PlazaWeb.MyStoreLive do
         </.link>
       </div>
       <div style="position: relative; left: 75px;">
-        <ProductComponent.products3 disabled={false} products={@my_products} href={true} />
+        <ProductComponent.products3 products={@my_products} />
       </div>
       <div
         class="has-font-3"
