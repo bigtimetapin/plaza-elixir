@@ -22,69 +22,73 @@ defmodule PlazaWeb.MyStoreLive do
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    user_id = socket.assigns.current_user.id
-    seller = Accounts.get_seller_by_id(user_id)
-    IO.inspect(seller)
-    my_products = Products.list_products_by_user_id(user_id)
-    IO.inspect(my_products)
-
-    seller_form =
-      case seller do
-        nil ->
-          to_form(
-            SellerForm.changeset(
-              %SellerForm{
-                user_id: user_id
-              },
-              %{}
-            )
-          )
-
-        _ ->
-          to_form(
-            SellerForm.changeset(
-              SellerForm.from_seller(seller),
-              %{}
-            )
-          )
-      end
-
     socket =
-      socket
-      |> assign(:header, :my_store)
-      |> assign(:seller, seller)
-      |> assign(:my_products, my_products)
-      |> assign(:local_logo_upload, nil)
-      |> allow_upload(:logo,
-        accept: ~w(.png .jpg .jpeg .svg .gif),
-        max_entries: 1,
-        auto_upload: true,
-        progress: &handle_progress/3
-      )
-      |> assign(
-        :seller_form,
-        seller_form
-      )
-      |> assign(waiting: false)
+      case connected?(socket) do
+        true ->
+          user_id = socket.assigns.current_user.id
+          seller = Accounts.get_seller_by_id(user_id)
+          IO.inspect(seller)
+          my_products = Products.list_products_by_user_id(user_id)
+          IO.inspect(my_products)
 
-    socket =
-      case seller do
-        nil ->
-          if connected?(socket) do
+          seller_form =
+            case seller do
+              nil ->
+                to_form(
+                  SellerForm.changeset(
+                    %SellerForm{
+                      user_id: user_id
+                    },
+                    %{}
+                  )
+                )
+
+              _ ->
+                to_form(
+                  SellerForm.changeset(
+                    SellerForm.from_seller(seller),
+                    %{}
+                  )
+                )
+            end
+
+          socket =
+            case seller do
+              nil ->
+                socket
+
+              _ ->
+                socket
+                |> push_event(
+                  "read",
+                  %{
+                    key: @local_storage_key,
+                    event: "read-product-form"
+                  }
+                )
+            end
+
+          socket =
             socket
-            |> push_event(
-              "read",
-              %{
-                key: @local_storage_key,
-                event: "read-product-form"
-              }
+            |> assign(:header, :my_store)
+            |> assign(:seller, seller)
+            |> assign(:my_products, my_products)
+            |> assign(:local_logo_upload, nil)
+            |> allow_upload(:logo,
+              accept: ~w(.png .jpg .jpeg .svg .gif),
+              max_entries: 1,
+              auto_upload: true,
+              progress: &handle_progress/3
             )
-          else
-            socket
-          end
+            |> assign(
+              :seller_form,
+              seller_form
+            )
+            |> assign(waiting: false)
 
-        _ ->
+        false ->
           socket
+          |> assign(waiting: true)
       end
 
     {:ok, socket}
@@ -418,7 +422,7 @@ defmodule PlazaWeb.MyStoreLive do
   def render(%{waiting: true} = assigns) do
     ~H"""
     <div style="margin-top: 200px; display: flex; justify-content: center;">
-      waiting
+      <img src="gif/loading.gif" />
     </div>
     """
   end
@@ -477,9 +481,9 @@ defmodule PlazaWeb.MyStoreLive do
 
   def render(%{seller: %Seller{stripe_id: nil}, my_products: []} = assigns) do
     ~H"""
-    <div style="margin-bottom: 50px;">
+    <div style="display: flex; margin-bottom: 50px;">
       <.left seller={@seller} />
-      <div style="display: inline-block; position: absolute; margin-left: 150px; margin-top: 150px;">
+      <div style="margin-left: 150px; margin-top: 150px;">
         <div class="has-font-3" style="font-size: 34px;">
           <div style="display: flex; justify-content: center;">
             <div style="text-align: center;">
@@ -511,9 +515,9 @@ defmodule PlazaWeb.MyStoreLive do
 
   def render(%{seller: %Seller{stripe_id: nil}, my_products: [product]} = assigns) do
     ~H"""
-    <div style="margin-bottom: 50px;">
+    <div style="display: flex; margin-bottom: 50px;">
       <.left seller={@seller} />
-      <div style="display: inline-block; position: absolute; margin-left: 150px; margin-top: 150px;">
+      <div style="margin-left: 150px; margin-top: 150px;">
         <div class="has-font-3" style="font-size: 34px;">
           <div style="display: flex; justify-content: center;">
             <div style="text-align: center;">
@@ -542,7 +546,7 @@ defmodule PlazaWeb.MyStoreLive do
 
   def render(assigns) do
     ~H"""
-    <div style="margin-bottom: 50px;">
+    <div style="display: flex; margin-bottom: 50px;">
       <.left seller={@seller} />
       <.right my_products={@my_products} />
     </div>
@@ -620,7 +624,7 @@ defmodule PlazaWeb.MyStoreLive do
       |> assign(user_urls: urls)
 
     ~H"""
-    <div class="has-font-3" style="display: inline-block; position: relative; top: 50px;">
+    <div class="has-font-3" style="position: relative; top: 50px;">
       <div style="width: 377px; height: 377px; overflow: hidden;">
         <img src={if @seller.profile_photo_url, do: @seller.profile_photo_url, else: "png/pep.png"} />
       </div>
@@ -644,7 +648,9 @@ defmodule PlazaWeb.MyStoreLive do
 
   defp url_or(%{url: {:default, default}} = assigns) do
     ~H"""
-    <%= default %>
+    <div style="opacity: 70%;">
+      <%= default %>
+    </div>
     """
   end
 
@@ -658,7 +664,7 @@ defmodule PlazaWeb.MyStoreLive do
 
   defp right(assigns) do
     ~H"""
-    <div style="display: inline-block;">
+    <div>
       <div style="position: relative; left: 100px;">
         <.link navigate="/upload" style="text-decoration: underline;" class="has-font-3 is-size-6">
           upload more stuff
