@@ -140,7 +140,7 @@ defmodule PlazaWeb.UploadLive2 do
                 "png",
                 if(local_upload_atom == :front_local_upload,
                   do: "mockup-front.png",
-                  else: "mockup-front.png"
+                  else: "mockup-back.png"
                 )
               ])
 
@@ -180,7 +180,7 @@ defmodule PlazaWeb.UploadLive2 do
                 mock,
                 img,
                 x: :middle,
-                y: 245
+                y: 1700
               )
 
             {:ok, _} =
@@ -1360,11 +1360,11 @@ defmodule PlazaWeb.UploadLive2 do
 
   defp upload_preview(assigns) do
     ~H"""
-    <div style={if @size == "small", do: "width: 400px;"}>
+    <div style={if @size == "small", do: "width: 400px;", else: "width: 650px;"}>
       <img src={
         if @local_url,
           do: @local_url,
-          else: if(@side == "front", do: "png/mockup-front.png", else: "png/mockup-front.png")
+          else: if(@side == "front", do: "png/mockup-front.png", else: "png/mockup-back.png")
       } />
     </div>
     """
