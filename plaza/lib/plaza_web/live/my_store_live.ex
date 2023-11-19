@@ -56,9 +56,6 @@ defmodule PlazaWeb.MyStoreLive do
             case seller do
               nil ->
                 socket
-
-              _ ->
-                socket
                 |> push_event(
                   "read",
                   %{
@@ -66,6 +63,10 @@ defmodule PlazaWeb.MyStoreLive do
                     event: "read-product-form"
                   }
                 )
+
+              ## TODO; not working ??
+              _ ->
+                socket
             end
 
           socket =
@@ -429,12 +430,7 @@ defmodule PlazaWeb.MyStoreLive do
 
   def render(%{seller: nil, my_products: []} = assigns) do
     ~H"""
-    <div
-      id="plaza-product-reader"
-      phx-hook="LocalStorage"
-      class="has-font-3"
-      style="margin-top: 150px; margin-bottom: 250px; font-size: 34px;"
-    >
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 250px; font-size: 34px;">
       <div style="display: flex; justify-content: center; margin-bottom: 100px;">
         <.link navigate="/upload" style="text-decoration: underline;">
           go upload some stuff
