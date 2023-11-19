@@ -17,6 +17,13 @@ defmodule Plaza.Products do
     )
   end
 
+  def count(id) do
+    Repo.aggregate(
+      from(Product, where: [user_id: ^id]),
+      :count
+    )
+  end
+
   @doc """
   Returns the list of products.
 

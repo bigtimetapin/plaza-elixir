@@ -28,8 +28,8 @@ defmodule PlazaWeb.MyStoreLive do
           user_id = socket.assigns.current_user.id
           seller = Accounts.get_seller_by_id(user_id)
           IO.inspect(seller)
-          my_products = Products.list_products_by_user_id(user_id)
-          IO.inspect(my_products)
+          products = Products.list_products_by_user_id(user_id)
+          IO.inspect(products)
 
           seller_form =
             case seller do
@@ -53,8 +53,8 @@ defmodule PlazaWeb.MyStoreLive do
             end
 
           socket =
-            case seller do
-              nil ->
+            case products do
+              [] ->
                 socket
                 |> push_event(
                   "read",
@@ -63,8 +63,8 @@ defmodule PlazaWeb.MyStoreLive do
                     event: "read-product-form"
                   }
                 )
+                |> assign(product_buffer: nil)
 
-              ## TODO; not working ??
               _ ->
                 socket
             end
@@ -73,7 +73,7 @@ defmodule PlazaWeb.MyStoreLive do
             socket
             |> assign(:header, :my_store)
             |> assign(:seller, seller)
-            |> assign(:my_products, my_products)
+            |> assign(:products, products)
             |> assign(:local_logo_upload, nil)
             |> allow_upload(:logo,
               accept: ~w(.png .jpg .jpeg .svg .gif),
@@ -147,7 +147,7 @@ defmodule PlazaWeb.MyStoreLive do
           IO.inspect(restored)
 
           socket
-          |> assign(:my_products, [restored])
+          |> assign(:product_buffer, restored)
 
         {:error, reason} ->
           # We don't continue checking. Display error.
@@ -246,7 +246,7 @@ defmodule PlazaWeb.MyStoreLive do
           IO.inspect(seller)
 
           Task.async(fn ->
-            pubish_s3(socket.assigns.local_logo_upload)
+            publish_s3(socket.assigns.local_logo_upload)
           end)
 
           socket =
@@ -258,7 +258,7 @@ defmodule PlazaWeb.MyStoreLive do
     {:noreply, socket}
   end
 
-  defp pubish_s3(local_upload) do
+  defp publish_s3(local_upload) do
     url =
       case local_upload do
         nil ->
@@ -393,15 +393,25 @@ defmodule PlazaWeb.MyStoreLive do
     socket =
       case Accounts.create_seller(seller) do
         {:ok, seller} ->
-          case socket.assigns.my_products do
-            [product] ->
-              product = %{product | user_id: seller.user_id}
-              result = Products.create_product(product)
-              IO.inspect(result)
+          socket =
+            case socket.assigns.product_buffer do
+              nil ->
+                socket
 
-            _ ->
-              nil
-          end
+              product ->
+                product = %{
+                  product
+                  | user_id: seller.user_id,
+                    user_name: seller.user_name
+                }
+
+                {:ok, product} = Products.create_product(product)
+                IO.inspect(product)
+
+                socket =
+                  socket
+                  |> assign(products: [product])
+            end
 
           socket =
             socket
@@ -428,7 +438,7 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
-  def render(%{seller: nil, my_products: []} = assigns) do
+  def render(%{seller: nil, product_buffer: nil} = assigns) do
     ~H"""
     <div class="has-font-3" style="margin-top: 150px; margin-bottom: 250px; font-size: 34px;">
       <div style="display: flex; justify-content: center; margin-bottom: 100px;">
@@ -450,7 +460,7 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
-  def render(%{seller: nil, my_products: [product]} = assigns) do
+  def render(%{seller: nil, product_buffer: product} = assigns) do
     ~H"""
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 250px;">
       <div style="display: flex; justify-content: center;">
@@ -475,7 +485,7 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
-  def render(%{seller: %Seller{stripe_id: nil}, my_products: []} = assigns) do
+  def render(%{seller: %Seller{stripe_id: nil}, products: []} = assigns) do
     ~H"""
     <div style="display: flex; margin-bottom: 50px;">
       <.left seller={@seller} />
@@ -509,29 +519,27 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
-  def render(%{seller: %Seller{stripe_id: nil}, my_products: [product]} = assigns) do
+  def render(%{seller: %Seller{stripe_id: nil}, products: products} = assigns) do
     ~H"""
     <div style="display: flex; margin-bottom: 50px;">
       <.left seller={@seller} />
       <div style="margin-left: 150px; margin-top: 150px;">
         <div class="has-font-3" style="font-size: 34px;">
-          <div style="display: flex; justify-content: center;">
-            <div style="text-align: center;">
-              <div style="margin-bottom: 50px;">
-                Ok you've created your seller (loja) profile
-              </div>
-              <div style="margin-bottom: 50px;">
-                and you've uploaded your first product
-                <div>
-                  <ProductComponent.product product={product} meta={false} />
-                </div>
+          <div style="text-align: center;">
+            <div style="margin-bottom: 50px;">
+              Ok you've created your seller (loja) profile
+            </div>
+            <div style="margin-bottom: 50px;">
+              and you've uploaded your first product
+              <div>
+                <ProductComponent.products3 products={products} />
               </div>
             </div>
-            <div style="width: 500px; margin-left: 50px; border: 1px dotted black; text-align: center;">
-              You just need to link your bank info with stripe so you can get paid for every sale.
-              <div style="text-decoration: underline; margin-top: 50px;">
-                <button phx-click="stripe-link-account">link stripe account</button>
-              </div>
+          </div>
+          <div style="border: 1px dotted black; text-align: center;">
+            You just need to link your bank info with stripe so you can get paid for every sale.
+            <div style="text-decoration: underline; margin-top: 50px;">
+              <button phx-click="stripe-link-account">link stripe account</button>
             </div>
           </div>
         </div>
@@ -544,7 +552,7 @@ defmodule PlazaWeb.MyStoreLive do
     ~H"""
     <div style="display: flex; margin-bottom: 50px;">
       <.left seller={@seller} />
-      <.right my_products={@my_products} />
+      <.right products={@products} />
     </div>
     """
   end
@@ -667,7 +675,7 @@ defmodule PlazaWeb.MyStoreLive do
         </.link>
       </div>
       <div style="position: relative; left: 75px;">
-        <ProductComponent.products3 products={@my_products} />
+        <ProductComponent.products3 products={@products} />
       </div>
       <div
         class="has-font-3"

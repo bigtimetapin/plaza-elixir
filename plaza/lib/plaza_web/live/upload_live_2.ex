@@ -22,74 +22,91 @@ defmodule PlazaWeb.UploadLive2 do
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    {seller, step, user_id} =
-      case socket.assigns.current_user do
-        nil ->
-          {nil, 1, -1}
-
-        %{id: id} ->
-          case Accounts.get_seller_by_id(id) do
-            nil ->
-              {nil, 4, id}
-
-            seller ->
-              {seller, 4, id}
-          end
-      end
-
-    ## days
-    campaign_duration = 7
-
-    campaign_duration_timestamp =
-      NaiveDateTime.utc_now()
-      |> NaiveDateTime.add(campaign_duration, :day)
-      |> NaiveDateTime.truncate(:second)
-
     socket =
-      socket
-      |> assign(:page_title, "Upload")
-      |> assign(:header, :my_store)
-      |> allow_upload(:front,
-        accept: ~w(.png),
-        max_entries: 1,
-        auto_upload: true,
-        progress: &handle_progress/3
-      )
-      |> allow_upload(:back,
-        accept: ~w(.png),
-        max_entries: 1,
-        auto_upload: true,
-        progress: &handle_progress/3
-      )
-      |> assign(:front_local_upload, nil)
-      |> assign(:back_local_upload, nil)
-      |> assign(:seller, seller)
-      |> assign(
-        :product_form,
-        to_form(
-          Product.changeset(
-            %Product{
-              user_id: user_id,
-              price: 75,
-              designs: %Designs{
-                display: 0
-              },
-              mocks: %Mocks{
-                front:
-                  "https://plaza-static-dev.s3.us-west-2.amazonaws.com/uploads/mockup-front.png",
-                back:
-                  "https://plaza-static-dev.s3.us-west-2.amazonaws.com/uploads/mockup-back.png"
-              },
-              campaign_duration: campaign_duration,
-              campaign_duration_timestamp: campaign_duration_timestamp,
-              active: true
-            },
-            %{}
+      case connected?(socket) do
+        true ->
+          {seller, user_id, active, step} =
+            case socket.assigns.current_user do
+              nil ->
+                {nil, -1, false, 1}
+
+              %{id: id} ->
+                case Accounts.get_seller_by_id(id) do
+                  nil ->
+                    {nil, id, false, 4}
+
+                  %{stripe_id: nil} = seller ->
+                    case Products.count(id) > 0 do
+                      true ->
+                        {seller, id, true, -1}
+
+                      false ->
+                        {seller, id, true, 4}
+                    end
+
+                  seller ->
+                    {seller, id, true, 4}
+                end
+            end
+
+          ## days
+          campaign_duration = 7
+
+          campaign_duration_timestamp =
+            NaiveDateTime.utc_now()
+            |> NaiveDateTime.add(campaign_duration, :day)
+            |> NaiveDateTime.truncate(:second)
+
+          socket
+          |> assign(:page_title, "Upload")
+          |> assign(:header, :my_store)
+          |> allow_upload(:front,
+            accept: ~w(.png),
+            max_entries: 1,
+            auto_upload: true,
+            progress: &handle_progress/3
           )
-        )
-      )
-      |> assign(:publish_status, 0)
-      |> assign(:step, step)
+          |> allow_upload(:back,
+            accept: ~w(.png),
+            max_entries: 1,
+            auto_upload: true,
+            progress: &handle_progress/3
+          )
+          |> assign(:front_local_upload, nil)
+          |> assign(:back_local_upload, nil)
+          |> assign(:seller, seller)
+          |> assign(
+            :product_form,
+            to_form(
+              Product.changeset(
+                %Product{
+                  user_id: user_id,
+                  price: 75,
+                  designs: %Designs{
+                    display: 0
+                  },
+                  mocks: %Mocks{
+                    front:
+                      "https://plaza-static-dev.s3.us-west-2.amazonaws.com/uploads/mockup-front.png",
+                    back:
+                      "https://plaza-static-dev.s3.us-west-2.amazonaws.com/uploads/mockup-back.png"
+                  },
+                  campaign_duration: campaign_duration,
+                  campaign_duration_timestamp: campaign_duration_timestamp,
+                  active: active
+                },
+                %{}
+              )
+            )
+          )
+          |> assign(:publish_status, 0)
+          |> assign(:step, step)
+          |> assign(waiting: false)
+
+        false ->
+          socket
+          |> assign(waiting: true)
+      end
 
     {:ok, socket}
   end
@@ -648,6 +665,33 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   @impl Phoenix.LiveView
+  def render(%{waiting: true} = assigns) do
+    ~H"""
+    <div style="margin-top: 200px; display: flex; justify-content: center;">
+      <img src="gif/loading.gif" />
+    </div>
+    """
+  end
+
+  def render(%{step: -1} = assigns) do
+    ~H"""
+    <div class="has-font-3 is-size-4" style="margin-top: 125px; margin-bottom: 125px;">
+      <div style="display: flex; justify-content: center;">
+        <div style="width: 500px; text-align: center;">
+          you've already uploaded your first product but haven't linked your bank account yet.
+          <.link
+            navigate="/my-store"
+            style="margin-left: 5px; margin-right: 5px; text-decoration: underline;"
+          >
+            go do that
+          </.link>
+          to activate your first product and continue uploading more products.
+        </div>
+      </div>
+    </div>
+    """
+  end
+
   def render(%{step: 1} = assigns) do
     ~H"""
     <div class="has-font-3 is-size-4" style="text-align: center; margin-top: 125px;">
