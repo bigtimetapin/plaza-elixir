@@ -19,33 +19,34 @@ defmodule PlazaWeb.UploadLive2 do
   @aws_s3_bucket "plaza-static-dev"
 
   @aspect_ratio 29.0 / 42.0
+  @default_user_name "tmp"
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     socket =
       case connected?(socket) do
         true ->
-          {seller, user_id, active, step} =
+          {seller, user_id, user_name, active, step} =
             case socket.assigns.current_user do
               nil ->
-                {nil, -1, false, 1}
+                {nil, -1, @default_user_name, false, 1}
 
               %{id: id} ->
                 case Accounts.get_seller_by_id(id) do
                   nil ->
-                    {nil, id, false, 4}
+                    {nil, id, @default_user_name, false, 4}
 
                   %{stripe_id: nil} = seller ->
                     case Products.count(id) > 0 do
                       true ->
-                        {seller, id, true, -1}
+                        {seller, id, seller.user_name, false, -1}
 
                       false ->
-                        {seller, id, true, 4}
+                        {seller, id, seller.user_name, false, 4}
                     end
 
                   seller ->
-                    {seller, id, true, 4}
+                    {seller, id, seller.user_name, true, 4}
                 end
             end
 
@@ -81,6 +82,7 @@ defmodule PlazaWeb.UploadLive2 do
               Product.changeset(
                 %Product{
                   user_id: user_id,
+                  user_name: user_name,
                   price: 75,
                   designs: %Designs{
                     display: 0
@@ -498,6 +500,11 @@ defmodule PlazaWeb.UploadLive2 do
   def handle_event("publish", _params, socket) do
     Task.async(fn -> pubish_s3(socket.assigns.front_local_upload, :front) end)
     Task.async(fn -> pubish_s3(socket.assigns.back_local_upload, :back) end)
+
+    socket =
+      socket
+      |> assign(waiting: true)
+
     {:noreply, socket}
   end
 
@@ -641,6 +648,7 @@ defmodule PlazaWeb.UploadLive2 do
             key: @local_storage_key,
             data: serialize_to_token(product)
           })
+          |> assign(waiting: false)
 
         seller ->
           case Products.create_product(product) do
@@ -648,11 +656,13 @@ defmodule PlazaWeb.UploadLive2 do
               socket
               |> assign(:write_status, :db_storage)
               |> assign(:step, 9)
+              |> assign(waiting: false)
 
             {:error, changeset} ->
               socket
               |> assign(:write_status, :error)
               |> assign(:step, 9)
+              |> assign(waiting: false)
           end
       end
 

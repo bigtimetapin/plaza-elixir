@@ -154,9 +154,25 @@ defmodule PlazaWeb.ProductLive do
             |> assign(waiting: false)
 
           _ ->
-            socket
-            |> assign(step: 1)
-            |> assign(waiting: false)
+            case seller do
+              %{stripe_id: nil} ->
+                socket
+                |> assign(step: -1)
+                |> assign(waiting: false)
+
+              _ ->
+                case product do
+                  %{active: false} ->
+                    socket
+                    |> assign(step: -2)
+                    |> assign(waiting: false)
+
+                  _ ->
+                    socket
+                    |> assign(step: 1)
+                    |> assign(waiting: false)
+                end
+            end
         end
       else
         socket
@@ -452,10 +468,8 @@ defmodule PlazaWeb.ProductLive do
   @impl Phoenix.LiveView
   def render(%{waiting: true} = assigns) do
     ~H"""
-    <div style="margin-top: 150px;">
-      <div style="display: flex; justify-content: center;">
-        waiting
-      </div>
+    <div style="margin-top: 200px; display: flex; justify-content: center;">
+      <img src="gif/loading.gif" />
     </div>
     """
   end
@@ -465,6 +479,36 @@ defmodule PlazaWeb.ProductLive do
     <div>
       <div style="display: flex; justify-content: center;">
         product does not exist
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{product: product, step: -1} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div>
+          <ProductComponent.product product={product} meta={true} />
+        </div>
+        <div>
+          this seller has not finished registration yet
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{product: product, step: -2} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div>
+          <ProductComponent.product product={product} meta={true} />
+        </div>
+        <div>
+          this product is no longer available
+        </div>
       </div>
     </div>
     """
