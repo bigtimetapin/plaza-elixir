@@ -24,6 +24,30 @@ defmodule Plaza.Products do
     )
   end
 
+  def expire_products do
+    now = NaiveDateTime.utc_now()
+
+    from(p in Product,
+      where: p.campaign_duration_timestamp < ^now and p.active == true
+    )
+    |> Repo.update_all(set: [active: false])
+  end
+
+  def activate_product(product) do
+    campaign_duration_timestamp =
+      NaiveDateTime.utc_now()
+      |> NaiveDateTime.add(product.campaign_duration, :day)
+      |> NaiveDateTime.truncate(:second)
+
+    update_product(
+      product,
+      %{
+        "campaign_duration_timestamp" => campaign_duration_timestamp,
+        "active" => true
+      }
+    )
+  end
+
   @doc """
   Returns the list of products.
 
@@ -101,15 +125,6 @@ defmodule Plaza.Products do
     product
     |> Product.changeset(attrs)
     |> Repo.update()
-  end
-
-  def expire_products do
-    now = NaiveDateTime.utc_now()
-
-    from(p in Product,
-      where: p.campaign_duration_timestamp < ^now and p.active == true
-    )
-    |> Repo.update_all(set: [active: false])
   end
 
   @doc """

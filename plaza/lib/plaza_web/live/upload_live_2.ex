@@ -543,20 +543,17 @@ defmodule PlazaWeb.UploadLive2 do
               File.read!(mock_read_path)
             )
 
-          put_design_response =
-            ExAws.request!(
+          {:ok, _} =
+            ExAws.request(
               put_design_request,
               region: @aws_s3_region
             )
 
-          put_mock_response =
-            ExAws.request!(
+          {:ok, _} =
+            ExAws.request(
               put_mock_request,
               region: @aws_s3_region
             )
-
-          IO.inspect(put_design_response)
-          IO.inspect(put_mock_response)
 
           %{
             design_url: "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{design_url}",

@@ -14,7 +14,9 @@ defmodule PlazaWeb.MyStoreLive do
 
   alias ExAws.S3
 
-  @site "https://plazaaaaa.fly.dev"
+  ## TODO; set produt as active on successful stripe registration
+  @site "http://localhost:4000"
+  ## @site "https://plazaaaaa.fly.dev"
   @local_storage_key "plaza-product-form"
 
   @aws_s3_region "us-west-2"
@@ -294,21 +296,23 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   def handle_event("stripe-link-account", _params, socket) do
-    {:ok, %Stripe.Account{id: stripe_id}} = Stripe.Account.create(%{type: :express})
+    Task.async(fn ->
+      {:ok, %Stripe.Account{id: stripe_id}} = Stripe.Account.create(%{type: :express})
 
-    {:ok, %Stripe.AccountLink{url: stripe_account_link_url}} =
-      Stripe.AccountLink.create(%{
-        account: stripe_id,
-        refresh_url: "#{@site}/my-store?stripe-setup-refresh=#{stripe_id}",
-        return_url: "#{@site}/my-store?stripe-setup-return=#{stripe_id}",
-        type: :account_onboarding
-      })
+      {:ok, %Stripe.AccountLink{url: stripe_account_link_url}} =
+        Stripe.AccountLink.create(%{
+          account: stripe_id,
+          refresh_url: "#{@site}/my-store?stripe-setup-refresh=#{stripe_id}",
+          return_url: "#{@site}/my-store?stripe-setup-return=#{stripe_id}",
+          type: :account_onboarding
+        })
 
-    IO.inspect(stripe_account_link_url)
+      {:stripe_link_account, stripe_account_link_url}
+    end)
 
     socket =
       socket
-      |> redirect(external: stripe_account_link_url)
+      |> assign(waiting: true)
 
     {:noreply, socket}
   end
@@ -355,21 +359,36 @@ defmodule PlazaWeb.MyStoreLive do
 
           IO.inspect(seller)
 
-          seller =
+          products = socket.assigns.products
+
+          {seller, products} =
             case details_submitted do
               true ->
                 seller = %{seller | stripe_id: stripe_id}
-                {:ok, seller} = Accounts.update_seller(seller, %{})
-                seller
+                {:ok, seller} = Accounts.update_seller(seller)
+
+                products =
+                  case products do
+                    [product] ->
+                      {:ok, product} = Products.activate_product(product)
+                      [product]
+
+                    _ ->
+                      products
+                  end
+
+                IO.inspect(seller)
+                IO.inspect(products)
+
+                {seller, products}
 
               false ->
-                seller
+                {seller, products}
             end
 
-          IO.inspect(seller)
-
           socket
-          |> assign(:seller, seller)
+          |> assign(seller: seller)
+          |> assign(products: products)
 
         false ->
           socket
@@ -383,6 +402,17 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   @impl Phoenix.LiveView
+  def handle_info({ref, {:stripe_link_account, url}}, socket) do
+    Process.demonitor(ref, [:flush])
+    IO.inspect(url)
+
+    socket =
+      socket
+      |> redirect(external: url)
+
+    {:noreply, socket}
+  end
+
   def handle_info({ref, {:publish, url}}, socket) do
     Process.demonitor(ref, [:flush])
 
@@ -519,7 +549,7 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
-  def render(%{seller: %Seller{stripe_id: nil}, products: products} = assigns) do
+  def render(%{seller: %Seller{stripe_id: nil}, products: [product]} = assigns) do
     ~H"""
     <div style="display: flex; margin-bottom: 50px;">
       <.left seller={@seller} />
@@ -532,7 +562,7 @@ defmodule PlazaWeb.MyStoreLive do
             <div style="margin-bottom: 50px;">
               and you've uploaded your first product
               <div>
-                <ProductComponent.products3 products={products} />
+                <ProductComponent.product product={product} meta={false} />
               </div>
             </div>
           </div>
@@ -632,7 +662,7 @@ defmodule PlazaWeb.MyStoreLive do
       <div style="width: 377px; height: 377px; overflow: hidden;">
         <img src={if @seller.profile_photo_url, do: @seller.profile_photo_url, else: "png/pep.png"} />
       </div>
-      <div style="position: relative; left: 61px; width: 316px; height: 423px; border-right: 1px solid #707070;">
+      <div style="position: relative; left: 61px; width: 316px; height: 600px; border-right: 1px solid #707070;">
         <div class="is-size-6 mb-small" style="text-decoration: underline;">
           <%= @seller.user_name %>
         </div>

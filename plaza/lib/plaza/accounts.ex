@@ -23,7 +23,7 @@ defmodule Plaza.Accounts do
     |> Repo.insert()
   end
 
-  def update_seller(%Seller{} = seller, attrs) do
+  def update_seller(%Seller{} = seller) do
     seller
     |> Repo.insert(
       on_conflict: :replace_all,
