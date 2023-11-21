@@ -223,73 +223,72 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   def handle_event("submit-seller-form", %{"seller_form" => attrs}, socket) do
-    IO.inspect(socket.assigns.seller_form)
+    Task.async(fn ->
+      changes =
+        SellerForm.changeset(
+          socket.assigns.seller_form.data,
+          attrs
+        )
+        |> Changeset.apply_action(:update)
 
-    ## TODO; wrap this in task
-    changes =
-      SellerForm.changeset(
-        socket.assigns.seller_form.data,
-        attrs
-      )
-      |> Changeset.apply_action(:update)
+      IO.inspect(changes)
 
-    IO.inspect(changes)
-
-    socket =
       case changes do
         {:error, changeset} ->
-          socket = socket |> assign(seller_form: changeset |> to_form)
+          {:invalid_changes, changeset |> to_form}
 
         {:ok, seller_form} ->
           seller = SellerForm.to_seller(seller_form)
           IO.inspect(seller)
 
-          ## TODO; update when logo didn't change
-          Task.async(fn ->
-            publish_s3(socket.assigns.local_logo_upload)
-          end)
+          case Map.get(socket.assigns.local_logo_upload, :url) do
+            nil ->
+              {:valid_changes, seller}
 
-          socket
-          |> assign(seller: seller)
-          |> assign(waiting: true)
+            url ->
+              case String.starts_with?(url, "https") do
+                true ->
+                  {:valid_changes, seller}
+
+                false ->
+                  s3_url = publish_s3(url)
+                  {:logo_uploaded, s3_url, seller}
+              end
+          end
       end
+    end)
+
+    socket =
+      socket
+      |> assign(waiting: true)
 
     {:noreply, socket}
   end
 
-  defp publish_s3(local_upload) do
-    url =
-      case local_upload do
-        nil ->
-          nil
+  defp publish_s3(local_url) do
+    src =
+      Path.join([
+        :code.priv_dir(:plaza),
+        "static",
+        local_url
+      ])
 
-        %{url: nes} ->
-          src =
-            Path.join([
-              :code.priv_dir(:plaza),
-              "static",
-              nes
-            ])
+    request =
+      S3.put_object(
+        @aws_s3_bucket,
+        local_url,
+        File.read!(src)
+      )
 
-          request =
-            S3.put_object(
-              @aws_s3_bucket,
-              nes,
-              File.read!(src)
-            )
+    {:ok, term} =
+      ExAws.request(
+        request,
+        region: @aws_s3_region
+      )
 
-          response =
-            ExAws.request!(
-              request,
-              region: @aws_s3_region
-            )
+    IO.inspect(term)
 
-          IO.inspect(response)
-
-          "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{nes}"
-      end
-
-    {:publish, url}
+    "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{local_url}"
   end
 
   def handle_event("stripe-link-account", _params, socket) do
@@ -436,11 +435,35 @@ defmodule PlazaWeb.MyStoreLive do
     {:noreply, socket}
   end
 
-  def handle_info({ref, {:publish, url}}, socket) do
+  def handle_info({ref, {:invalid_changes, seller_form}}, socket) do
     Process.demonitor(ref, [:flush])
 
-    seller = socket.assigns.seller
-    seller = %{seller | profile_photo_url: url}
+    socket =
+      socket
+      |> assign(seller_form: seller_form)
+      |> assign(waiting: false)
+
+    {:noreply, socket}
+  end
+
+  def handle_info({ref, {:valid_changes, seller}}, socket) do
+    Process.demonitor(ref, [:flush])
+
+    {:ok, seller} = Accounts.update_seller(seller)
+
+    socket =
+      socket
+      |> assign(seller: seller)
+      |> assign(waiting: false)
+      |> assign(step: nil)
+
+    {:noreply, socket}
+  end
+
+  def handle_info({ref, {:logo_uploaded, s3_url, seller}}, socket) do
+    Process.demonitor(ref, [:flush])
+
+    seller = %{seller | profile_photo_url: s3_url}
     IO.inspect(seller)
 
     socket =
