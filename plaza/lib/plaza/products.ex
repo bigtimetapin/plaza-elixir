@@ -65,6 +65,15 @@ defmodule Plaza.Products do
     Repo.all(from p in Product, where: [user_id: ^id])
   end
 
+  def list_products_by_user_id(id, n) do
+    Repo.all(
+      from Product,
+        where: [user_id: ^id],
+        order_by: [desc: :updated_at],
+        limit: ^n
+    )
+  end
+
   @doc """
   Gets a single product.
 

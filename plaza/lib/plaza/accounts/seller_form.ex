@@ -5,6 +5,7 @@ defmodule Plaza.Accounts.SellerForm do
   alias Plaza.Accounts.Socials
 
   defstruct [
+    :id,
     :user_id,
     :user_name,
     :profile_photo_url,
@@ -14,11 +15,14 @@ defmodule Plaza.Accounts.SellerForm do
     :instagram,
     :soundcloud,
     :twitter,
-    :stripe_id
+    :stripe_id,
+    :inserted_at,
+    :updated_at
   ]
 
   def from_seller(seller) do
     %__MODULE__{
+      id: seller.id,
       user_id: seller.user_id,
       user_name: seller.user_name,
       profile_photo_url: seller.profile_photo_url,
@@ -28,12 +32,15 @@ defmodule Plaza.Accounts.SellerForm do
       instagram: maybe_get(seller.socials, :instagram),
       soundcloud: maybe_get(seller.socials, :soundcloud),
       twitter: maybe_get(seller.socials, :twitter),
-      stripe_id: seller.stripe_id
+      stripe_id: seller.stripe_id,
+      inserted_at: seller.inserted_at,
+      updated_at: seller.updated_at
     }
   end
 
   def to_seller(seller_form) do
     %Seller{
+      id: seller_form.id,
       user_id: seller_form.user_id,
       user_name: seller_form.user_name,
       profile_photo_url: seller_form.profile_photo_url,
@@ -45,7 +52,9 @@ defmodule Plaza.Accounts.SellerForm do
         soundcloud: seller_form.soundcloud,
         twitter: seller_form.twitter
       },
-      stripe_id: seller_form.stripe_id
+      stripe_id: seller_form.stripe_id,
+      inserted_at: seller_form.inserted_at,
+      updated_at: seller_form.updated_at
     }
   end
 
@@ -59,14 +68,25 @@ defmodule Plaza.Accounts.SellerForm do
   def changeset(seller_form, attrs) do
     {seller_form, types()}
     |> cast(attrs, [
+      :id,
+      :user_id,
       :user_name,
+      :profile_photo_url,
+      :description,
+      :location,
       :website,
       :instagram,
       :soundcloud,
-      :twitter
+      :twitter,
+      :stripe_id,
+      :inserted_at,
+      :updated_at
     ])
     |> validate_required([
-      :user_name
+      :user_id,
+      :user_name,
+      :inserted_at,
+      :updated_at
     ])
     |> validate_length(:instagram, min: 1)
     |> validate_length(:soundcloud, min: 1)
@@ -75,11 +95,19 @@ defmodule Plaza.Accounts.SellerForm do
 
   defp types() do
     %{
+      id: :id,
+      user_id: :id,
       user_name: :string,
+      profile_photo_url: :string,
+      description: :string,
+      location: :string,
       website: :string,
       instagram: :string,
       soundcloud: :string,
-      twitter: :string
+      twitter: :string,
+      stripe_id: :string,
+      inserted_at: :naive_datetime,
+      updated_at: :naive_datetime
     }
   end
 end

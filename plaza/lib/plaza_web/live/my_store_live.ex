@@ -14,7 +14,6 @@ defmodule PlazaWeb.MyStoreLive do
 
   alias ExAws.S3
 
-  ## TODO; set produt as active on successful stripe registration
   @site "http://localhost:4000"
   ## @site "https://plazaaaaa.fly.dev"
   @local_storage_key "plaza-product-form"
@@ -30,29 +29,18 @@ defmodule PlazaWeb.MyStoreLive do
           user_id = socket.assigns.current_user.id
           seller = Accounts.get_seller_by_id(user_id)
           IO.inspect(seller)
-          products = Products.list_products_by_user_id(user_id)
+          products = Products.list_products_by_user_id(user_id, 3)
           IO.inspect(products)
 
           seller_form =
-            case seller do
-              nil ->
-                to_form(
-                  SellerForm.changeset(
-                    %SellerForm{
-                      user_id: user_id
-                    },
-                    %{}
-                  )
-                )
-
-              _ ->
-                to_form(
-                  SellerForm.changeset(
-                    SellerForm.from_seller(seller),
-                    %{}
-                  )
-                )
-            end
+            to_form(
+              SellerForm.changeset(
+                %SellerForm{
+                  user_id: user_id
+                },
+                %{}
+              )
+            )
 
           socket =
             case products do
@@ -120,13 +108,21 @@ defmodule PlazaWeb.MyStoreLive do
 
         IO.inspect(local_url)
 
+        new =
+          Map.get(
+            socket.assigns.local_logo_upload,
+            :new,
+            true
+          )
+
         socket =
           socket
           |> assign(
             :local_logo_upload,
             %{
               url: local_url,
-              file_name: file_name
+              file_name: file_name,
+              new: new
             }
           )
       else
@@ -221,7 +217,7 @@ defmodule PlazaWeb.MyStoreLive do
   def handle_event("logo-upload-cancel", _params, socket) do
     socket =
       socket
-      |> assign(local_logo_upload: nil)
+      |> assign(local_logo_upload: %{new: socket.assigns.local_logo_upload.new})
 
     {:noreply, socket}
   end
@@ -229,6 +225,7 @@ defmodule PlazaWeb.MyStoreLive do
   def handle_event("submit-seller-form", %{"seller_form" => attrs}, socket) do
     IO.inspect(socket.assigns.seller_form)
 
+    ## TODO; wrap this in task
     changes =
       SellerForm.changeset(
         socket.assigns.seller_form.data,
@@ -247,14 +244,14 @@ defmodule PlazaWeb.MyStoreLive do
           seller = SellerForm.to_seller(seller_form)
           IO.inspect(seller)
 
+          ## TODO; update when logo didn't change
           Task.async(fn ->
             publish_s3(socket.assigns.local_logo_upload)
           end)
 
-          socket =
-            socket
-            |> assign(seller: seller)
-            |> assign(waiting: true)
+          socket
+          |> assign(seller: seller)
+          |> assign(waiting: true)
       end
 
     {:noreply, socket}
@@ -313,6 +310,32 @@ defmodule PlazaWeb.MyStoreLive do
     socket =
       socket
       |> assign(waiting: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("edit-seller", _params, socket) do
+    seller = socket.assigns.seller
+
+    socket =
+      socket
+      |> assign(
+        seller_form:
+          to_form(
+            SellerForm.changeset(
+              SellerForm.from_seller(seller),
+              %{}
+            )
+          )
+      )
+      |> assign(
+        local_logo_upload: %{
+          url: seller.profile_photo_url,
+          file_name: "your-current-logo.foto",
+          new: false
+        }
+      )
+      |> assign(step: "edit-seller")
 
     {:noreply, socket}
   end
@@ -421,35 +444,44 @@ defmodule PlazaWeb.MyStoreLive do
     IO.inspect(seller)
 
     socket =
-      case Accounts.create_seller(seller) do
-        {:ok, seller} ->
-          socket =
-            case socket.assigns.product_buffer do
-              nil ->
-                socket
+      case socket.assigns.local_logo_upload.new do
+        true ->
+          case Accounts.create_seller(seller) do
+            {:ok, seller} ->
+              socket =
+                case socket.assigns.product_buffer do
+                  nil ->
+                    socket
 
-              product ->
-                product = %{
-                  product
-                  | user_id: seller.user_id,
-                    user_name: seller.user_name
-                }
+                  product ->
+                    product = %{
+                      product
+                      | user_id: seller.user_id,
+                        user_name: seller.user_name
+                    }
 
-                {:ok, product} = Products.create_product(product)
-                IO.inspect(product)
+                    {:ok, product} = Products.create_product(product)
+                    IO.inspect(product)
 
-                socket =
-                  socket
-                  |> assign(products: [product])
-            end
+                    socket =
+                      socket
+                      |> assign(products: [product])
+                end
 
-          socket =
-            socket
-            |> assign(seller: seller)
+              socket
+              |> assign(seller: seller)
 
-        {:error, changeset} ->
+            {:error, changeset} ->
+              socket
+              |> assign(seller_form: changeset |> to_form)
+          end
+
+        false ->
+          {:ok, seller} = Accounts.update_seller(seller)
+
           socket
-          |> assign(seller_form: changeset |> to_form)
+          |> assign(seller: seller)
+          |> assign(step: nil)
       end
 
     socket =
@@ -578,6 +610,18 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
+  def render(%{step: "edit-seller"} = assigns) do
+    ~H"""
+    <div style="display: flex; justify-content: center; margin-top: 150px; margin-bottom: 150px;">
+      <.seller_form
+        seller_form={@seller_form}
+        uploads={@uploads}
+        local_logo_upload={@local_logo_upload}
+      />
+    </div>
+    """
+  end
+
   def render(assigns) do
     ~H"""
     <div style="display: flex; margin-bottom: 50px;">
@@ -675,6 +719,9 @@ defmodule PlazaWeb.MyStoreLive do
         <div :for={url <- @user_urls} class="is-size-6" style="text-decoration: underline;">
           <.url_or url={url} />
         </div>
+        <div style="margin-top: 50px; height: 30px; width: 33px; border-top: none; border-left: none; border-right: none; border-bottom: 2px solid black;">
+          <button phx-click="edit-seller" class="has-font-3" style="font-size: 24px;">edit</button>
+        </div>
       </div>
     </div>
     """
@@ -698,8 +745,8 @@ defmodule PlazaWeb.MyStoreLive do
 
   defp right(assigns) do
     ~H"""
-    <div>
-      <div style="position: relative; left: 100px;">
+    <div style="margin-top: 150px;">
+      <div style="position: relative; left: 100px; margin-bottom: 50px;">
         <.link navigate="/upload" style="text-decoration: underline;" class="has-font-3 is-size-6">
           upload more stuff
         </.link>
@@ -730,7 +777,7 @@ defmodule PlazaWeb.MyStoreLive do
     ~H"""
     <div>
       <form>
-        <div :if={!@local_logo_upload}>
+        <div :if={!@local_logo_upload[:url]}>
           <label
             class="has-font-3 is-size-4"
             style="width: 312px; height: 300px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
@@ -749,12 +796,12 @@ defmodule PlazaWeb.MyStoreLive do
           </label>
         </div>
         <div
-          :if={@local_logo_upload}
+          :if={@local_logo_upload[:url]}
           style="width: 312px; height: 300px; overflow: hidden; border: 1px solid black;"
         >
           <img src={@local_logo_upload.url} />
         </div>
-        <div :if={@local_logo_upload} style="position: relative; left: 5px;">
+        <div :if={@local_logo_upload[:file_name]} style="position: relative; left: 5px;">
           <div style="display: inline-block; width: 270px; font-size: 24px; color: gray;">
             <%= @local_logo_upload.file_name %>
           </div>
@@ -808,7 +855,7 @@ defmodule PlazaWeb.MyStoreLive do
             <button>
               <img src="svg/yellow-ellipse.svg" />
               <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                Criar Loja
+                <%= if @local_logo_upload[:new], do: "Criar Loja", else: "Editar Loja" %>
               </div>
             </button>
           </div>
