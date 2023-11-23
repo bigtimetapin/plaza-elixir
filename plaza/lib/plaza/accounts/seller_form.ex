@@ -84,9 +84,7 @@ defmodule Plaza.Accounts.SellerForm do
     ])
     |> validate_required([
       :user_id,
-      :user_name,
-      :inserted_at,
-      :updated_at
+      :user_name
     ])
     |> validate_length(:instagram, min: 1)
     |> validate_length(:soundcloud, min: 1)

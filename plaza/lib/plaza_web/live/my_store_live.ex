@@ -14,8 +14,8 @@ defmodule PlazaWeb.MyStoreLive do
 
   alias ExAws.S3
 
-  @site "http://localhost:4000"
-  ## @site "https://plazaaaaa.fly.dev"
+  ## @site "http://localhost:4000"
+  @site "https://plazaaaaa.fly.dev"
   @local_storage_key "plaza-product-form"
 
   @aws_s3_region "us-west-2"
@@ -64,7 +64,7 @@ defmodule PlazaWeb.MyStoreLive do
             |> assign(:header, :my_store)
             |> assign(:seller, seller)
             |> assign(:products, products)
-            |> assign(:local_logo_upload, nil)
+            |> assign(:local_logo_upload, %{new: true})
             |> allow_upload(:logo,
               accept: ~w(.png .jpg .jpeg .svg .gif),
               max_entries: 1,
@@ -339,6 +339,14 @@ defmodule PlazaWeb.MyStoreLive do
     {:noreply, socket}
   end
 
+  def handle_event("cancel-edit-seller", _params, socket) do
+    socket =
+      socket
+      |> assign(step: nil)
+
+    {:noreply, socket}
+  end
+
   @impl Phoenix.LiveView
   def handle_params(%{"stripe-setup-refresh" => stripe_id}, _uri, socket) do
     socket =
@@ -449,13 +457,11 @@ defmodule PlazaWeb.MyStoreLive do
   def handle_info({ref, {:valid_changes, seller}}, socket) do
     Process.demonitor(ref, [:flush])
 
-    {:ok, seller} = Accounts.update_seller(seller)
-
     socket =
-      socket
-      |> assign(seller: seller)
-      |> assign(waiting: false)
-      |> assign(step: nil)
+      create_or_update_seller(
+        socket,
+        seller
+      )
 
     {:noreply, socket}
   end
@@ -466,6 +472,16 @@ defmodule PlazaWeb.MyStoreLive do
     seller = %{seller | profile_photo_url: s3_url}
     IO.inspect(seller)
 
+    socket =
+      create_or_update_seller(
+        socket,
+        seller
+      )
+
+    {:noreply, socket}
+  end
+
+  def create_or_update_seller(socket, seller) do
     socket =
       case socket.assigns.local_logo_upload.new do
         true ->
@@ -507,11 +523,8 @@ defmodule PlazaWeb.MyStoreLive do
           |> assign(step: nil)
       end
 
-    socket =
-      socket
-      |> assign(waiting: false)
-
-    {:noreply, socket}
+    socket
+    |> assign(waiting: false)
   end
 
   @impl Phoenix.LiveView
@@ -534,7 +547,7 @@ defmodule PlazaWeb.MyStoreLive do
       <div style="display: flex; justify-content: center;">
         Ou preencha para criar seu perfil de loja
       </div>
-      <div style="position: relative; top: 50px; display: flex; justify-content: center;">
+      <div style="position: relative; top: 50px;">
         <.seller_form
           seller_form={@seller_form}
           uploads={@uploads}
@@ -559,12 +572,35 @@ defmodule PlazaWeb.MyStoreLive do
       <div style="display: flex; justify-content: center; margin-top: 100px; margin-bottom: 50px;">
         create your store before the product goes live
       </div>
-      <div style="display: flex; justify-content: center;">
+      <div>
         <.seller_form
           seller_form={@seller_form}
           uploads={@uploads}
           local_logo_upload={@local_logo_upload}
         />
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{step: "edit-seller"} = assigns) do
+    ~H"""
+    <div style="margin-top: 150px; margin-bottom: 150px;">
+      <div style="display: flex; flex-direction: column;">
+        <.seller_form
+          seller_form={@seller_form}
+          uploads={@uploads}
+          local_logo_upload={@local_logo_upload}
+        />
+        <div style="display: flex; justify-content: center; margin-top: 50px;">
+          <button
+            phx-click="cancel-edit-seller"
+            class="has-font-3"
+            style="border-bottom: 2px solid black; width: 50px; font-size: 32px;"
+          >
+            cancel
+          </button>
+        </div>
       </div>
     </div>
     """
@@ -629,18 +665,6 @@ defmodule PlazaWeb.MyStoreLive do
           </div>
         </div>
       </div>
-    </div>
-    """
-  end
-
-  def render(%{step: "edit-seller"} = assigns) do
-    ~H"""
-    <div style="display: flex; justify-content: center; margin-top: 150px; margin-bottom: 150px;">
-      <.seller_form
-        seller_form={@seller_form}
-        uploads={@uploads}
-        local_logo_upload={@local_logo_upload}
-      />
     </div>
     """
   end
@@ -726,7 +750,7 @@ defmodule PlazaWeb.MyStoreLive do
 
     ~H"""
     <div class="has-font-3" style="position: relative; top: 50px;">
-      <div style="width: 377px; height: 377px; overflow: hidden;">
+      <div style="width: 377px; overflow: hidden;">
         <img src={if @seller.profile_photo_url, do: @seller.profile_photo_url, else: "png/pep.png"} />
       </div>
       <div style="position: relative; left: 61px; width: 316px; height: 600px; border-right: 1px solid #707070;">
@@ -798,91 +822,93 @@ defmodule PlazaWeb.MyStoreLive do
 
   defp seller_form(assigns) do
     ~H"""
-    <div>
-      <form>
-        <div :if={!@local_logo_upload[:url]}>
-          <label
-            class="has-font-3 is-size-4"
-            style="width: 312px; height: 300px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
-          >
-            <.live_file_input
-              upload={@uploads.logo}
-              style="display: none;"
-              phx-change="change-seller-logo"
-            />
-            <div style="text-align: center; text-decoration: underline; font-size: 24px;">
-              Upload
-              <div>
-                Logo/Foto de Perfil
+    <div style="display: flex; justify-content: center;">
+      <div>
+        <form>
+          <div :if={!@local_logo_upload[:url]}>
+            <label
+              class="has-font-3 is-size-4"
+              style="width: 312px; height: 300px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
+            >
+              <.live_file_input
+                upload={@uploads.logo}
+                style="display: none;"
+                phx-change="change-seller-logo"
+              />
+              <div style="text-align: center; text-decoration: underline; font-size: 24px;">
+                Upload
+                <div>
+                  Logo/Foto de Perfil
+                </div>
               </div>
+            </label>
+          </div>
+          <div
+            :if={@local_logo_upload[:url]}
+            style="width: 312px; height: 300px; overflow: hidden; border: 1px solid black;"
+          >
+            <img src={@local_logo_upload.url} />
+          </div>
+          <div :if={@local_logo_upload[:file_name]} style="position: relative; left: 5px;">
+            <div style="display: inline-block; width: 270px; font-size: 24px; color: gray;">
+              <%= @local_logo_upload.file_name %>
             </div>
-          </label>
-        </div>
-        <div
-          :if={@local_logo_upload[:url]}
-          style="width: 312px; height: 300px; overflow: hidden; border: 1px solid black;"
-        >
-          <img src={@local_logo_upload.url} />
-        </div>
-        <div :if={@local_logo_upload[:file_name]} style="position: relative; left: 5px;">
-          <div style="display: inline-block; width: 270px; font-size: 24px; color: gray;">
-            <%= @local_logo_upload.file_name %>
+            <div style="display: inline-block;">
+              <button type="button" phx-click="logo-upload-cancel">
+                &times;
+              </button>
+            </div>
           </div>
-          <div style="display: inline-block;">
-            <button type="button" phx-click="logo-upload-cancel">
-              &times;
-            </button>
-          </div>
+        </form>
+      </div>
+      <div>
+        <div style="position: relative; left: 50px; bottom: 40px;">
+          <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
+            <.input
+              field={@seller_form[:user_name]}
+              type="text"
+              placeholder="username / nome da loja *"
+              class="text-input-1"
+            >
+            </.input>
+            <.input
+              field={@seller_form[:website]}
+              type="text"
+              placeholder="website"
+              class="text-input-1"
+            >
+            </.input>
+            <.input
+              field={@seller_form[:instagram]}
+              type="text"
+              placeholder="instagram"
+              class="text-input-1"
+            >
+            </.input>
+            <.input
+              field={@seller_form[:twitter]}
+              type="text"
+              placeholder="twitter"
+              class="text-input-1"
+            >
+            </.input>
+            <.input
+              field={@seller_form[:soundcloud]}
+              type="text"
+              placeholder="soundcloud"
+              class="text-input-1"
+            >
+            </.input>
+            <div style="position: relative; top: 100px;">
+              <button>
+                <img src="svg/yellow-ellipse.svg" />
+                <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                  <%= if @local_logo_upload[:new], do: "Criar Loja", else: "Editar Loja" %>
+                </div>
+              </button>
+            </div>
+          </.form>
         </div>
-      </form>
-    </div>
-    <div>
-      <div style="position: relative; left: 50px; bottom: 40px;">
-        <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
-          <.input
-            field={@seller_form[:user_name]}
-            type="text"
-            placeholder="username / nome da loja *"
-            class="text-input-1"
-          >
-          </.input>
-          <.input
-            field={@seller_form[:website]}
-            type="text"
-            placeholder="website"
-            class="text-input-1"
-          >
-          </.input>
-          <.input
-            field={@seller_form[:instagram]}
-            type="text"
-            placeholder="instagram"
-            class="text-input-1"
-          >
-          </.input>
-          <.input
-            field={@seller_form[:twitter]}
-            type="text"
-            placeholder="twitter"
-            class="text-input-1"
-          >
-          </.input>
-          <.input
-            field={@seller_form[:soundcloud]}
-            type="text"
-            placeholder="soundcloud"
-            class="text-input-1"
-          >
-          </.input>
-          <div style="position: relative; top: 100px;">
-            <button>
-              <img src="svg/yellow-ellipse.svg" />
-              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                <%= if @local_logo_upload[:new], do: "Criar Loja", else: "Editar Loja" %>
-              </div>
-            </button>
-          </div>
-        </.form>
       </div>
     </div>
     """

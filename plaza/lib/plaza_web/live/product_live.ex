@@ -12,8 +12,8 @@ defmodule PlazaWeb.ProductLive do
   alias Plaza.Purchases
   alias PlazaWeb.ProductComponent
 
-  @site "http://localhost:4000"
-  ## @site "https://plazaaaaa.fly.dev"
+  ## @site "http://localhost:4000"
+  @site "https://plazaaaaa.fly.dev"
 
   @impl Phoenix.LiveView
   def mount(params, _session, socket) do

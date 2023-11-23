@@ -12,6 +12,7 @@ defmodule PlazaWeb.UploadLive2 do
 
   alias ExAws.S3
 
+  ## @site "http://localhost:4000"
   @site "https://plazaaaaa.fly.dev"
   @local_storage_key "plaza-product-form"
 
