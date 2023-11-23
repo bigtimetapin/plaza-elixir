@@ -28,6 +28,7 @@ let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("
 
 // hooks 
 let Hooks = {};
+// local storage hook
 Hooks.LocalStorage = {
   mounted() {
     this.handleEvent("write", (obj) => this.write(obj))
@@ -48,6 +49,35 @@ Hooks.LocalStorage = {
     localStorage.removeItem(obj.key)
   }
 };
+// file reader hook 
+let base64;
+Hooks.FileReader = {
+  mounted() {
+    const uploadInput = document.getElementById(
+      "upload-3-file-input"
+    );
+    const uploadDisplay = document.getElementById(
+      "upload-3-file-display"
+    );
+    if (base64) {
+      uploadDisplay.src = base64;
+    }
+    uploadInput.addEventListener("change", async () => {
+      files = uploadInput.files;
+      base64 = await getBase64(files[0]);
+      uploadDisplay.src = base64;
+    });
+  }
+};
+
+function getBase64(file) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onload = function() { resolve(reader.result); };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 // live socket 
 let liveSocket = new LiveSocket("/live", Socket, { params: { _csrf_token: csrfToken }, hooks: Hooks });

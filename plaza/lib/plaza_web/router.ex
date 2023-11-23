@@ -26,6 +26,7 @@ defmodule PlazaWeb.Router do
       live "/", LandingLive
       live "/product", ProductLive
       live "/upload", UploadLive2
+      live "/upload3", UploadLive3
     end
   end
 
