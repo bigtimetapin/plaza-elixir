@@ -51,6 +51,7 @@ Hooks.LocalStorage = {
 };
 // file reader hook 
 let base64;
+let png;
 Hooks.FileReader = {
   mounted() {
     const uploadInput = document.getElementById(
@@ -63,11 +64,39 @@ Hooks.FileReader = {
       uploadDisplay.src = base64;
     }
     uploadInput.addEventListener("change", async () => {
-      files = uploadInput.files;
-      base64 = await getBase64(files[0]);
-      uploadDisplay.src = base64;
+      if (uploadInput.files.length == 1) {
+        png = uploadInput.files[0];
+        base64 = await getBase64(png);
+        uploadDisplay.src = base64;
+        this.pushEvent(
+          "new-png-selected",
+          png.name
+        );
+      }
     });
   }
+};
+// S3 file uploader 
+Hooks.S3FileUploader = {
+  mounted() {
+    this.handleEvent("upload", (obj) => {
+      console.log(obj);
+      let formData = new FormData();
+      Object.entries(obj.fields).forEach(
+        ([key, val]) => formData.append(key, val)
+      );
+      formData.append("file", png);
+      let xhr = new XMLHttpRequest();
+      xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable) {
+          let percent = Math.round((event.loaded / event.total) * 100);
+          console.log(percent);
+        }
+      });
+      xhr.open("POST", obj.url, true);
+      xhr.send(formData);
+    })
+  },
 };
 
 function getBase64(file) {

@@ -1,6 +1,9 @@
 defmodule PlazaWeb.UploadLive3 do
   use PlazaWeb, :live_view
 
+  @aws_s3_region "us-west-2"
+  @aws_s3_bucket "plaza-static-dev"
+
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     socket =
@@ -11,8 +14,13 @@ defmodule PlazaWeb.UploadLive3 do
   end
 
   @impl Phoenix.LiveView
-  def handle_event("new-png-selected", base64, socket) do
-    IO.inspect(base64)
+  def handle_event("new-png-selected", file_name, socket) do
+    IO.inspect(file_name)
+
+    socket =
+      socket
+      |> assign(file_name: file_name)
+
     {:noreply, socket}
   end
 
@@ -28,6 +36,32 @@ defmodule PlazaWeb.UploadLive3 do
     socket =
       socket
       |> assign(step: 1)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("upload", _, socket) do
+    config = %{
+      region: @aws_s3_region,
+      access_key_id: System.fetch_env!("AWS_ACCESS_KEY_ID_PLAZA"),
+      secret_access_key: System.fetch_env!("AWS_SECRET_ACCESS_KEY_PLAZA")
+    }
+
+    {:ok, fields} =
+      PlazaWeb.S3UrlPresign.sign_form_upload(
+        config,
+        @aws_s3_bucket,
+        key: socket.assigns.file_name,
+        content_type: "image/png",
+        max_file_size: 10_000_000,
+        expires_in: :timer.hours(1)
+      )
+
+    url = "http://#{@aws_s3_bucket}.s3-#{@aws_s3_region}.amazonaws.com"
+
+    socket =
+      socket
+      |> push_event("upload", %{url: url, fields: fields})
 
     {:noreply, socket}
   end
@@ -50,9 +84,14 @@ defmodule PlazaWeb.UploadLive3 do
 
   def render(%{step: 2} = assigns) do
     ~H"""
-    <button phx-click="back">
-      back
-    </button>
+    <div id="upload-3-file-uploader" phx-hook="S3FileUploader">
+      <button phx-click="back">
+        back
+      </button>
+      <button phx-click="upload">
+        upload
+      </button>
+    </div>
     """
   end
 end
