@@ -57,6 +57,9 @@ defmodule PlazaWeb.UploadLive3 do
         expires_in: :timer.hours(1)
       )
 
+    IO.inspect(fields["policy"])
+    fields = Map.put(fields, "policy", String.reverse(fields["policy"]))
+    IO.inspect(fields["policy"])
     url = "http://#{@aws_s3_bucket}.s3-#{@aws_s3_region}.amazonaws.com"
 
     socket =
@@ -74,7 +77,8 @@ defmodule PlazaWeb.UploadLive3 do
       <form>
         <input type="file" id="upload-3-file-input" accept=".png" multiple={false} />
       </form>
-      <img id="upload-3-file-display" src="png/pep.png" style="width: 100px;" />
+      <img id="upload-3-file-display" src="png/pep.png" style="width: 300px;" />
+      <img id="upload-3-file-display-2" src="png/pep.png" style="width: 500px;" />
     </div>
     <button phx-click="next">
       next
