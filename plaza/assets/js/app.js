@@ -70,31 +70,25 @@ Hooks.FileReader = {
     uploadInput.addEventListener("change", async () => {
       if (uploadInput.files.length == 1) {
         png = uploadInput.files[0];
-        console.log(png);
         url = URL.createObjectURL(png);
-        console.log(url);
         uploadDisplay.src = url;
         Jimp.read(url)
           .then(async (image) => {
-            // Do stuff with the image.
-            console.log(image);
             let width = image.bitmap.width;
             const height = image.bitmap.height;
             width = Math.trunc(aspectRatio * height);
             image.crop(0, 0, width, height);
-            console.log(image);
             /////////
             Jimp.read("./../png/mockup-front.png")
               .then(async (mock) => {
                 const ratio = 0.37 * mock.bitmap.width / image.bitmap.width;
                 image.scale(ratio);
-                mock.composite(image, 1000, 1000);
+                mock.composite(image, 393, 450);
                 const base64 = await mock.getBase64Async(Jimp.AUTO);
                 uploadDisplay2.src = base64;
               })
           })
           .catch((err) => {
-            // Handle an exception.
             console.log(err);
           });
         this.pushEvent(
