@@ -50,55 +50,126 @@ Hooks.LocalStorage = {
   }
 };
 // file reader hook 
-let url;
-let png;
+let frontMockUrl; let backMockUrl;
+let frontMockPng; let backMockPng;
+let frontDesignPng; let backDesignPng;
 const aspectRatio = 29.0 / 42.0;
 Hooks.FileReader = {
   mounted() {
-    const uploadInput = document.getElementById(
-      "upload-3-file-input"
-    );
-    const uploadDisplay = document.getElementById(
-      "upload-3-file-display"
-    );
-    const uploadDisplay2 = document.getElementById(
-      "upload-3-file-display-2"
-    );
-    if (url) {
-      uploadDisplay.src = url;
-    }
-    uploadInput.addEventListener("change", async () => {
-      if (uploadInput.files.length == 1) {
-        png = uploadInput.files[0];
-        url = URL.createObjectURL(png);
-        uploadDisplay.src = url;
-        Jimp.read(url)
-          .then(async (image) => {
-            let width = image.bitmap.width;
-            const height = image.bitmap.height;
-            width = Math.trunc(aspectRatio * height);
-            image.crop(0, 0, width, height);
-            /////////
-            Jimp.read("./../png/mockup-front.png")
-              .then(async (mock) => {
-                const ratio = 0.37 * mock.bitmap.width / image.bitmap.width;
-                image.scale(ratio);
-                mock.composite(image, 393, 450);
-                const base64 = await mock.getBase64Async(Jimp.AUTO);
-                uploadDisplay2.src = base64;
-              })
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-        this.pushEvent(
-          "new-png-selected",
-          png.name
-        );
-      }
+    console.log("right now");
+    this.handleEvent("front-upload-cancel", (_) => {
+      frontMockUrl = "png/mockup-front.png";
     });
+    this.handleEvent("back-upload-cancel", (_) => {
+      backMockUrl = "png/mockup-back.png";
+    });
+    const frontInput = document.getElementById(
+      "plaza-file-input-front"
+    );
+    const backInput = document.getElementById(
+      "plaza-file-input-back"
+    );
+    const frontDisplay = document.getElementById(
+      "plaza-file-display-front"
+    );
+    const backDisplay = document.getElementById(
+      "plaza-file-display-back"
+    );
+    if (frontInput) {
+      frontInput.addEventListener("change", async () => {
+        const files = frontInput.files;
+        if (files.length == 1) {
+          const file = files[0];
+          const designUrl = URL.createObjectURL(file);
+          frontDisplay.src = designUrl;
+          Jimp.read(designUrl)
+            .then(async (image) => {
+              let width = image.bitmap.width;
+              const height = image.bitmap.height;
+              width = Math.trunc(aspectRatio * height);
+              image.crop(0, 0, width, height);
+              frontDesignPng = image;
+              /////////
+              Jimp.read("./../png/mockup-front.png")
+                .then(async (mock) => {
+                  const ratio = 0.37 * mock.bitmap.width / image.bitmap.width;
+                  image.scale(ratio);
+                  mock.composite(image, 393, 450);
+                  frontMockPng = mock;
+                  const base64 = await mock.getBase64Async(Jimp.AUTO);
+                  frontDisplay.src = base64;
+                  frontMockUrl = base64;
+                })
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+          this.pushEvent(
+            "front-upload-change",
+            file.name
+          );
+        }
+      });
+    }
+    if (backInput) {
+      console.log("now")
+      backInput.addEventListener("change", async () => {
+        const files = backInput.files;
+        if (files.length == 1) {
+          const file = files[0];
+          const designUrl = URL.createObjectURL(file);
+          backDisplay.src = designUrl;
+          Jimp.read(designUrl)
+            .then(async (image) => {
+              let width = image.bitmap.width;
+              const height = image.bitmap.height;
+              width = Math.trunc(aspectRatio * height);
+              image.crop(0, 0, width, height);
+              backDesignPng = image;
+              /////////
+              Jimp.read("./../png/mockup-back.png")
+                .then(async (mock) => {
+                  const ratio = 0.37 * mock.bitmap.width / image.bitmap.width;
+                  image.scale(ratio);
+                  mock.composite(image, 393, 450);
+                  backMockPng = mock;
+                  const base64 = await mock.getBase64Async(Jimp.AUTO);
+                  backDisplay.src = base64;
+                  backMockUrl = base64;
+                })
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+          this.pushEvent(
+            "back-upload-change",
+            file.name
+          );
+        }
+      });
+    }
   }
 };
+// file display hook 
+Hooks.FileDisplay = {
+  mounted() {
+    console.log("here");
+    const frontDisplay = document.getElementById(
+      "plaza-file-display-front"
+    );
+    const backDisplay = document.getElementById(
+      "plaza-file-display-back"
+    );
+    if (frontMockUrl && frontDisplay) {
+      console.log("here");
+      frontDisplay.src = frontMockUrl;
+    };
+    if (backMockUrl && backDisplay) {
+      backDisplay.src = backMockUrl;
+    };
+  }
+}
+
 // S3 file uploader 
 Hooks.S3FileUploader = {
   mounted() {

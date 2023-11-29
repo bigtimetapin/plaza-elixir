@@ -19,7 +19,6 @@ defmodule PlazaWeb.UploadLive2 do
   @aws_s3_region "us-west-2"
   @aws_s3_bucket "plaza-static-dev"
 
-  @aspect_ratio 29.0 / 42.0
   @default_user_name "tmp"
 
   @impl Phoenix.LiveView
@@ -60,50 +59,38 @@ defmodule PlazaWeb.UploadLive2 do
             |> NaiveDateTime.truncate(:second)
 
           socket
-          |> assign(:page_title, "Upload")
-          |> assign(:header, :my_store)
-          |> allow_upload(:front,
-            accept: ~w(.png),
-            max_entries: 1,
-            auto_upload: true,
-            progress: &handle_progress/3
-          )
-          |> allow_upload(:back,
-            accept: ~w(.png),
-            max_entries: 1,
-            auto_upload: true,
-            progress: &handle_progress/3
-          )
-          |> assign(:front_local_upload, nil)
-          |> assign(:back_local_upload, nil)
-          |> assign(:seller, seller)
+          |> assign(page_title: "Upload")
+          |> assign(header: :my_store)
+          |> assign(seller: seller)
           |> assign(
-            :product_form,
-            to_form(
-              Product.changeset(
-                %Product{
-                  user_id: user_id,
-                  user_name: user_name,
-                  price: 75,
-                  designs: %Designs{
-                    display: 0
+            product_form:
+              to_form(
+                Product.changeset(
+                  %Product{
+                    user_id: user_id,
+                    user_name: user_name,
+                    price: 75,
+                    designs: %Designs{
+                      display: 0
+                    },
+                    mocks: %Mocks{
+                      front:
+                        "https://plaza-static-dev.s3.us-west-2.amazonaws.com/uploads/mockup-front.png",
+                      back:
+                        "https://plaza-static-dev.s3.us-west-2.amazonaws.com/uploads/mockup-back.png"
+                    },
+                    campaign_duration: campaign_duration,
+                    campaign_duration_timestamp: campaign_duration_timestamp,
+                    active: active
                   },
-                  mocks: %Mocks{
-                    front:
-                      "https://plaza-static-dev.s3.us-west-2.amazonaws.com/uploads/mockup-front.png",
-                    back:
-                      "https://plaza-static-dev.s3.us-west-2.amazonaws.com/uploads/mockup-back.png"
-                  },
-                  campaign_duration: campaign_duration,
-                  campaign_duration_timestamp: campaign_duration_timestamp,
-                  active: active
-                },
-                %{}
+                  %{}
+                )
               )
-            )
           )
-          |> assign(:publish_status, 0)
-          |> assign(:step, step)
+          |> assign(front_local_upload: nil)
+          |> assign(back_local_upload: nil)
+          |> assign(publish_status: 0)
+          |> assign(step: step)
           |> assign(waiting: false)
 
         false ->
@@ -112,121 +99,6 @@ defmodule PlazaWeb.UploadLive2 do
       end
 
     {:ok, socket}
-  end
-
-  defp handle_progress(:front, entry, socket) do
-    handle_progress_generic(:front_local_upload, entry, socket)
-  end
-
-  defp handle_progress(:back, entry, socket) do
-    handle_progress_generic(:back_local_upload, entry, socket)
-  end
-
-  defp handle_progress_generic(local_upload_atom, entry, socket) do
-    socket =
-      if entry.done? do
-        {local_design_url, local_mock_url, file_name} =
-          consume_uploaded_entry(socket, entry, fn %{path: design_src_path} ->
-            #############################################################
-            ## pathing ##################################################
-            design_file_name =
-              "#{entry.uuid}-#{entry.client_name}"
-              |> String.replace(" ", "")
-
-            mock_file_name =
-              "#{entry.uuid}-mock-#{entry.client_name}"
-              |> String.replace(" ", "")
-
-            design_write_path =
-              Path.join([
-                :code.priv_dir(:plaza),
-                "static",
-                "uploads",
-                design_file_name
-              ])
-
-            mock_write_path =
-              Path.join([
-                :code.priv_dir(:plaza),
-                "static",
-                "uploads",
-                mock_file_name
-              ])
-
-            mock_src_path =
-              Path.join([
-                :code.priv_dir(:plaza),
-                "static",
-                "png",
-                if(local_upload_atom == :front_local_upload,
-                  do: "mockup-front.png",
-                  else: "mockup-back.png"
-                )
-              ])
-
-            #############################################################
-            ## resize design ############################################
-            {:ok, img} = Image.open(design_src_path)
-            width = Image.width(img)
-            height = Image.height(img)
-            IO.inspect("#{width}, #{height}")
-            width = Kernel.trunc(@aspect_ratio * height)
-            IO.inspect("#{width}, #{height}")
-
-            {:ok, img} =
-              Image.crop(
-                img,
-                :center,
-                :middle,
-                width,
-                height
-              )
-
-            {:ok, _} =
-              Image.write(
-                img,
-                design_write_path
-              )
-
-            #############################################################
-            ## overlay design on mock ###################################
-            {:ok, mock} = Image.open(mock_src_path)
-
-            ratio = 0.37 * Image.width(mock) / Image.width(img)
-            {:ok, img} = Image.resize(img, ratio)
-
-            {:ok, mock} =
-              Image.compose(
-                mock,
-                img,
-                x: :middle,
-                y: 1700
-              )
-
-            {:ok, _} =
-              Image.write(
-                mock,
-                mock_write_path
-              )
-
-            {:ok, {"uploads/#{design_file_name}", "uploads/#{mock_file_name}", entry.client_name}}
-          end)
-
-        socket =
-          socket
-          |> assign(
-            local_upload_atom,
-            %{
-              design_url: local_design_url,
-              mock_url: local_mock_url,
-              file_name: file_name
-            }
-          )
-      else
-        socket
-      end
-
-    {:noreply, socket}
   end
 
   @impl Phoenix.LiveView
@@ -263,10 +135,6 @@ defmodule PlazaWeb.UploadLive2 do
       socket
       |> assign(:step, 5)
 
-    IO.inspect(socket.assigns.uploads.front)
-
-    IO.inspect(socket.assigns.uploads.back)
-
     {:noreply, socket}
   end
 
@@ -274,10 +142,6 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 6)
-
-    IO.inspect(socket.assigns.uploads.front)
-
-    IO.inspect(socket.assigns.uploads.back)
 
     {:noreply, socket}
   end
@@ -294,29 +158,6 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 8)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("upload-change", _params, socket) do
-    IO.inspect(socket.assigns.uploads.front)
-
-    IO.inspect(socket.assigns.uploads.back)
-    {:noreply, socket}
-  end
-
-  def handle_event("front-upload-cancel", _params, socket) do
-    socket =
-      socket
-      |> assign(:front_local_upload, nil)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("back-upload-cancel", _params, socket) do
-    socket =
-      socket
-      |> assign(:back_local_upload, nil)
 
     {:noreply, socket}
   end
@@ -498,141 +339,64 @@ defmodule PlazaWeb.UploadLive2 do
     {:noreply, socket}
   end
 
-  def handle_event("publish", _params, socket) do
-    Task.async(fn -> pubish_s3(socket.assigns.front_local_upload, :front) end)
-    Task.async(fn -> pubish_s3(socket.assigns.back_local_upload, :back) end)
-
+  def handle_event("front-upload-change", file_name, socket) do
     socket =
       socket
-      |> assign(waiting: true)
+      |> assign(front_local_upload: file_name)
 
     {:noreply, socket}
   end
 
-  defp pubish_s3(local_upload, atom) do
-    urls =
-      case local_upload do
-        nil ->
-          nil
+  def handle_event("back-upload-change", file_name, socket) do
+    socket =
+      socket
+      |> assign(back_local_upload: file_name)
 
-        %{design_url: design_url, mock_url: mock_url} ->
-          design_read_path =
-            Path.join([
-              :code.priv_dir(:plaza),
-              "static",
-              design_url
-            ])
-
-          mock_read_path =
-            Path.join([
-              :code.priv_dir(:plaza),
-              "static",
-              mock_url
-            ])
-
-          put_design_request =
-            S3.put_object(
-              @aws_s3_bucket,
-              design_url,
-              File.read!(design_read_path)
-            )
-
-          put_mock_request =
-            S3.put_object(
-              @aws_s3_bucket,
-              mock_url,
-              File.read!(mock_read_path)
-            )
-
-          {:ok, _} =
-            ExAws.request(
-              put_design_request,
-              region: @aws_s3_region
-            )
-
-          {:ok, _} =
-            ExAws.request(
-              put_mock_request,
-              region: @aws_s3_region
-            )
-
-          %{
-            design_url: "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{design_url}",
-            mock_url: "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{mock_url}"
-          }
-      end
-
-    {:publish, urls, atom}
+    {:noreply, socket}
   end
 
+  def handle_event("front-upload-cancel", _, socket) do
+    socket =
+      socket
+      |> assign(front_local_upload: nil)
+      |> push_event("front-upload-cancel", %{})
+
+    {:noreply, socket}
+  end
+
+  def handle_event("back-upload-cancel", _, socket) do
+    socket =
+      socket
+      |> assign(back_local_upload: nil)
+      |> push_event("back-upload-cancel", %{})
+
+    {:noreply, socket}
+  end
+
+  ## TODO: publish-status
+  ## changes =
+  ##     Product.changeset_designs_and_mocks(
+  ##       socket.assigns.product_form.data,
+  ##       %{"designs" => designs, "mocks" => mocks}
+  ##     )
+  ##     |> Changeset.apply_action(:update)
+
+  ##   form =
+  ##     case changes do
+  ##       {:error, changeset} ->
+  ##         to_form(changeset)
+
+  ##       {:ok, product} ->
+  ##         Product.changeset(
+  ##           product,
+  ##           %{}
+  ##         )
+  ##         |> Map.put(:action, :validate)
+  ##         |> to_form
+  ##     end
+
+  ## TODO handle event? 
   @impl Phoenix.LiveView
-  def handle_info({ref, {:publish, urls, atom}}, socket) do
-    Process.demonitor(ref, [:flush])
-    inc = socket.assigns.publish_status + 1
-    designs = socket.assigns.product_form.data.designs
-    mocks = socket.assigns.product_form.data.mocks
-
-    {designs, mocks} =
-      case urls do
-        nil ->
-          {designs, mocks}
-
-        %{design_url: design_url, mock_url: mock_url} ->
-          case atom do
-            :front ->
-              {
-                %{designs | front: design_url},
-                %{mocks | front: mock_url}
-              }
-
-            :back ->
-              {
-                %{designs | back: design_url},
-                %{mocks | back: mock_url}
-              }
-          end
-      end
-
-    changes =
-      Product.changeset_designs_and_mocks(
-        socket.assigns.product_form.data,
-        %{"designs" => designs, "mocks" => mocks}
-      )
-      |> Changeset.apply_action(:update)
-
-    form =
-      case changes do
-        {:error, changeset} ->
-          to_form(changeset)
-
-        {:ok, product} ->
-          Product.changeset(
-            product,
-            %{}
-          )
-          |> Map.put(:action, :validate)
-          |> to_form
-      end
-
-    socket =
-      socket =
-      socket
-      |> assign(
-        :publish_status,
-        inc
-      )
-      |> assign(
-        :product_form,
-        form
-      )
-
-    if inc == 2 do
-      send(self(), :write)
-    end
-
-    {:noreply, socket}
-  end
-
   def handle_info(:write, socket) do
     product = socket.assigns.product_form.data
 
@@ -810,13 +574,9 @@ defmodule PlazaWeb.UploadLive2 do
     ~H"""
     <.upload_generic
       step={@step}
-      current={@uploads.front}
-      front={@uploads.front}
-      back={@uploads.back}
+      side="front"
       front_local_upload={@front_local_upload}
       back_local_upload={@back_local_upload}
-      current_local_url={@front_local_upload[:mock_url]}
-      current_side="front"
       product_form={@product_form}
     />
     """
@@ -826,13 +586,9 @@ defmodule PlazaWeb.UploadLive2 do
     ~H"""
     <.upload_generic
       step={@step}
-      current={@uploads.back}
-      front={@uploads.front}
-      back={@uploads.back}
+      side="back"
       front_local_upload={@front_local_upload}
       back_local_upload={@back_local_upload}
-      current_local_url={@back_local_upload[:mock_url]}
-      current_side="back"
       product_form={@product_form}
     />
     """
@@ -862,13 +618,13 @@ defmodule PlazaWeb.UploadLive2 do
           </div>
           <div>
             <div style="display: inline-block;">
-              <.upload_preview local_url={@front_local_upload[:mock_url]} side="front" />
+              <.upload_preview step={@step} side="front" />
               <div style="position: relative; bottom: 350px; left: 10px; font-size: 34px;">
                 Frente
               </div>
             </div>
             <div style="display: inline-block; margin-left: 150px;">
-              <.upload_preview local_url={@back_local_upload[:mock_url]} side="back" />
+              <.upload_preview step={@step} side="back" />
               <div style="position: relative; bottom: 350px; left: 10px; font-size: 34px;">
                 Costas
               </div>
@@ -923,10 +679,10 @@ defmodule PlazaWeb.UploadLive2 do
           </button>
           <div style="margin-top: 10px;">
             <div :if={@product_form.data.designs.display == 0}>
-              <.upload_preview local_url={@front_local_upload[:mock_url]} side="front" />
+              <.upload_preview step={@step} side="front" />
             </div>
             <div :if={@product_form.data.designs.display == 1}>
-              <.upload_preview local_url={@back_local_upload[:mock_url]} side="back" />
+              <.upload_preview step={@step} side="back" />
             </div>
           </div>
         </div>
@@ -958,6 +714,7 @@ defmodule PlazaWeb.UploadLive2 do
                   placeholder="*Nome do produto"
                   style="color: #707070; font-size: 36px; text-decoration-line: underline; border: none;"
                   class="has-font-3"
+                  phx-debounce="500"
                 >
                 </.input>
               </div>
@@ -968,6 +725,7 @@ defmodule PlazaWeb.UploadLive2 do
                   placeholder="*Descrição"
                   style="color: #707070; font-size: 28px; text-decoration-line: underline; border: none; width: 500px; height: 250px;"
                   class="has-font-3"
+                  phx-debounce="500"
                 >
                 </.input>
               </div>
@@ -1017,11 +775,7 @@ defmodule PlazaWeb.UploadLive2 do
       <div style="display: flex; justify-content: center;  margin-top: 50px;">
         <div style="display: inline-block;">
           <.upload_preview
-            local_url={
-              if @product_form.data.designs.display == 0,
-                do: @front_local_upload[:mock_url],
-                else: @back_local_upload[:mock_url]
-            }
+            step={@step}
             side={if @product_form.data.designs.display == 0, do: "front", else: "back"}
             size="small"
           />
@@ -1208,9 +962,9 @@ defmodule PlazaWeb.UploadLive2 do
 
   attr :step, :integer, required: true
   attr :disabled, :boolean, default: false
-  attr :front_local_upload, :map, required: true
-  attr :back_local_upload, :map, required: true
   attr :product_form, :map, required: true
+  attr :front_local_upload, :string, required: true
+  attr :back_local_upload, :string, required: true
 
   def header(assigns) do
     ~H"""
@@ -1233,7 +987,7 @@ defmodule PlazaWeb.UploadLive2 do
         <a
           phx-click="step"
           phx-value-step={
-            if @disabled || !(@front_local_upload[:mock_url] || @back_local_upload[:mock_url]),
+            if @disabled || !(@front_local_upload || @back_local_upload),
               do: "noop",
               else: "7"
           }
@@ -1265,18 +1019,18 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   attr :step, :integer, required: true
-  attr :current, Phoenix.LiveView.UploadConfig, required: true
-  attr :front, Phoenix.LiveView.UploadConfig, required: true
-  attr :back, Phoenix.LiveView.UploadConfig, required: true
-  attr :front_local_upload, :map, default: nil
-  attr :back_local_upload, :map, default: nil
-  attr :current_local_url, :string, default: nil
-  attr :current_side, :string, required: true
+  attr :side, :string, values: ~w(front back)
+  attr :front_local_upload, :string, required: true
+  attr :back_local_upload, :string, required: true
   attr :product_form, :map, required: true
 
   defp upload_generic(assigns) do
     ~H"""
-    <div style="margin-top: 150px; margin-bottom: 750px;">
+    <div
+      id={"plaza-file-uploader-#{@step}"}
+      phx-hook="FileReader"
+      style="margin-top: 150px; margin-bottom: 750px;"
+    >
       <PlazaWeb.UploadLive2.header
         step={@step}
         front_local_upload={@front_local_upload}
@@ -1287,9 +1041,7 @@ defmodule PlazaWeb.UploadLive2 do
       <div style="display: inline-block; position: absolute; margin-left: 50px;">
         <div style="margin-top: 50px;">
           <.upload_form
-            current={@current}
-            front={@front}
-            back={@back}
+            side={@side}
             front_local_upload={@front_local_upload}
             back_local_upload={@back_local_upload}
           />
@@ -1297,7 +1049,7 @@ defmodule PlazaWeb.UploadLive2 do
       </div>
       <div style="display: inline-block; position: relative; left: 900px; top: 50px;">
         <div style="display: inline-block;">
-          <.upload_preview local_url={@current_local_url} side={@current_side} />
+          <.upload_preview step={@step} side={@side} />
         </div>
         <div style="display: inline-block; position: absolute;">
           <div style="position: relative; left: 25px;">
@@ -1309,16 +1061,14 @@ defmodule PlazaWeb.UploadLive2 do
     """
   end
 
-  attr :current, Phoenix.LiveView.UploadConfig, required: true
-  attr :front, Phoenix.LiveView.UploadConfig, required: true
-  attr :back, Phoenix.LiveView.UploadConfig, required: true
-  attr :front_local_upload, :map, default: nil
-  attr :back_local_upload, :map, default: nil
+  attr :side, :string, values: ~w(front back)
+  attr :front_local_upload, :string, required: true
+  attr :back_local_upload, :string, required: true
 
   defp upload_form(assigns) do
     ~H"""
     <div>
-      <.upload_input upload={@current} />
+      <.upload_input side={@side} />
       <div class="has-font-3" style="width: 760px; font-size: 28px;">
         <div style="margin-top: 25px;">
           Arquivo PNG com formato de cores RGB com pelo menos 300 dpi de resolução.
@@ -1329,73 +1079,50 @@ defmodule PlazaWeb.UploadLive2 do
         </div>
       </div>
       <div style="margin-left: 20px;">
-        <.upload_item
-          upload={@front}
-          local_file_name={@front_local_upload[:file_name]}
-          no_file_yet="front.png"
-        />
-        <.upload_item
-          upload={@back}
-          local_file_name={@back_local_upload[:file_name]}
-          no_file_yet="back.png"
-        />
+        <.upload_item side={@side} local_upload={@front_local_upload} no_file_yet="front.png" />
+        <.upload_item side={@side} local_upload={@back_local_upload} no_file_yet="back.png" />
       </div>
     </div>
     """
   end
 
-  attr :upload, Phoenix.LiveView.UploadConfig, required: true
+  attr :side, :string, values: ~w(front back)
 
   defp upload_input(assigns) do
     ~H"""
     <div>
-      <form id="upload-form" phx-change="upload-change" phx-submit="upload-submit">
+      <form>
         <label
           class="has-font-3 is-size-4"
           style="width: 760px; height: 130px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
         >
-          <.live_file_input upload={@upload} style="display: none;" />
-          Arraste seus arquivos .png aqui para fazer upload
+          <input
+            type="file"
+            id={"plaza-file-input-#{@side}"}
+            accept=".png"
+            multiple={false}
+            style="display: none;"
+          /> Arraste seus arquivos .png aqui para fazer upload
         </label>
       </form>
     </div>
     """
   end
 
-  attr :upload, Phoenix.LiveView.UploadConfig, required: true
-  attr :local_file_name, :string, default: nil
-  attr :no_file_yet, :string, default: nil
+  attr :side, :string, values: ~w(front back)
+  attr :local_upload, :string, required: true
+  attr :no_file_yet, :string, required: true
 
   defp upload_item(assigns) do
-    map =
-      case assigns.upload.entries do
-        [head | []] ->
-          head
-
-        _ ->
-          case assigns.local_file_name do
-            nil ->
-              %{progress: 0}
-
-            _ ->
-              %{progress: 100}
-          end
-      end
-
-    assigns =
-      assigns
-      |> assign(entry: map)
-
     ~H"""
     <div>
       <div class="has-font-3 is-size-6">
-        <%= if @local_file_name, do: @local_file_name, else: @no_file_yet %>
+        <%= if @local_upload, do: @local_upload, else: @no_file_yet %>
         <div>
-          <progress value={@entry.progress} max="100"><%= @entry.progress %>%</progress>
           <button
-            :if={@local_file_name}
+            :if={@local_upload}
             type="button"
-            phx-click={"#{@upload.name}-upload-cancel"}
+            phx-click={"#{@side}-upload-cancel"}
             aria-label="cancel"
           >
             &times;
@@ -1406,18 +1133,21 @@ defmodule PlazaWeb.UploadLive2 do
     """
   end
 
-  attr :local_url, :string, default: nil
+  attr :step, :integer, required: true
   attr :side, :string, values: ~w(front back)
   attr :size, :string, default: "big", values: ~w(big small)
 
   defp upload_preview(assigns) do
     ~H"""
-    <div style={if @size == "small", do: "width: 400px;", else: "width: 650px;"}>
-      <img src={
-        if @local_url,
-          do: @local_url,
-          else: if(@side == "front", do: "png/mockup-front.png", else: "png/mockup-back.png")
-      } />
+    <div
+      id={"plaza-file-display-container-#{@step}-#{@side}"}
+      phx-hook="FileDisplay"
+      style={if @size == "small", do: "width: 400px;", else: "width: 650px;"}
+    >
+      <img
+        id={"plaza-file-display-#{@side}"}
+        src={if @side == "front", do: "png/mockup-front.png", else: "png/mockup-back.png"}
+      />
     </div>
     """
   end
