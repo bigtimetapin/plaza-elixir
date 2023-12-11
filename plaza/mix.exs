@@ -60,7 +60,8 @@ defmodule Plaza.MixProject do
       {:stripity_stripe, "~> 2.17.2"},
       {:navigation_history, "~> 0.4"},
       {:quantum, "~> 3.0"},
-      {:image, "~> 0.37"}
+      {:image, "~> 0.37"},
+      {:uuid, "~> 1.1" }
     ]
   end
 

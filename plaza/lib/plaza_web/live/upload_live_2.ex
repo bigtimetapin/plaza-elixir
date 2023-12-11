@@ -150,6 +150,7 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:step, 7)
+      |> assign(:uuid, UUID.uuid1())
 
     {:noreply, socket}
   end
@@ -236,6 +237,7 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:product_form, form)
+      |> assign(:uuid, UUID.uuid1())
 
     {:noreply, socket}
   end
@@ -283,6 +285,7 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:product_form, form)
+      |> assign(:uuid, UUID.uuid1())
 
     {:noreply, socket}
   end
@@ -679,10 +682,10 @@ defmodule PlazaWeb.UploadLive2 do
           </button>
           <div style="margin-top: 10px;">
             <div :if={@product_form.data.designs.display == 0}>
-              <.upload_preview step={@step} side="front" />
+              <.upload_preview step={@step} side="front" uid={@uuid} />
             </div>
             <div :if={@product_form.data.designs.display == 1}>
-              <.upload_preview step={@step} side="back" />
+              <.upload_preview step={@step} side="back" uid={@uuid} />
             </div>
           </div>
         </div>
@@ -1136,11 +1139,12 @@ defmodule PlazaWeb.UploadLive2 do
   attr :step, :integer, required: true
   attr :side, :string, values: ~w(front back)
   attr :size, :string, default: "big", values: ~w(big small)
+  attr :uid, :string, default: "uid"
 
   defp upload_preview(assigns) do
     ~H"""
     <div
-      id={"plaza-file-display-container-#{@step}-#{@side}"}
+      id={"plaza-file-display-container-#{@step}-#{@side}-#{@uid}"}
       phx-hook="FileDisplay"
       style={if @size == "small", do: "width: 400px;", else: "width: 650px;"}
     >

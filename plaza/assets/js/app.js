@@ -35,16 +35,13 @@ Hooks.LocalStorage = {
     this.handleEvent("clear", (obj) => this.clear(obj))
     this.handleEvent("read", (obj) => this.read(obj))
   },
-
   write(obj) {
     localStorage.setItem(obj.key, obj.data)
   },
-
   read(obj) {
     var data = localStorage.getItem(obj.key)
     this.pushEvent(obj.event, data)
   },
-
   clear(obj) {
     localStorage.removeItem(obj.key)
   }
@@ -54,15 +51,11 @@ let frontMockUrl; let backMockUrl;
 let frontMockPng; let backMockPng;
 let frontDesignPng; let backDesignPng;
 const aspectRatio = 29.0 / 42.0;
+const defaultFrontMockUrl = "./../png/mockup-front.png";
+const defaultBackMockUrl = "./../png/mockup-back.png";
 Hooks.FileReader = {
   mounted() {
     console.log("right now");
-    this.handleEvent("front-upload-cancel", (_) => {
-      frontMockUrl = "png/mockup-front.png";
-    });
-    this.handleEvent("back-upload-cancel", (_) => {
-      backMockUrl = "png/mockup-back.png";
-    });
     const frontInput = document.getElementById(
       "plaza-file-input-front"
     );
@@ -75,13 +68,20 @@ Hooks.FileReader = {
     const backDisplay = document.getElementById(
       "plaza-file-display-back"
     );
+    this.handleEvent("front-upload-cancel", (_) => {
+      frontMockUrl = defaultFrontMockUrl;
+      frontDisplay.src = frontMockUrl;
+    });
+    this.handleEvent("back-upload-cancel", (_) => {
+      backMockUrl = defaultBackMockUrl;
+      backDisplay.src = backMockUrl;
+    });
     if (frontInput) {
       frontInput.addEventListener("change", async () => {
         const files = frontInput.files;
         if (files.length == 1) {
           const file = files[0];
           const designUrl = URL.createObjectURL(file);
-          frontDisplay.src = designUrl;
           Jimp.read(designUrl)
             .then(async (image) => {
               let width = image.bitmap.width;
@@ -90,7 +90,7 @@ Hooks.FileReader = {
               image.crop(0, 0, width, height);
               frontDesignPng = image;
               /////////
-              Jimp.read("./../png/mockup-front.png")
+              Jimp.read(defaultFrontMockUrl)
                 .then(async (mock) => {
                   const ratio = 0.37 * mock.bitmap.width / image.bitmap.width;
                   image.scale(ratio);
@@ -112,13 +112,11 @@ Hooks.FileReader = {
       });
     }
     if (backInput) {
-      console.log("now")
       backInput.addEventListener("change", async () => {
         const files = backInput.files;
         if (files.length == 1) {
           const file = files[0];
           const designUrl = URL.createObjectURL(file);
-          backDisplay.src = designUrl;
           Jimp.read(designUrl)
             .then(async (image) => {
               let width = image.bitmap.width;
@@ -127,7 +125,7 @@ Hooks.FileReader = {
               image.crop(0, 0, width, height);
               backDesignPng = image;
               /////////
-              Jimp.read("./../png/mockup-back.png")
+              Jimp.read(defaultBackMockUrl)
                 .then(async (mock) => {
                   const ratio = 0.37 * mock.bitmap.width / image.bitmap.width;
                   image.scale(ratio);
@@ -153,7 +151,7 @@ Hooks.FileReader = {
 // file display hook 
 Hooks.FileDisplay = {
   mounted() {
-    console.log("here");
+    console.log("file display");
     const frontDisplay = document.getElementById(
       "plaza-file-display-front"
     );
@@ -161,7 +159,6 @@ Hooks.FileDisplay = {
       "plaza-file-display-back"
     );
     if (frontMockUrl && frontDisplay) {
-      console.log("here");
       frontDisplay.src = frontMockUrl;
     };
     if (backMockUrl && backDisplay) {
