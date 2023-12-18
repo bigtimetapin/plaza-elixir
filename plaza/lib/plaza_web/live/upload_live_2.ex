@@ -338,6 +338,7 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(:product_form, form)
+      |> assign(:uuid, UUID.uuid1())
 
     {:noreply, socket}
   end
@@ -781,6 +782,7 @@ defmodule PlazaWeb.UploadLive2 do
             step={@step}
             side={if @product_form.data.designs.display == 0, do: "front", else: "back"}
             size="small"
+            uid={@uuid}
           />
           <div style="position: relative; right: 3px;">
             <div style="display: flex; justify-content: right; font-size: 22px;">
