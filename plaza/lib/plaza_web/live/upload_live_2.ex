@@ -90,6 +90,7 @@ defmodule PlazaWeb.UploadLive2 do
           |> assign(front_local_upload: nil)
           |> assign(back_local_upload: nil)
           |> assign(publish_status: 0)
+          |> assign(:uuid, UUID.uuid1())
           |> assign(step: step)
           |> assign(waiting: false)
 
@@ -363,6 +364,7 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(front_local_upload: nil)
+      |> assign(:uuid, UUID.uuid1())
       |> push_event("front-upload-cancel", %{})
 
     {:noreply, socket}
@@ -372,6 +374,7 @@ defmodule PlazaWeb.UploadLive2 do
     socket =
       socket
       |> assign(back_local_upload: nil)
+      |> assign(:uuid, UUID.uuid1())
       |> push_event("back-upload-cancel", %{})
 
     {:noreply, socket}
@@ -582,6 +585,7 @@ defmodule PlazaWeb.UploadLive2 do
       front_local_upload={@front_local_upload}
       back_local_upload={@back_local_upload}
       product_form={@product_form}
+      uuid={@uuid}
     />
     """
   end
@@ -594,6 +598,7 @@ defmodule PlazaWeb.UploadLive2 do
       front_local_upload={@front_local_upload}
       back_local_upload={@back_local_upload}
       product_form={@product_form}
+      uuid={@uuid}
     />
     """
   end
@@ -1028,6 +1033,7 @@ defmodule PlazaWeb.UploadLive2 do
   attr :front_local_upload, :string, required: true
   attr :back_local_upload, :string, required: true
   attr :product_form, :map, required: true
+  attr :uuid, :string, default: "uuid"
 
   defp upload_generic(assigns) do
     ~H"""
@@ -1054,7 +1060,7 @@ defmodule PlazaWeb.UploadLive2 do
       </div>
       <div style="display: inline-block; position: relative; left: 900px; top: 50px;">
         <div style="display: inline-block;">
-          <.upload_preview step={@step} side={@side} />
+          <.upload_preview step={@step} side={@side} uid={@uuid} />
         </div>
         <div style="display: inline-block; position: absolute;">
           <div style="position: relative; left: 25px;">
@@ -1084,8 +1090,8 @@ defmodule PlazaWeb.UploadLive2 do
         </div>
       </div>
       <div style="margin-left: 20px;">
-        <.upload_item side={@side} local_upload={@front_local_upload} no_file_yet="front.png" />
-        <.upload_item side={@side} local_upload={@back_local_upload} no_file_yet="back.png" />
+        <.upload_item side="front" local_upload={@front_local_upload} no_file_yet="front.png" />
+        <.upload_item side="back" local_upload={@back_local_upload} no_file_yet="back.png" />
       </div>
     </div>
     """
