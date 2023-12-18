@@ -1122,17 +1122,21 @@ defmodule PlazaWeb.UploadLive2 do
     ~H"""
     <div>
       <div class="has-font-3 is-size-6">
-        <%= if @local_upload, do: @local_upload, else: @no_file_yet %>
-        <div>
-          <button
-            :if={@local_upload}
-            type="button"
-            phx-click={"#{@side}-upload-cancel"}
-            aria-label="cancel"
-          >
-            &times;
-          </button>
-        </div>
+        <%= if @local_upload,
+          do:
+            if(String.length(@local_upload) >= 20,
+              do: "#{String.slice(@local_upload, 0, 10)}...#{String.slice(@local_upload, -9, 9)}",
+              else: @local_upload
+            ),
+          else: @no_file_yet %>
+        <button
+          :if={@local_upload}
+          type="button"
+          phx-click={"#{@side}-upload-cancel"}
+          aria-label="cancel"
+        >
+          &times;
+        </button>
       </div>
     </div>
     """
