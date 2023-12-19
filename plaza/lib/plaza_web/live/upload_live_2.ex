@@ -198,8 +198,6 @@ defmodule PlazaWeb.UploadLive2 do
           |> to_form
       end
 
-    IO.inspect(form)
-
     socket =
       socket
       |> assign(:product_form, form)
@@ -208,16 +206,12 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   def handle_event("change-product-form", %{"product" => product}, socket) do
-    IO.inspect(product)
-
     changes =
       Product.changeset_name_and_description(
         socket.assigns.product_form.data,
         product
       )
       |> Changeset.apply_action(:update)
-
-    IO.inspect(changes)
 
     form =
       case changes do
@@ -232,8 +226,6 @@ defmodule PlazaWeb.UploadLive2 do
           |> Map.put(:action, :validate)
           |> to_form
       end
-
-    IO.inspect(form)
 
     socket =
       socket
@@ -256,16 +248,12 @@ defmodule PlazaWeb.UploadLive2 do
           end
       end
 
-    IO.inspect(price_attr)
-
     changes =
       Product.changeset_price(
         socket.assigns.product_form.data,
         price_attr
       )
       |> Changeset.apply_action(:update)
-
-    IO.inspect(changes)
 
     form =
       case changes do
@@ -280,8 +268,6 @@ defmodule PlazaWeb.UploadLive2 do
           |> Map.put(:action, :validate)
           |> to_form
       end
-
-    IO.inspect(form)
 
     socket =
       socket
@@ -318,8 +304,6 @@ defmodule PlazaWeb.UploadLive2 do
       )
       |> Changeset.apply_action(:update)
 
-    IO.inspect(changes)
-
     form =
       case changes do
         {:error, changeset} ->
@@ -333,8 +317,6 @@ defmodule PlazaWeb.UploadLive2 do
           |> Map.put(:action, :validate)
           |> to_form
       end
-
-    IO.inspect(form)
 
     socket =
       socket
@@ -380,28 +362,66 @@ defmodule PlazaWeb.UploadLive2 do
     {:noreply, socket}
   end
 
-  ## TODO: publish-status
-  ## changes =
-  ##     Product.changeset_designs_and_mocks(
-  ##       socket.assigns.product_form.data,
-  ##       %{"designs" => designs, "mocks" => mocks}
-  ##     )
-  ##     |> Changeset.apply_action(:update)
+  def handle_event("s3-upload-complete", side, socket) do
+    publish_status = socket.assigns.publish_status + 1
+    product = socket.assigns.product
+    designs = product.designs
+    mocks = product.mocks
+    url = "http://#{@aws_s3_bucket}.s3.#{@aws_s3_region}.amazonaws.com"
 
-  ##   form =
-  ##     case changes do
-  ##       {:error, changeset} ->
-  ##         to_form(changeset)
+    {designs, mocks} =
+      case side do
+        "front-design" ->
+          file_name = URI.encode(socket.assigns.front_local_upload)
+          {%{designs | front: "#{url}/#{file_name}"}, mocks}
 
-  ##       {:ok, product} ->
-  ##         Product.changeset(
-  ##           product,
-  ##           %{}
-  ##         )
-  ##         |> Map.put(:action, :validate)
-  ##         |> to_form
-  ##     end
-  #
+        "front-mock" ->
+          file_name = URI.encode("mock_#{socket.assigns.front_local_upload}")
+          {designs, %{mocks | front: "#{url}/#{file_name}"}}
+
+        "back-design" ->
+          file_name = URI.encode(socket.assigns.back_local_upload)
+          {%{designs | back: "#{url}/#{file_name}"}, mocks}
+
+        "back-mock" ->
+          file_name = URI.encode("mock_#{socket.assigns.back_local_upload}")
+          {designs, %{mocks | back: "#{url}/#{file_name}"}}
+      end
+
+    product = %{product | designs: designs, mocks: mocks}
+
+    socket =
+      case publish_status do
+        4 ->
+          case socket.assigns.seller do
+            nil ->
+              socket
+              |> assign(:write_status, :local_storage)
+              |> assign(:step, 9)
+              |> push_event("write", %{
+                key: @local_storage_key,
+                data: serialize_to_token(product)
+              })
+              |> assign(waiting: false)
+
+            seller ->
+              {:ok, _inserted} = Products.create_product(product)
+
+              socket
+              |> assign(:write_status, :db_storage)
+              |> assign(:step, 9)
+              |> assign(waiting: false)
+          end
+
+        _ ->
+          socket
+          |> assign(product: product)
+          |> assign(publish_status: publish_status)
+      end
+
+    {:noreply, socket}
+  end
+
   def handle_event("publish", _params, socket) do
     url = "http://#{@aws_s3_bucket}.s3-#{@aws_s3_region}.amazonaws.com"
 
@@ -410,6 +430,11 @@ defmodule PlazaWeb.UploadLive2 do
       access_key_id: System.fetch_env!("AWS_ACCESS_KEY_ID_PLAZA"),
       secret_access_key: System.fetch_env!("AWS_SECRET_ACCESS_KEY_PLAZA")
     }
+
+    socket =
+      socket
+      |> assign(product: socket.assigns.product_form.data)
+      |> assign(waiting: true)
 
     socket = push_upload_event(socket, config, url, "front", socket.assigns.front_local_upload)
     socket = push_upload_event(socket, config, url, "back", socket.assigns.back_local_upload)
@@ -421,6 +446,7 @@ defmodule PlazaWeb.UploadLive2 do
     case maybe_file_name do
       nil ->
         socket
+        |> assign(publish_status: socket.assigns.publish_status + 2)
 
       file_name ->
         {:ok, design_fields} =
@@ -451,42 +477,6 @@ defmodule PlazaWeb.UploadLive2 do
           side: side
         })
     end
-  end
-
-  ## TODO handle event? 
-  @impl Phoenix.LiveView
-  def handle_info(:write, socket) do
-    product = socket.assigns.product_form.data
-
-    socket =
-      case socket.assigns.seller do
-        nil ->
-          socket
-          |> assign(:write_status, :local_storage)
-          |> assign(:step, 9)
-          |> push_event("write", %{
-            key: @local_storage_key,
-            data: serialize_to_token(product)
-          })
-          |> assign(waiting: false)
-
-        seller ->
-          case Products.create_product(product) do
-            {:ok, inserted} ->
-              socket
-              |> assign(:write_status, :db_storage)
-              |> assign(:step, 9)
-              |> assign(waiting: false)
-
-            {:error, changeset} ->
-              socket
-              |> assign(:write_status, :error)
-              |> assign(:step, 9)
-              |> assign(waiting: false)
-          end
-      end
-
-    {:noreply, socket}
   end
 
   defp serialize_to_token(state_data) do
@@ -825,12 +815,7 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: 8} = assigns) do
     ~H"""
-    <div
-      class="has-font-3"
-      style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;"
-      id="plaza-s3-file-uploader"
-      phx-hook="S3FileUploader"
-    >
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
       <PlazaWeb.UploadLive2.header
         step={@step}
         front_local_upload={@front_local_upload}
@@ -1120,7 +1105,11 @@ defmodule PlazaWeb.UploadLive2 do
         </div>
         <div style="display: inline-block; position: absolute;">
           <div style="position: relative; left: 25px;">
-            <.upload_toggle step={@step} />
+            <.upload_toggle
+              step={@step}
+              front_local_upload={@front_local_upload}
+              back_local_upload={@back_local_upload}
+            />
           </div>
         </div>
       </div>
@@ -1225,6 +1214,8 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   attr :step, :integer, required: true
+  attr :front_local_upload, :string, required: true
+  attr :back_local_upload, :string, required: true
 
   defp upload_toggle(assigns) do
     ~H"""
@@ -1267,7 +1258,7 @@ defmodule PlazaWeb.UploadLive2 do
         </button>
       </div>
       <div style="position: relative; top: 620px; width: 200px;">
-        <button :if={@step == 5} phx-click="step" phx-value-step="6">
+        <button :if={@front_local_upload || @back_local_upload} phx-click="step" phx-value-step="6">
           <img src="svg/yellow-ellipse.svg" />
           <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
             Próximo

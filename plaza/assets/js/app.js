@@ -56,7 +56,6 @@ const defaultFrontMockUrl = "./../png/mockup-front.png";
 const defaultBackMockUrl = "./../png/mockup-back.png";
 Hooks.FileReader = {
   mounted() {
-    console.log("right now");
     const frontInput = document.getElementById(
       "plaza-file-input-front"
     );
@@ -82,7 +81,7 @@ Hooks.FileReader = {
         const files = frontInput.files;
         if (files.length == 1) {
           const file = files[0];
-          frontFileName = file.name;
+          frontFileName = file.name.replace(" ", "");
           const designUrl = URL.createObjectURL(file);
           Jimp.read(designUrl)
             .then(async (image) => {
@@ -108,7 +107,7 @@ Hooks.FileReader = {
             });
           this.pushEvent(
             "front-upload-change",
-            file.name
+            frontFileName
           );
         }
       });
@@ -118,7 +117,7 @@ Hooks.FileReader = {
         const files = backInput.files;
         if (files.length == 1) {
           const file = files[0];
-          backFileName = file.name;
+          backFileName = file.name.replace(" ", "");
           const designUrl = URL.createObjectURL(file);
           Jimp.read(designUrl)
             .then(async (image) => {
@@ -130,7 +129,6 @@ Hooks.FileReader = {
               /////////
               Jimp.read(defaultBackMockUrl)
                 .then(async (mock) => {
-                  console.log(mock);
                   const ratio = 0.37 * mock.bitmap.width / image.bitmap.width;
                   image.scale(ratio);
                   mock.composite(image, 393, 450);
@@ -145,7 +143,7 @@ Hooks.FileReader = {
             });
           this.pushEvent(
             "back-upload-change",
-            file.name
+            backFileName
           );
         }
       });
@@ -155,7 +153,6 @@ Hooks.FileReader = {
 // file display hook 
 Hooks.FileDisplay = {
   mounted() {
-    console.log("file display");
     const frontDisplay = document.getElementById(
       "plaza-file-display-front"
     );
@@ -175,19 +172,25 @@ Hooks.FileDisplay = {
 Hooks.S3FileUploader = {
   mounted() {
     this.handleEvent("upload", async (obj) => {
-      console.log(obj);
-      if (obj.side == "front") {
+      if (obj.side === "front") {
         const designPng = await jimpToPng(frontDesignPng, frontFileName);
-        uploadToS3(obj.url, obj.design_fields, designPng);
+        uploadToS3(this, "front-design", obj.url, obj.design_fields, designPng);
         const mockFileName = "mock_" + frontFileName;
         const mockPng = await jimpToPng(frontMockPng, mockFileName);
-        uploadToS3(obj.url, obj.mock_fields, mockPng);
+        uploadToS3(this, "front-mock", obj.url, obj.mock_fields, mockPng);
+      }
+      if (obj.side === "back") {
+        const designPng = await jimpToPng(backDesignPng, backFileName);
+        uploadToS3(this, "back-design", obj.url, obj.design_fields, designPng);
+        const mockFileName = "mock_" + backFileName;
+        const mockPng = await jimpToPng(backMockPng, mockFileName);
+        uploadToS3(this, "back-mock", obj.url, obj.mock_fields, mockPng);
       }
     })
   },
 };
 
-function uploadToS3(url, fields, png) {
+function uploadToS3(that, side, url, fields, png) {
   let formData = new FormData();
   Object.entries(fields).forEach(
     ([key, val]) => formData.append(key, val)
@@ -198,6 +201,12 @@ function uploadToS3(url, fields, png) {
     if (event.lengthComputable) {
       let percent = Math.round((event.loaded / event.total) * 100);
       console.log(percent);
+      if (percent === 100) {
+        that.pushEvent(
+          "s3-upload-complete",
+          side
+        );
+      }
     }
   });
   xhr.open("POST", url, true);
