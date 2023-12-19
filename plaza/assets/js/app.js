@@ -50,6 +50,7 @@ Hooks.LocalStorage = {
 let frontMockUrl; let backMockUrl;
 let frontMockPng; let backMockPng;
 let frontDesignPng; let backDesignPng;
+let frontFileName; let backFileName;
 const aspectRatio = 29.0 / 42.0;
 const defaultFrontMockUrl = "./../png/mockup-front.png";
 const defaultBackMockUrl = "./../png/mockup-back.png";
@@ -81,6 +82,7 @@ Hooks.FileReader = {
         const files = frontInput.files;
         if (files.length == 1) {
           const file = files[0];
+          frontFileName = file.name;
           const designUrl = URL.createObjectURL(file);
           Jimp.read(designUrl)
             .then(async (image) => {
@@ -116,6 +118,7 @@ Hooks.FileReader = {
         const files = backInput.files;
         if (files.length == 1) {
           const file = files[0];
+          backFileName = file.name;
           const designUrl = URL.createObjectURL(file);
           Jimp.read(designUrl)
             .then(async (image) => {
@@ -127,6 +130,7 @@ Hooks.FileReader = {
               /////////
               Jimp.read(defaultBackMockUrl)
                 .then(async (mock) => {
+                  console.log(mock);
                   const ratio = 0.37 * mock.bitmap.width / image.bitmap.width;
                   image.scale(ratio);
                   mock.composite(image, 393, 450);
@@ -170,33 +174,39 @@ Hooks.FileDisplay = {
 // S3 file uploader 
 Hooks.S3FileUploader = {
   mounted() {
-    this.handleEvent("upload", (obj) => {
+    this.handleEvent("upload", async (obj) => {
       console.log(obj);
-      let formData = new FormData();
-      Object.entries(obj.fields).forEach(
-        ([key, val]) => formData.append(key, val)
-      );
-      formData.append("file", png);
-      let xhr = new XMLHttpRequest();
-      xhr.upload.addEventListener("progress", (event) => {
-        if (event.lengthComputable) {
-          let percent = Math.round((event.loaded / event.total) * 100);
-          console.log(percent);
-        }
-      });
-      xhr.open("POST", obj.url, true);
-      xhr.send(formData);
+      if (obj.side == "front") {
+        const designPng = await jimpToPng(frontDesignPng, frontFileName);
+        uploadToS3(obj.url, obj.design_fields, designPng);
+        const mockFileName = "mock_" + frontFileName;
+        const mockPng = await jimpToPng(frontMockPng, mockFileName);
+        uploadToS3(obj.url, obj.mock_fields, mockPng);
+      }
     })
   },
 };
 
-function getBase64(file) {
-  return new Promise(function(resolve, reject) {
-    var reader = new FileReader();
-    reader.onload = function() { resolve(reader.result); };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+function uploadToS3(url, fields, png) {
+  let formData = new FormData();
+  Object.entries(fields).forEach(
+    ([key, val]) => formData.append(key, val)
+  );
+  formData.append("file", png);
+  let xhr = new XMLHttpRequest();
+  xhr.upload.addEventListener("progress", (event) => {
+    if (event.lengthComputable) {
+      let percent = Math.round((event.loaded / event.total) * 100);
+      console.log(percent);
+    }
   });
+  xhr.open("POST", url, true);
+  xhr.send(formData);
+}
+
+async function jimpToPng(jimp, fileName) {
+  const buffer = await jimp.getBufferAsync(Jimp.MIME_PNG);
+  return new Blob([buffer], { name: fileName, type: "image/png" });
 }
 
 // live socket 

@@ -401,6 +401,57 @@ defmodule PlazaWeb.UploadLive2 do
   ##         |> Map.put(:action, :validate)
   ##         |> to_form
   ##     end
+  #
+  def handle_event("publish", _params, socket) do
+    url = "http://#{@aws_s3_bucket}.s3-#{@aws_s3_region}.amazonaws.com"
+
+    config = %{
+      region: @aws_s3_region,
+      access_key_id: System.fetch_env!("AWS_ACCESS_KEY_ID_PLAZA"),
+      secret_access_key: System.fetch_env!("AWS_SECRET_ACCESS_KEY_PLAZA")
+    }
+
+    socket = push_upload_event(socket, config, url, "front", socket.assigns.front_local_upload)
+    socket = push_upload_event(socket, config, url, "back", socket.assigns.back_local_upload)
+
+    {:noreply, socket}
+  end
+
+  defp push_upload_event(socket, config, url, side, maybe_file_name) do
+    case maybe_file_name do
+      nil ->
+        socket
+
+      file_name ->
+        {:ok, design_fields} =
+          PlazaWeb.S3UrlPresign.sign_form_upload(
+            config,
+            @aws_s3_bucket,
+            key: file_name,
+            content_type: "image/png",
+            max_file_size: 10_000_000,
+            expires_in: :timer.hours(1)
+          )
+
+        {:ok, mock_fields} =
+          PlazaWeb.S3UrlPresign.sign_form_upload(
+            config,
+            @aws_s3_bucket,
+            key: "mock_#{file_name}",
+            content_type: "image/png",
+            max_file_size: 10_000_000,
+            expires_in: :timer.hours(1)
+          )
+
+        socket
+        |> push_event("upload", %{
+          url: url,
+          design_fields: design_fields,
+          mock_fields: mock_fields,
+          side: side
+        })
+    end
+  end
 
   ## TODO handle event? 
   @impl Phoenix.LiveView
@@ -774,7 +825,12 @@ defmodule PlazaWeb.UploadLive2 do
 
   def render(%{step: 8} = assigns) do
     ~H"""
-    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
+    <div
+      class="has-font-3"
+      style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;"
+      id="plaza-s3-file-uploader"
+      phx-hook="S3FileUploader"
+    >
       <PlazaWeb.UploadLive2.header
         step={@step}
         front_local_upload={@front_local_upload}
