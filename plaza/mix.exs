@@ -61,7 +61,8 @@ defmodule Plaza.MixProject do
       {:navigation_history, "~> 0.4"},
       {:quantum, "~> 3.0"},
       {:image, "~> 0.37"},
-      {:uuid, "~> 1.1" }
+      {:uuid, "~> 1.1" },
+      {:paginator, "~> 1.2.0"}
     ]
   end
 

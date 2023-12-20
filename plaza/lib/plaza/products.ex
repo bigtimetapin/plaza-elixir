@@ -12,9 +12,24 @@ defmodule Plaza.Products do
     Repo.all(
       from Product,
         where: [active: true],
-        order_by: [desc: :updated_at],
+        order_by: [asc: :updated_at],
         limit: 10
     )
+  end
+
+  def top_4_paginated do
+    %{entries: entries, metadata: metadata} =
+      Repo.paginate(
+        from(
+          p in Product,
+          where: [active: true],
+          order_by: [asc: :updated_at]
+        ),
+        cursor_fields: [:updated_at],
+        limit: 4
+      )
+
+    %{entries: entries, metadata: metadata}
   end
 
   def count(id) do

@@ -61,20 +61,17 @@ defmodule PlazaWeb.MyStoreLive do
 
           socket =
             socket
-            |> assign(:header, :my_store)
-            |> assign(:seller, seller)
-            |> assign(:products, products)
-            |> assign(:local_logo_upload, %{new: true})
+            |> assign(header: :my_store)
+            |> assign(seller: seller)
+            |> assign(products: products)
+            |> assign(local_logo_upload: %{})
             |> allow_upload(:logo,
               accept: ~w(.png .jpg .jpeg .svg .gif),
               max_entries: 1,
               auto_upload: true,
               progress: &handle_progress/3
             )
-            |> assign(
-              :seller_form,
-              seller_form
-            )
+            |> assign(seller_form: seller_form)
             |> assign(waiting: false)
 
         false ->
@@ -106,23 +103,13 @@ defmodule PlazaWeb.MyStoreLive do
             {:ok, {"uploads/#{unique_file_name}", entry.client_name}}
           end)
 
-        IO.inspect(local_url)
-
-        new =
-          Map.get(
-            socket.assigns.local_logo_upload,
-            :new,
-            true
-          )
-
         socket =
           socket
           |> assign(
             :local_logo_upload,
             %{
               url: local_url,
-              file_name: file_name,
-              new: new
+              file_name: file_name
             }
           )
       else
@@ -193,19 +180,32 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   def handle_event("change-seller-form", %{"seller_form" => attrs}, socket) do
-    IO.inspect(socket.assigns.seller_form)
+    %{
+      "instagram" => instagram,
+      "soundcloud" => soundcloud,
+      "twitter" => twitter,
+      "user_name" => user_name,
+      "website" => website
+    } = attrs
 
-    form =
-      SellerForm.changeset(
-        socket.assigns.seller_form.data,
-        attrs
-      )
-      |> Map.put(:action, :validate)
-      |> to_form
+    seller_form = socket.assigns.seller_form
+    seller_form_data = seller_form.data
+
+    seller_form_data = %{
+      seller_form_data
+      | user_name: user_name,
+        website: website,
+        instagram: instagram,
+        soundcloud: soundcloud,
+        twitter: twitter
+    }
+
+    seller_form = %{seller_form | data: seller_form_data}
+    IO.inspect(seller_form)
 
     socket =
       socket
-      |> assign(seller_form: form)
+      |> assign(seller_form: seller_form)
 
     {:noreply, socket}
   end
@@ -217,7 +217,7 @@ defmodule PlazaWeb.MyStoreLive do
   def handle_event("logo-upload-cancel", _params, socket) do
     socket =
       socket
-      |> assign(local_logo_upload: %{new: socket.assigns.local_logo_upload.new})
+      |> assign(local_logo_upload: %{})
 
     {:noreply, socket}
   end
@@ -330,8 +330,7 @@ defmodule PlazaWeb.MyStoreLive do
       |> assign(
         local_logo_upload: %{
           url: seller.profile_photo_url,
-          file_name: "your-current-logo.foto",
-          new: false
+          file_name: "your-current-logo.foto"
         }
       )
       |> assign(step: "edit-seller")
@@ -376,19 +375,12 @@ defmodule PlazaWeb.MyStoreLive do
     socket =
       case connected?(socket) do
         true ->
-          IO.inspect(stripe_id)
-
           {:ok,
            %Stripe.Account{
              details_submitted: details_submitted
            } = stripe_account} = Stripe.Account.retrieve(stripe_id)
 
-          IO.inspect(details_submitted)
-
           seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
-
-          IO.inspect(seller)
-
           products = socket.assigns.products
 
           {seller, products} =
@@ -403,12 +395,9 @@ defmodule PlazaWeb.MyStoreLive do
                       {:ok, product} = Products.activate_product(product)
                       [product]
 
-                    _ ->
-                      products
+                    [] ->
+                      []
                   end
-
-                IO.inspect(seller)
-                IO.inspect(products)
 
                 {seller, products}
 
@@ -483,8 +472,8 @@ defmodule PlazaWeb.MyStoreLive do
 
   def create_or_update_seller(socket, seller) do
     socket =
-      case socket.assigns.local_logo_upload.new do
-        true ->
+      case socket.assigns.seller do
+        nil ->
           case Accounts.create_seller(seller) do
             {:ok, seller} ->
               socket =
@@ -515,7 +504,7 @@ defmodule PlazaWeb.MyStoreLive do
               |> assign(seller_form: changeset |> to_form)
           end
 
-        false ->
+        _ ->
           {:ok, seller} = Accounts.update_seller(seller)
 
           socket
@@ -552,6 +541,7 @@ defmodule PlazaWeb.MyStoreLive do
           seller_form={@seller_form}
           uploads={@uploads}
           local_logo_upload={@local_logo_upload}
+          seller={@seller}
         />
       </div>
     </div>
@@ -577,6 +567,7 @@ defmodule PlazaWeb.MyStoreLive do
           seller_form={@seller_form}
           uploads={@uploads}
           local_logo_upload={@local_logo_upload}
+          seller={@seller}
         />
       </div>
     </div>
@@ -591,6 +582,7 @@ defmodule PlazaWeb.MyStoreLive do
           seller_form={@seller_form}
           uploads={@uploads}
           local_logo_upload={@local_logo_upload}
+          seller={@seller}
         />
         <div style="display: flex; justify-content: center; margin-top: 50px;">
           <button
@@ -869,6 +861,7 @@ defmodule PlazaWeb.MyStoreLive do
               type="text"
               placeholder="username / nome da loja *"
               class="text-input-1"
+              phx-debounce="500"
             >
             </.input>
             <.input
@@ -876,6 +869,7 @@ defmodule PlazaWeb.MyStoreLive do
               type="text"
               placeholder="website"
               class="text-input-1"
+              phx-debounce="500"
             >
             </.input>
             <.input
@@ -883,6 +877,7 @@ defmodule PlazaWeb.MyStoreLive do
               type="text"
               placeholder="instagram"
               class="text-input-1"
+              phx-debounce="500"
             >
             </.input>
             <.input
@@ -890,6 +885,7 @@ defmodule PlazaWeb.MyStoreLive do
               type="text"
               placeholder="twitter"
               class="text-input-1"
+              phx-debounce="500"
             >
             </.input>
             <.input
@@ -897,13 +893,14 @@ defmodule PlazaWeb.MyStoreLive do
               type="text"
               placeholder="soundcloud"
               class="text-input-1"
+              phx-debounce="500"
             >
             </.input>
             <div style="position: relative; top: 100px;">
               <button>
                 <img src="svg/yellow-ellipse.svg" />
                 <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                  <%= if @local_logo_upload[:new], do: "Criar Loja", else: "Editar Loja" %>
+                  <%= if !@seller, do: "Criar Loja", else: "Editar Loja" %>
                 </div>
               </button>
             </div>

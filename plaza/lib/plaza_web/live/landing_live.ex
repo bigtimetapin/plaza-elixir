@@ -6,7 +6,7 @@ defmodule PlazaWeb.LandingLive do
   alias PlazaWeb.ProductComponent
 
   def mount(_params, session, socket) do
-    products = Products.top_10()
+    products = Products.top_4_paginated()
     IO.inspect(products)
 
     seller =
@@ -20,7 +20,7 @@ defmodule PlazaWeb.LandingLive do
 
     socket =
       socket
-      |> assign(products: products)
+      |> assign(products: products.entries)
       |> assign(page_title: "Hello Plaza")
       |> assign(header: :landing)
       |> assign(seller: seller)
