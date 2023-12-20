@@ -69,7 +69,7 @@ defmodule PlazaWeb.UploadLive2 do
                   %Product{
                     user_id: user_id,
                     user_name: user_name,
-                    price: 75,
+                    price: 75.0,
                     designs: %Designs{
                       display: 0
                     },

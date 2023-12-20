@@ -7,7 +7,7 @@ defmodule PlazaWeb.LandingLive do
 
   @impl Phoenix.LiveView
   def mount(_params, session, socket) do
-    products = Products.top_4_paginated()
+    products = Products.top_4_paginated(%{before: nil, after: nil})
     IO.inspect(products)
 
     seller =
@@ -22,6 +22,8 @@ defmodule PlazaWeb.LandingLive do
     socket =
       socket
       |> assign(products: products.entries)
+      |> assign(cursor_before: nil)
+      |> assign(cursor_after: products.metadata.after)
       |> assign(page_title: "Hello Plaza")
       |> assign(header: :landing)
       |> assign(seller: seller)
@@ -36,6 +38,32 @@ defmodule PlazaWeb.LandingLive do
     {:noreply, push_navigate(socket, to: "/product?#{url}")}
   end
 
+  def handle_event("cursor-after", _, socket) do
+    products = Products.top_4_paginated(%{before: nil, after: socket.assigns.cursor_after})
+    IO.inspect(products)
+
+    socket =
+      socket
+      |> assign(products: products.entries)
+      |> assign(cursor_before: products.metadata.before)
+      |> assign(cursor_after: products.metadata.after)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("cursor-before", _, socket) do
+    products = Products.top_4_paginated(%{before: socket.assigns.cursor_before, after: nil})
+    IO.inspect(products)
+
+    socket =
+      socket
+      |> assign(products: products.entries)
+      |> assign(cursor_before: products.metadata.before)
+      |> assign(cursor_after: products.metadata.after)
+
+    {:noreply, socket}
+  end
+
   def render(assigns) do
     ~H"""
     <div class="mt-large mx-large">
@@ -43,7 +71,21 @@ defmodule PlazaWeb.LandingLive do
       <div class="is-size-3-desktop is-size-4-touch">
         <div class="mb-small">produtos em alta</div>
       </div>
-      <ProductComponent.products4 products={@products}></ProductComponent.products4>
+      <div>
+        <ProductComponent.products4 products={@products}></ProductComponent.products4>
+        <div style="display: flex; justify-content: space-around;">
+          <div>
+            <button :if={@cursor_before} phx-click="cursor-before">
+              here
+            </button>
+          </div>
+          <div>
+            <button :if={@cursor_after} phx-click="cursor-after">
+              and here
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     """
   end
