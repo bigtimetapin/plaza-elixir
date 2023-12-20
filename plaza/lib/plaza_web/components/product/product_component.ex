@@ -49,7 +49,7 @@ defmodule PlazaWeb.ProductComponent do
       class="is-product-1 has-font-3 mr-medium mb-medium"
       disabled={@disabled}
       phx-click={if !@disabled, do: "product-href"}
-      phx-value-product-name={if !@disabled, do: "#{@product.name}"}
+      phx-value-product-id={if !@disabled, do: "#{@product.id}"}
       {@rest}
     >
       <div>

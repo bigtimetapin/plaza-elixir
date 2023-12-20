@@ -87,25 +87,22 @@ defmodule PlazaWeb.ProductLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_params(
-        %{"user-name" => user_name, "product-name" => product_name} = params,
-        uri,
-        socket
-      ) do
+  def handle_params(%{"product-id" => product_id} = params, uri, socket) do
     socket =
       if connected?(socket) do
-        seller = Accounts.get_seller_by_user_name(user_name)
-
-        product =
-          case seller do
+        {product, seller} =
+          case Products.get_product(product_id) do
             nil ->
-              nil
+              {nil, nil}
 
-            nnil ->
-              Products.get_product(
-                seller.user_id,
-                product_name
-              )
+            product ->
+              case Accounts.get_seller_by_id(product.user_id) do
+                nil ->
+                  {nil, nil}
+
+                seller ->
+                  {product, seller}
+              end
           end
 
         socket =
@@ -219,8 +216,7 @@ defmodule PlazaWeb.ProductLive do
 
     params = %{
       "purchase-id" => purchase.id,
-      "user-name" => socket.assigns.seller.user_name,
-      "product-name" => product.name,
+      "product-id" => product.id,
       "email" => email
     }
 

@@ -5,6 +5,7 @@ defmodule PlazaWeb.LandingLive do
   alias Plaza.Products
   alias PlazaWeb.ProductComponent
 
+  @impl Phoenix.LiveView
   def mount(_params, session, socket) do
     products = Products.top_4_paginated()
     IO.inspect(products)
@@ -26,6 +27,13 @@ defmodule PlazaWeb.LandingLive do
       |> assign(seller: seller)
 
     {:ok, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("product-href", %{"product-id" => product_id}, socket) do
+    params = %{"product-id" => product_id}
+    url = URI.encode_query(params)
+    {:noreply, push_navigate(socket, to: "/product?#{url}")}
   end
 
   def render(assigns) do

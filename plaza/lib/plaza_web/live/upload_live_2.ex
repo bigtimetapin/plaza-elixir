@@ -397,8 +397,8 @@ defmodule PlazaWeb.UploadLive2 do
           case socket.assigns.seller do
             nil ->
               socket
-              |> assign(:write_status, :local_storage)
-              |> assign(:step, 9)
+              |> assign(write_status: :local_storage)
+              |> assign(step: 9)
               |> push_event("write", %{
                 key: @local_storage_key,
                 data: serialize_to_token(product)
@@ -406,11 +406,12 @@ defmodule PlazaWeb.UploadLive2 do
               |> assign(waiting: false)
 
             seller ->
-              {:ok, _inserted} = Products.create_product(product)
+              {:ok, product} = Products.create_product(product)
 
               socket
-              |> assign(:write_status, :db_storage)
-              |> assign(:step, 9)
+              |> assign(write_status: :db_storage)
+              |> assign(product: product)
+              |> assign(step: 9)
               |> assign(waiting: false)
           end
 
@@ -948,9 +949,8 @@ defmodule PlazaWeb.UploadLive2 do
     """
   end
 
-  def render(%{step: 9, write_status: :db_storage} = assigns) do
-    product = assigns.product_form.data
-    product_params = %{"user-name" => assigns.seller.user_name, "product-name" => product.name}
+  def render(%{step: 9, write_status: :db_storage, product: product} = assigns) do
+    product_params = %{"product-id" => product.id}
 
     assigns =
       assigns

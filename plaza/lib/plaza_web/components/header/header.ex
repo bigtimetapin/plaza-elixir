@@ -261,14 +261,14 @@ defmodule PlazaWeb.Header do
             </div>
             <div class="level-item pr-xmedium">
               <div class="is-size-5" style="position: relative; top: 11px;">
-                <div :if={@selected}>
+                <.link :if={@selected} navigate="/">
                   loja
                   <div style="position: absolute;">
                     <div style="position: relative; left: 2px;">
                       <img src="svg/yellow-circle.svg" />
                     </div>
                   </div>
-                </div>
+                </.link>
                 <.link :if={!@selected} navigate="/">
                   loja
                 </.link>

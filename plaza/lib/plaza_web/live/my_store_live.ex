@@ -171,11 +171,9 @@ defmodule PlazaWeb.MyStoreLive do
     push_event(socket, "clear", %{key: @local_storage_key})
   end
 
-  def handle_event("product-href", %{"product-name" => product_name}, socket) do
-    seller = socket.assigns.seller
-    params = %{"user-name" => seller.user_name, "product-name" => product_name}
+  def handle_event("product-href", %{"product-id" => product_id}, socket) do
+    params = %{"product-id" => product_id}
     url = URI.encode_query(params)
-    IO.inspect(url)
     {:noreply, push_navigate(socket, to: "/product?#{url}")}
   end
 
