@@ -67,10 +67,6 @@ defmodule PlazaWeb.LandingLive do
   def render(assigns) do
     ~H"""
     <div class="mt-large mx-large">
-      <div class="is-size-1-desktop is-size-2-touch mb-medium mt-large">onde artistas vestem</div>
-      <div class="is-size-3-desktop is-size-4-touch">
-        <div class="mb-small">produtos em alta</div>
-      </div>
       <div>
         <ProductComponent.products4 products={@products}></ProductComponent.products4>
         <div style="display: flex; justify-content: space-around;">
@@ -84,6 +80,28 @@ defmodule PlazaWeb.LandingLive do
               next
             </button>
           </div>
+        </div>
+      </div>
+      <div style="display: flex; margin-top: 100px;">
+        <div class="has-font-3">
+          <h2 style="font-size: 63px; margin-bottom: 25px;">
+            plazaaaaa é um espaço público para venda de camisetas
+          </h2>
+          <h3 style="font-size: 38px; width: 1005px; line-height: 45px; margin-bottom: 25px;">
+            qualquer um pode publicar seus designs e vender por aqui, basta escolher sua margem de lucro e subir a arte, o resto a gente cuida.
+          </h3>
+          <h3 style="font-size: 38px; width: 970px; line-height: 45px; margin-bottom: 25px;">
+            cada produto vendido é produzido sob demanda e chega na casa do cliente final em até 7 dias úteis.
+          </h3>
+          <h3 style="font-size: 38px; width: 970px; line-height: 45px; margin-bottom: 25px;">
+            produzimos sob demanda e não tem desperdício.
+            <.link navigate="/upload" style="text-decoration: underline; margin-left: 50px;">
+              quero vender
+            </.link>
+          </h3>
+        </div>
+        <div>
+          <img src="svg/star.svg" />
         </div>
       </div>
     </div>
