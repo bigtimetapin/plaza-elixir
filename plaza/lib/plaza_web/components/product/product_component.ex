@@ -46,7 +46,7 @@ defmodule PlazaWeb.ProductComponent do
   defp productp(assigns) do
     product = assigns.product
 
-    days_remaining =
+    {days_remaining, expiring} =
       case product.active do
         true ->
           now = NaiveDateTime.utc_now()
@@ -58,24 +58,36 @@ defmodule PlazaWeb.ProductComponent do
               :day
             )
 
+          expiring = diff <= 2
+
           diff =
             case diff do
               0 -> "0.5"
               _ -> diff
             end
 
-          "Disponível por mais #{diff} dias"
+          {"Disponível por mais #{diff} dias", expiring}
 
         false ->
-          "expired"
+          {"expired", false}
       end
 
     assigns =
       assigns
       |> assign(days_remaining: days_remaining)
+      |> assign(expiring: expiring)
 
     ~H"""
-    <div style="height: calc(428px + 86px);">
+    <div style="height: calc(428px + 105px);">
+      <div
+        :if={@expiring}
+        style="position: absolute; z-index: 99; width: 150px; transform: rotate(-16deg);"
+      >
+        <img src="svg/yellow-ellipse.svg" />
+        <div class="has-font-3" style="position: relative; bottom: 59px; left: 11px; font-size: 30px;">
+          Últimos dias
+        </div>
+      </div>
       <button
         class="is-product-1 has-font-3 mr-medium mb-medium"
         disabled={@disabled}
