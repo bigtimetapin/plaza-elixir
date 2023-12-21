@@ -23,11 +23,11 @@ defmodule Plaza.Products do
         from(
           p in Product,
           where: [active: true],
-          order_by: [desc: :updated_at]
+          order_by: [desc: :updated_at, desc: :id]
         ),
         before: cursors.before,
         after: cursors.after,
-        cursor_fields: [:updated_at],
+        cursor_fields: [{:updated_at, :desc}, {:id, :desc}],
         limit: 4
       )
 
