@@ -44,30 +44,73 @@ defmodule PlazaWeb.ProductComponent do
   attr :rest, :global
 
   defp productp(assigns) do
+    product = assigns.product
+
+    days_remaining =
+      case product.active do
+        true ->
+          now = NaiveDateTime.utc_now()
+
+          diff =
+            NaiveDateTime.diff(
+              product.campaign_duration_timestamp,
+              now,
+              :day
+            )
+
+          diff =
+            case diff do
+              0 -> "0.5"
+              _ -> diff
+            end
+
+          "Disponível por mais #{diff} dias"
+
+        false ->
+          "expired"
+      end
+
+    assigns =
+      assigns
+      |> assign(days_remaining: days_remaining)
+
     ~H"""
-    <button
-      class="is-product-1 has-font-3 mr-medium mb-medium"
-      disabled={@disabled}
-      phx-click={if !@disabled, do: "product-href"}
-      phx-value-product-id={if !@disabled, do: "#{@product.id}"}
-      {@rest}
-    >
-      <div>
-        <img
-          src={if @product.designs.display == 0, do: @product.mocks.front, else: @product.mocks.back}
-          style="width: 100%;"
-        />
-      </div>
-      <div :if={@meta}>
-        <div style="position: absolute; bottom: 25px; left: 10px;"><%= @product.name %></div>
-        <div class="pr-xsmall" style="position: absolute; bottom: 25px; right: 0px;">
-          <%= "R$ #{@product.price}" %>
+    <div style="height: calc(428px + 86px);">
+      <button
+        class="is-product-1 has-font-3 mr-medium mb-medium"
+        disabled={@disabled}
+        phx-click={if !@disabled, do: "product-href"}
+        phx-value-product-id={if !@disabled, do: "#{@product.id}"}
+        {@rest}
+      >
+        <div>
+          <img
+            src={
+              if @product.designs.display == 0, do: @product.mocks.front, else: @product.mocks.back
+            }
+            style="width: 100%;"
+          />
         </div>
-        <div class="has-dark-gray-text is-size-7" style="position: absolute; bottom: 0px; left: 10px;">
-          <%= @product.user_name %>
+        <div :if={@meta} style="position: relative; top: 56px;">
+          <div style="position: absolute; bottom: 25px; left: 10px;"><%= @product.name %></div>
+          <div class="pr-xsmall" style="position: absolute; bottom: 25px; right: 0px;">
+            <%= "R$ #{@product.price}" %>
+          </div>
+          <div
+            class="has-dark-gray-text is-size-7"
+            style="position: absolute; bottom: 0px; left: 10px;"
+          >
+            <%= @product.user_name %>
+          </div>
+          <div
+            class="has-dark-gray-text is-size-7"
+            style="position: absolute; bottom: 0px; right: 0px;"
+          >
+            <%= @days_remaining %>
+          </div>
         </div>
-      </div>
-    </button>
+      </button>
+    </div>
     """
   end
 end

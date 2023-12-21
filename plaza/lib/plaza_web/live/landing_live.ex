@@ -76,12 +76,12 @@ defmodule PlazaWeb.LandingLive do
         <div style="display: flex; justify-content: space-around;">
           <div>
             <button :if={@cursor_before} phx-click="cursor-before">
-              here
+              prev
             </button>
           </div>
           <div>
             <button :if={@cursor_after} phx-click="cursor-after">
-              and here
+              next
             </button>
           </div>
         </div>
