@@ -7,8 +7,10 @@ defmodule PlazaWeb.LandingLive do
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    products = Products.top_4_paginated(%{before: nil, after: nil})
-    IO.inspect(products)
+    curated_products = Products.top_4_paginated(%{before: nil, after: nil})
+    uncurated_products = Products.top_8_uncurated_paginated(%{before: nil, after: nil})
+    first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
+    second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
 
     seller =
       case socket.assigns.current_user do
@@ -21,9 +23,13 @@ defmodule PlazaWeb.LandingLive do
 
     socket =
       socket
-      |> assign(products: products.entries)
-      |> assign(cursor_before: nil)
-      |> assign(cursor_after: products.metadata.after)
+      |> assign(curated_products: curated_products.entries)
+      |> assign(curated_cursor_before: nil)
+      |> assign(curated_cursor_after: curated_products.metadata.after)
+      |> assign(first_4_uncurated_products: first_4_uncurated_products)
+      |> assign(second_4_uncurated_products: second_4_uncurated_products)
+      |> assign(uncurated_cursor_before: nil)
+      |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
       |> assign(page_title: "Hello Plaza")
       |> assign(header: :landing)
       |> assign(seller: seller)
@@ -38,29 +44,68 @@ defmodule PlazaWeb.LandingLive do
     {:noreply, push_navigate(socket, to: "/product?#{url}")}
   end
 
-  def handle_event("cursor-after", _, socket) do
-    products = Products.top_4_paginated(%{before: nil, after: socket.assigns.cursor_after})
-    IO.inspect(products)
+  def handle_event("curated-cursor-after", _, socket) do
+    curated_products =
+      Products.top_4_paginated(%{before: nil, after: socket.assigns.curated_cursor_after})
 
     socket =
       socket
-      |> assign(products: products.entries)
-      |> assign(cursor_before: products.metadata.before)
-      |> assign(cursor_after: products.metadata.after)
+      |> assign(curated_products: curated_products.entries)
+      |> assign(curated_cursor_before: curated_products.metadata.before)
+      |> assign(curated_cursor_after: curated_products.metadata.after)
 
     {:noreply, socket}
   end
 
-  @impl Phoenix.LiveView
-  def handle_event("cursor-before", _, socket) do
-    products = Products.top_4_paginated(%{before: socket.assigns.cursor_before, after: nil})
-    IO.inspect(products)
+  def handle_event("curated-cursor-before", _, socket) do
+    curated_products =
+      Products.top_4_paginated(%{before: socket.assigns.curated_cursor_before, after: nil})
 
     socket =
       socket
-      |> assign(products: products.entries)
-      |> assign(cursor_before: products.metadata.before)
-      |> assign(cursor_after: products.metadata.after)
+      |> assign(curated_products: curated_products.entries)
+      |> assign(curated_cursor_before: curated_products.metadata.before)
+      |> assign(curated_cursor_after: curated_products.metadata.after)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("uncurated-cursor-after", _, socket) do
+    uncurated_products =
+      Products.top_8_uncurated_paginated(%{
+        before: nil,
+        after: socket.assigns.uncurated_cursor_after
+      })
+
+    first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
+    second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
+
+    socket =
+      socket
+      |> assign(first_4_uncurated_products: first_4_uncurated_products)
+      |> assign(second_4_uncurated_products: second_4_uncurated_products)
+      |> assign(uncurated_cursor_before: uncurated_products.metadata.before)
+      |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("uncurated-cursor-before", _, socket) do
+    uncurated_products =
+      Products.top_8_uncurated_paginated(%{
+        before: socket.assigns.uncurated_cursor_before,
+        after: nil
+      })
+
+    first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
+    second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
+
+    socket =
+      socket
+      |> assign(first_4_uncurated_products: first_4_uncurated_products)
+      |> assign(second_4_uncurated_products: second_4_uncurated_products)
+      |> assign(uncurated_cursor_before: uncurated_products.metadata.before)
+      |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
 
     {:noreply, socket}
   end
@@ -69,21 +114,21 @@ defmodule PlazaWeb.LandingLive do
     ~H"""
     <div class="mt-large mx-large">
       <div>
-        <ProductComponent.products4 products={@products}></ProductComponent.products4>
+        <ProductComponent.products4 products={@curated_products} />
         <div style="display: flex; justify-content: space-around;">
           <div>
-            <button :if={@cursor_before} phx-click="cursor-before">
+            <button :if={@curated_cursor_before} phx-click="curated-cursor-before">
               prev
             </button>
           </div>
           <div>
-            <button :if={@cursor_after} phx-click="cursor-after">
+            <button :if={@curated_cursor_after} phx-click="curated-cursor-after">
               next
             </button>
           </div>
         </div>
       </div>
-      <div style="display: flex; margin-top: 100px;">
+      <div style="display: flex; margin-top: 100px; margin-bottom: 100px;">
         <div class="has-font-3">
           <h2 style="font-size: 63px; margin-bottom: 25px;">
             plazaaaaa é um espaço público para venda de camisetas
@@ -104,6 +149,27 @@ defmodule PlazaWeb.LandingLive do
         <div>
           <img src="svg/star.svg" />
         </div>
+      </div>
+      <div>
+        <div style="margin-bottom: 100px;">
+          <ProductComponent.products4 products={@first_4_uncurated_products} />
+        </div>
+        <div>
+          <ProductComponent.products4 products={@second_4_uncurated_products} />
+        </div>
+        <div style="display: flex; justify-content: space-around; margin-top: 25px; margin-bottom: 50px;">
+          <div>
+            <button :if={@uncurated_cursor_before} phx-click="uncurated-cursor-before">
+              prev
+            </button>
+          </div>
+          <div>
+            <button :if={@uncurated_cursor_after} phx-click="uncurated-cursor-after">
+              next
+            </button>
+          </div>
+        </div>
+        <div style="width: 1650px; height: 495px; border: 1px solid gray; margin-bottom: 1000px;" />
       </div>
     </div>
     """

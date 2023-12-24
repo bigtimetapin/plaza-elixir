@@ -114,12 +114,12 @@ defmodule PlazaWeb.AdminLive do
         <div style="text-align: center;">
           <%= "seller selected; #{@seller.user_name}" %>
         </div>
-        <div style="text-align: center;">
+        <div style="text-align: center; margin-bottom: 50px;">
           <%= "total number of products; #{@num_seller_products}" %>
         </div>
         <div
           :for={product <- @seller_products}
-          style="display: flex; flex-direction: column; margin-bottom: 25px;"
+          style="display: flex; flex-direction: column; border: 1px dotted black; margin-bottom: 25px;"
         >
           <ProductComponent.product product={product} meta={true} />
           <div style="text-align: center;">
