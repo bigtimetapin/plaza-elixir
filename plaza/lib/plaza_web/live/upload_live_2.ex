@@ -368,7 +368,7 @@ defmodule PlazaWeb.UploadLive2 do
     product = socket.assigns.product
     designs = product.designs
     mocks = product.mocks
-    url = "http://#{@aws_s3_bucket}.s3.#{@aws_s3_region}.amazonaws.com"
+    url = "https://#{@aws_s3_bucket}.s3.#{@aws_s3_region}.amazonaws.com"
 
     {designs, mocks} =
       case side do
@@ -425,7 +425,7 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   def handle_event("publish", _params, socket) do
-    url = "http://#{@aws_s3_bucket}.s3-#{@aws_s3_region}.amazonaws.com"
+    url = "https://#{@aws_s3_bucket}.s3-#{@aws_s3_region}.amazonaws.com"
 
     config = %{
       region: @aws_s3_region,

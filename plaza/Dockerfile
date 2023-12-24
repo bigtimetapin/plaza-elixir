@@ -59,6 +59,9 @@ COPY lib lib
 
 COPY assets assets
 
+# install js dependencies 
+RUN npm install --prefix ./assets 
+
 # compile assets
 RUN --mount=type=secret,id=STRIPE_API_KEY \
     --mount=type=secret,id=STRIPE_WEBHOOK_SIGNING_SECRET \
