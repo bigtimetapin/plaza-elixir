@@ -57,7 +57,7 @@ defmodule PlazaWeb.Header do
             log in
             <div style="position: absolute;">
               <div style="position: relative; left: 11px;">
-                <img src="../svg/yellow-circle.svg" />
+                <img src="/svg/yellow-circle.svg" />
               </div>
             </div>
           </div>
@@ -108,7 +108,7 @@ defmodule PlazaWeb.Header do
           <.my_store_href />
           <div style="position: absolute;">
             <div style="position: relative; left: 35px;">
-              <img src="svg/yellow-circle.svg" />
+              <img src="/svg/yellow-circle.svg" />
             </div>
           </div>
         </div>
@@ -188,7 +188,7 @@ defmodule PlazaWeb.Header do
       quero vender
       <div style="position: absolute;">
         <div style="position: relative; left: 45px;">
-          <img src="svg/yellow-circle.svg" />
+          <img src="/svg/yellow-circle.svg" />
         </div>
       </div>
     </div>
@@ -214,7 +214,7 @@ defmodule PlazaWeb.Header do
             conta
             <div style="position: absolute;">
               <div style="position: relative; left: 13px;">
-                <img src="svg/yellow-circle.svg" />
+                <img src="/svg/yellow-circle.svg" />
               </div>
             </div>
           </div>
@@ -265,7 +265,7 @@ defmodule PlazaWeb.Header do
                   loja
                   <div style="position: absolute;">
                     <div style="position: relative; left: 2px;">
-                      <img src="svg/yellow-circle.svg" />
+                      <img src="/svg/yellow-circle.svg" />
                     </div>
                   </div>
                 </.link>
