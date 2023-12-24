@@ -27,6 +27,7 @@ defmodule PlazaWeb.MyStoreLive do
       case connected?(socket) do
         true ->
           user_id = socket.assigns.current_user.id
+          IO.inspect(user_id)
           seller = Accounts.get_seller_by_id(user_id)
           IO.inspect(seller)
           products = Products.list_products_by_user_id(user_id, 3)

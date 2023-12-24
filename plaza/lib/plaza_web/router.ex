@@ -78,6 +78,7 @@ defmodule PlazaWeb.Router do
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
       live "/my-store", MyStoreLive
       live "/my-account", MyAccountLive
+      live "/admin", AdminLive
     end
   end
 

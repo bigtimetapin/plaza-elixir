@@ -6,7 +6,7 @@ defmodule PlazaWeb.LandingLive do
   alias PlazaWeb.ProductComponent
 
   @impl Phoenix.LiveView
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     products = Products.top_4_paginated(%{before: nil, after: nil})
     IO.inspect(products)
 
@@ -51,6 +51,7 @@ defmodule PlazaWeb.LandingLive do
     {:noreply, socket}
   end
 
+  @impl Phoenix.LiveView
   def handle_event("cursor-before", _, socket) do
     products = Products.top_4_paginated(%{before: socket.assigns.cursor_before, after: nil})
     IO.inspect(products)

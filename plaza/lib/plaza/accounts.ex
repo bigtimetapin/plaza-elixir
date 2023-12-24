@@ -18,6 +18,15 @@ defmodule Plaza.Accounts do
     Repo.get_by(Seller, user_name: user_name)
   end
 
+  def get_sellers_by_user_name_that_contain(user_name_fragment) do
+    Repo.all(
+      from s in Seller,
+        where: ilike(s.user_name, ^"%#{user_name_fragment}%"),
+        order_by: [asc: :id],
+        limit: 10
+    )
+  end
+
   def create_seller(seller) do
     seller
     |> Repo.insert()

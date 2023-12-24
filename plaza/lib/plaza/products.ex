@@ -65,6 +65,20 @@ defmodule Plaza.Products do
     )
   end
 
+  def curate_product(product) do
+    update_product(
+      product,
+      %{"curated" => true}
+    )
+  end
+
+  def uncurate_product(product) do
+    update_product(
+      product,
+      %{"curated" => false}
+    )
+  end
+
   @doc """
   Returns the list of products.
 
