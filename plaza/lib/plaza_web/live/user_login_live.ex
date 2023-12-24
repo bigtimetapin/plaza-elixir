@@ -3,7 +3,9 @@ defmodule PlazaWeb.UserLoginLive do
 
   def render(assigns) do
     ~H"""
-    <PlazaWeb.Auth.Login.login_full form={@form} />
+    <div style="margin-top: 150px; margin-bottom: 150px;">
+      <PlazaWeb.Auth.Login.login_full form={@form} />
+    </div>
     """
   end
 

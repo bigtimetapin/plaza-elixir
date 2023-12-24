@@ -6,7 +6,7 @@ defmodule PlazaWeb.UserRegistrationLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
+    <div class="mx-auto max-w-sm" style="margin-top: 150px; margin-bottom: 150px;">
       <.header class="text-center">
         Register for an account
         <:subtitle>
