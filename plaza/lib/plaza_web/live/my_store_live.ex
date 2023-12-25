@@ -48,7 +48,7 @@ defmodule PlazaWeb.MyStoreLive do
               seller ->
                 case seller.profile_photo_url do
                   nil -> nil
-                  _ -> "your-current-logo.foto"
+                  url -> %{new: false, url: url, name: "your-current-logo.foto"}
                 end
             end
 
@@ -162,7 +162,7 @@ defmodule PlazaWeb.MyStoreLive do
   def handle_event("logo-upload-change", file_name, socket) do
     socket =
       socket
-      |> assign(logo_upload: file_name)
+      |> assign(logo_upload: %{new: true, url: file_name, name: "your-new-logo.foto"})
 
     {:noreply, socket}
   end
@@ -196,11 +196,14 @@ defmodule PlazaWeb.MyStoreLive do
             nil ->
               {:valid_changes, seller}
 
-            "your-current-logo.foto" ->
-              {:valid_changes, seller}
+            logo_upload ->
+              case logo_upload do
+                %{new: true} ->
+                  {:upload_logo, seller}
 
-            _ ->
-              {:upload_logo, seller}
+                _ ->
+                  {:valid_changes, seller}
+              end
           end
       end
     end)
@@ -215,7 +218,7 @@ defmodule PlazaWeb.MyStoreLive do
   def handle_event("s3-upload-complete", "logo", socket) do
     seller = socket.assigns.seller
     url = "https://#{@aws_s3_bucket}.s3.#{@aws_s3_region}.amazonaws.com"
-    file_name = URI.encode(socket.assigns.logo_upload)
+    file_name = URI.encode(socket.assigns.logo_upload.url)
     file_name = "#{url}/#{file_name}"
     seller = %{seller | profile_photo_url: file_name}
 
@@ -244,7 +247,7 @@ defmodule PlazaWeb.MyStoreLive do
               %{url: s3_url}
             )
 
-          {socket, "your-current-logo.foto"}
+          {socket, %{new: false, url: s3_url, name: "your-current-logo.foto"}}
       end
 
     socket =
@@ -416,7 +419,7 @@ defmodule PlazaWeb.MyStoreLive do
       PlazaWeb.S3UrlPresign.sign_form_upload(
         config,
         @aws_s3_bucket,
-        key: socket.assigns.logo_upload,
+        key: socket.assigns.logo_upload.url,
         content_type: "image/png",
         max_file_size: 10_000_000,
         expires_in: :timer.hours(1)
@@ -776,7 +779,7 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   attr :seller_form, :map, required: true
-  attr :logo_upload, :string, required: true
+  attr :logo_upload, :map, required: true
   attr :seller, :map, required: true
   attr :uuid, :string, required: true
 
@@ -816,7 +819,7 @@ defmodule PlazaWeb.MyStoreLive do
               <img id="plaza-logo-display" />
             </div>
             <div style="display: inline-block; width: 270px; font-size: 24px; color: gray;">
-              <%= @logo_upload %>
+              <%= @logo_upload.name %>
             </div>
             <div style="display: inline-block;">
               <button type="button" phx-click="logo-upload-cancel">

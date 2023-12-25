@@ -60,7 +60,7 @@ Hooks.LogoFileReader = {
       const files = logoInput.files;
       if (files.length == 1) {
         const file = files[0];
-        logoFileName = file.name.replace(" ", "");
+        logoFileName = crypto.randomUUID();
         const url = URL.createObjectURL(file);
         Jimp.read(url)
           .then(async (image) => {
