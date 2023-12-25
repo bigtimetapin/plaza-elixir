@@ -27,11 +27,8 @@ defmodule PlazaWeb.MyStoreLive do
       case connected?(socket) do
         true ->
           user_id = socket.assigns.current_user.id
-          IO.inspect(user_id)
           seller = Accounts.get_seller_by_id(user_id)
-          IO.inspect(seller)
           products = Products.list_products_by_user_id(user_id, 3)
-          IO.inspect(products)
 
           seller_form =
             to_form(
@@ -42,6 +39,18 @@ defmodule PlazaWeb.MyStoreLive do
                 %{}
               )
             )
+
+          logo_upload =
+            case seller do
+              nil ->
+                nil
+
+              seller ->
+                case seller.profile_photo_url do
+                  nil -> nil
+                  _ -> "your-current-logo.foto"
+                end
+            end
 
           socket =
             case products do
@@ -65,14 +74,9 @@ defmodule PlazaWeb.MyStoreLive do
             |> assign(header: :my_store)
             |> assign(seller: seller)
             |> assign(products: products)
-            |> assign(local_logo_upload: %{})
-            |> allow_upload(:logo,
-              accept: ~w(.png .jpg .jpeg .svg .gif),
-              max_entries: 1,
-              auto_upload: true,
-              progress: &handle_progress/3
-            )
+            |> assign(logo_upload: logo_upload)
             |> assign(seller_form: seller_form)
+            |> assign(uuid: UUID.uuid1())
             |> assign(waiting: false)
 
         false ->
@@ -83,55 +87,15 @@ defmodule PlazaWeb.MyStoreLive do
     {:ok, socket}
   end
 
-  defp handle_progress(:logo, entry, socket) do
-    socket =
-      if entry.done? do
-        {local_url, file_name} =
-          consume_uploaded_entry(socket, entry, fn %{path: path} ->
-            unique_file_name =
-              "#{entry.uuid}-#{entry.client_name}"
-              |> String.replace(" ", "")
-
-            dest =
-              Path.join([
-                :code.priv_dir(:plaza),
-                "static",
-                "uploads",
-                unique_file_name
-              ])
-
-            File.cp!(path, dest)
-            {:ok, {"uploads/#{unique_file_name}", entry.client_name}}
-          end)
-
-        socket =
-          socket
-          |> assign(
-            :local_logo_upload,
-            %{
-              url: local_url,
-              file_name: file_name
-            }
-          )
-      else
-        socket
-      end
-
-    {:noreply, socket}
-  end
-
   @impl Phoenix.LiveView
   def handle_event("read-product-form", token_data, socket) when is_binary(token_data) do
     socket =
       case restore_from_token(token_data) do
         {:ok, nil} ->
-          IO.inspect("nothing")
           # do nothing with the previous state
           socket
 
         {:ok, restored} ->
-          IO.inspect(restored)
-
           socket
           |> assign(:product_buffer, restored)
 
@@ -200,23 +164,28 @@ defmodule PlazaWeb.MyStoreLive do
     }
 
     seller_form = %{seller_form | data: seller_form_data}
-    IO.inspect(seller_form)
 
     socket =
       socket
       |> assign(seller_form: seller_form)
+      |> assign(uuid: UUID.uuid1())
 
     {:noreply, socket}
   end
 
-  def handle_event("change-seller-logo", _params, socket) do
-    {:noreply, socket}
-  end
-
-  def handle_event("logo-upload-cancel", _params, socket) do
+  def handle_event("logo-upload-change", file_name, socket) do
     socket =
       socket
-      |> assign(local_logo_upload: %{})
+      |> assign(logo_upload: file_name)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("logo-upload-cancel", file_name, socket) do
+    socket =
+      socket
+      |> assign(logo_upload: nil)
+      |> push_event("logo-upload-cancel", %{})
 
     {:noreply, socket}
   end
@@ -230,29 +199,22 @@ defmodule PlazaWeb.MyStoreLive do
         )
         |> Changeset.apply_action(:update)
 
-      IO.inspect(changes)
-
       case changes do
         {:error, changeset} ->
           {:invalid_changes, changeset |> to_form}
 
         {:ok, seller_form} ->
           seller = SellerForm.to_seller(seller_form)
-          IO.inspect(seller)
 
-          case Map.get(socket.assigns.local_logo_upload, :url) do
+          case socket.assigns.logo_upload do
             nil ->
               {:valid_changes, seller}
 
-            url ->
-              case String.starts_with?(url, "https") do
-                true ->
-                  {:valid_changes, seller}
+            "your-current-logo.foto" ->
+              {:valid_changes, seller}
 
-                false ->
-                  s3_url = publish_s3(url)
-                  {:logo_uploaded, s3_url, seller}
-              end
+            _ ->
+              {:upload_logo, seller}
           end
       end
     end)
@@ -264,30 +226,65 @@ defmodule PlazaWeb.MyStoreLive do
     {:noreply, socket}
   end
 
-  defp publish_s3(local_url) do
-    src =
-      Path.join([
-        :code.priv_dir(:plaza),
-        "static",
-        local_url
-      ])
+  def handle_event("s3-upload-complete", "logo", socket) do
+    seller = socket.assigns.seller
+    url = "https://#{@aws_s3_bucket}.s3.#{@aws_s3_region}.amazonaws.com"
+    file_name = URI.encode(socket.assigns.logo_upload)
+    file_name = "#{url}/#{file_name}"
+    seller = %{seller | profile_photo_url: file_name}
 
-    request =
-      S3.put_object(
-        @aws_s3_bucket,
-        local_url,
-        File.read!(src)
+    socket =
+      create_or_update_seller(
+        socket,
+        seller
       )
 
-    {:ok, term} =
-      ExAws.request(
-        request,
-        region: @aws_s3_region
+    {:noreply, socket}
+  end
+
+  def handle_event("edit-seller", _params, socket) do
+    seller = socket.assigns.seller
+
+    {socket, logo_upload} =
+      case seller.profile_photo_url do
+        nil ->
+          {socket, nil}
+
+        s3_url ->
+          socket =
+            socket
+            |> push_event(
+              "plaza-logo-display-s3-url",
+              %{url: s3_url}
+            )
+
+          {socket, "your-current-logo.foto"}
+      end
+
+    socket =
+      socket
+      |> assign(
+        seller_form:
+          to_form(
+            SellerForm.changeset(
+              SellerForm.from_seller(seller),
+              %{}
+            )
+          )
       )
+      |> assign(logo_upload: logo_upload)
+      |> assign(uuid: UUID.uuid1())
+      |> assign(step: "edit-seller")
 
-    IO.inspect(term)
+    {:noreply, socket}
+  end
 
-    "https://#{@aws_s3_bucket}.s3.us-west-2.amazonaws.com/#{local_url}"
+  def handle_event("cancel-edit-seller", _params, socket) do
+    socket =
+      socket
+      |> assign(step: nil)
+
+    {:noreply, socket}
   end
 
   def handle_event("stripe-link-account", _params, socket) do
@@ -312,39 +309,6 @@ defmodule PlazaWeb.MyStoreLive do
     {:noreply, socket}
   end
 
-  def handle_event("edit-seller", _params, socket) do
-    seller = socket.assigns.seller
-
-    socket =
-      socket
-      |> assign(
-        seller_form:
-          to_form(
-            SellerForm.changeset(
-              SellerForm.from_seller(seller),
-              %{}
-            )
-          )
-      )
-      |> assign(
-        local_logo_upload: %{
-          url: seller.profile_photo_url,
-          file_name: "your-current-logo.foto"
-        }
-      )
-      |> assign(step: "edit-seller")
-
-    {:noreply, socket}
-  end
-
-  def handle_event("cancel-edit-seller", _params, socket) do
-    socket =
-      socket
-      |> assign(step: nil)
-
-    {:noreply, socket}
-  end
-
   @impl Phoenix.LiveView
   def handle_params(%{"stripe-setup-refresh" => stripe_id}, _uri, socket) do
     socket =
@@ -357,8 +321,6 @@ defmodule PlazaWeb.MyStoreLive do
               return_url: "#{@site}/my-store?stripe-setup-return=#{stripe_id}",
               type: :account_onboarding
             })
-
-          IO.inspect(stripe_account_link_url)
 
           socket
           |> redirect(external: stripe_account_link_url)
@@ -422,7 +384,6 @@ defmodule PlazaWeb.MyStoreLive do
   @impl Phoenix.LiveView
   def handle_info({ref, {:stripe_link_account, url}}, socket) do
     Process.demonitor(ref, [:flush])
-    IO.inspect(url)
 
     socket =
       socket
@@ -454,17 +415,35 @@ defmodule PlazaWeb.MyStoreLive do
     {:noreply, socket}
   end
 
-  def handle_info({ref, {:logo_uploaded, s3_url, seller}}, socket) do
+  def handle_info({ref, {:upload_logo, seller}}, socket) do
     Process.demonitor(ref, [:flush])
 
-    seller = %{seller | profile_photo_url: s3_url}
-    IO.inspect(seller)
+    url = "https://#{@aws_s3_bucket}.s3-#{@aws_s3_region}.amazonaws.com"
+
+    config = %{
+      region: @aws_s3_region,
+      access_key_id: System.fetch_env!("AWS_ACCESS_KEY_ID_PLAZA"),
+      secret_access_key: System.fetch_env!("AWS_SECRET_ACCESS_KEY_PLAZA")
+    }
+
+    {:ok, fields} =
+      PlazaWeb.S3UrlPresign.sign_form_upload(
+        config,
+        @aws_s3_bucket,
+        key: socket.assigns.logo_upload,
+        content_type: "image/png",
+        max_file_size: 10_000_000,
+        expires_in: :timer.hours(1)
+      )
 
     socket =
-      create_or_update_seller(
-        socket,
-        seller
-      )
+      socket
+      |> assign(seller: seller)
+      |> push_event("upload", %{
+        url: url,
+        fields: fields,
+        side: "logo"
+      })
 
     {:noreply, socket}
   end
@@ -488,7 +467,6 @@ defmodule PlazaWeb.MyStoreLive do
                     }
 
                     {:ok, product} = Products.create_product(product)
-                    IO.inspect(product)
 
                     socket =
                       socket
@@ -538,9 +516,9 @@ defmodule PlazaWeb.MyStoreLive do
       <div style="position: relative; top: 50px;">
         <.seller_form
           seller_form={@seller_form}
-          uploads={@uploads}
-          local_logo_upload={@local_logo_upload}
+          logo_upload={@logo_upload}
           seller={@seller}
+          uuid={@uuid}
         />
       </div>
     </div>
@@ -564,9 +542,9 @@ defmodule PlazaWeb.MyStoreLive do
       <div>
         <.seller_form
           seller_form={@seller_form}
-          uploads={@uploads}
-          local_logo_upload={@local_logo_upload}
+          logo_upload={@logo_upload}
           seller={@seller}
+          uuid={@uuid}
         />
       </div>
     </div>
@@ -579,9 +557,9 @@ defmodule PlazaWeb.MyStoreLive do
       <div style="display: flex; flex-direction: column;">
         <.seller_form
           seller_form={@seller_form}
-          uploads={@uploads}
-          local_logo_upload={@local_logo_upload}
+          logo_upload={@logo_upload}
           seller={@seller}
+          uuid={@uuid}
         />
         <div style="display: flex; justify-content: center; margin-top: 50px;">
           <button
@@ -811,20 +789,28 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
+  attr :seller_form, :map, required: true
+  attr :logo_upload, :string, required: true
+  attr :seller, :map, required: true
+  attr :uuid, :string, required: true
+
   defp seller_form(assigns) do
     ~H"""
     <div style="display: flex; justify-content: center;">
       <div>
         <form>
-          <div :if={!@local_logo_upload[:url]}>
+          <div :if={!@logo_upload}>
             <label
               class="has-font-3 is-size-4"
               style="width: 312px; height: 300px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
             >
-              <.live_file_input
-                upload={@uploads.logo}
+              <input
+                id="plaza-logo-input"
+                phx-hook="LogoFileReader"
+                type="file"
+                accept=".png"
+                multiple={false}
                 style="display: none;"
-                phx-change="change-seller-logo"
               />
               <div style="text-align: center; text-decoration: underline; font-size: 24px;">
                 Upload
@@ -835,14 +821,16 @@ defmodule PlazaWeb.MyStoreLive do
             </label>
           </div>
           <div
-            :if={@local_logo_upload[:url]}
-            style="width: 312px; height: 300px; overflow: hidden; border: 1px solid black;"
+            :if={@logo_upload}
+            id={"plaza-logo-display-hook-#{@uuid}"}
+            phx-hook="LogoDisplay"
+            style="position: relative; left: 5px;"
           >
-            <img src={@local_logo_upload.url} />
-          </div>
-          <div :if={@local_logo_upload[:file_name]} style="position: relative; left: 5px;">
+            <div style="width: 312px; height: 300px; overflow: hidden; border: 1px solid black;">
+              <img id="plaza-logo-display" />
+            </div>
             <div style="display: inline-block; width: 270px; font-size: 24px; color: gray;">
-              <%= @local_logo_upload.file_name %>
+              <%= @logo_upload %>
             </div>
             <div style="display: inline-block;">
               <button type="button" phx-click="logo-upload-cancel">

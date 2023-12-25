@@ -46,6 +46,55 @@ Hooks.LocalStorage = {
     localStorage.removeItem(obj.key)
   }
 };
+// logo reader hook 
+let logoBase64; let logoPng; let logoFileName;
+Hooks.LogoFileReader = {
+  mounted() {
+    const logoInput = document.getElementById(
+      "plaza-logo-input"
+    );
+    this.handleEvent("logo-upload-cancel", (_) => {
+      logoBase64 = logoPng = logoFileName = null;
+    });
+    logoInput.addEventListener("change", async () => {
+      const files = logoInput.files;
+      if (files.length == 1) {
+        const file = files[0];
+        logoFileName = file.name.replace(" ", "");
+        const url = URL.createObjectURL(file);
+        Jimp.read(url)
+          .then(async (image) => {
+            logoPng = image;
+            logoBase64 = await image.getBase64Async(Jimp.AUTO);
+            this.pushEvent(
+              "logo-upload-change",
+              logoFileName
+            );
+          });
+      }
+    });
+  }
+}
+// logo display hook 
+Hooks.LogoDisplay = {
+  mounted() {
+    console.log("here");
+    const display = document.getElementById(
+      "plaza-logo-display"
+    );
+    display.src = logoBase64;
+  }
+}
+window.addEventListener("phx:plaza-logo-display-s3-url", (obj) => {
+  console.log("and here");
+  const display = document.getElementById(
+    "plaza-logo-display"
+  );
+  if (display) {
+    display.src = obj.detail.url
+  }
+  logoBase64 = obj.detail.url;
+});
 // file reader hook 
 let frontMockUrl; let backMockUrl;
 let frontMockPng; let backMockPng;
@@ -167,7 +216,6 @@ Hooks.FileDisplay = {
     };
   }
 }
-
 // S3 file uploader 
 Hooks.S3FileUploader = {
   mounted() {
@@ -185,6 +233,10 @@ Hooks.S3FileUploader = {
         const mockFileName = "mock_" + backFileName;
         const mockPng = await jimpToPng(backMockPng, mockFileName);
         uploadToS3(this, "back-mock", obj.url, obj.mock_fields, mockPng);
+      }
+      if (obj.side === "logo") {
+        const png = await jimpToPng(logoPng, logoFileName);
+        uploadToS3(this, "logo", obj.url, obj.fields, png);
       }
     })
   },
