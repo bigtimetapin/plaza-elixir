@@ -86,9 +86,6 @@ defmodule Plaza.Accounts.SellerForm do
       :user_id,
       :user_name
     ])
-    |> validate_length(:instagram, min: 1)
-    |> validate_length(:soundcloud, min: 1)
-    |> validate_length(:twitter, min: 1)
   end
 
   defp types() do

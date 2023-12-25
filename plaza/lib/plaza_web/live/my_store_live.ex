@@ -143,27 +143,13 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   def handle_event("change-seller-form", %{"seller_form" => attrs}, socket) do
-    %{
-      "instagram" => instagram,
-      "soundcloud" => soundcloud,
-      "twitter" => twitter,
-      "user_name" => user_name,
-      "website" => website
-    } = attrs
-
-    seller_form = socket.assigns.seller_form
-    seller_form_data = seller_form.data
-
-    seller_form_data = %{
-      seller_form_data
-      | user_name: user_name,
-        website: website,
-        instagram: instagram,
-        soundcloud: soundcloud,
-        twitter: twitter
-    }
-
-    seller_form = %{seller_form | data: seller_form_data}
+    seller_form =
+      SellerForm.changeset(
+        socket.assigns.seller_form.data,
+        attrs
+      )
+      |> Map.put(:action, :insert)
+      |> to_form()
 
     socket =
       socket
