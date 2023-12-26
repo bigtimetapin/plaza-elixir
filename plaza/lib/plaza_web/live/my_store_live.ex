@@ -732,19 +732,17 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
-  defp url_or(%{url: {:default, default}} = assigns) do
-    ~H"""
-    <div style="opacity: 70%;">
-      <%= default %>
-    </div>
-    """
-  end
-
   defp url_or(%{url: {:url, url}} = assigns) do
     ~H"""
     <a href={url} target="_blank">
       <%= url %>
     </a>
+    """
+  end
+
+  defp url_or(assigns) do
+    ~H"""
+
     """
   end
 
