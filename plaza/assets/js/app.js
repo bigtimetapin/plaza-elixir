@@ -31,19 +31,19 @@ let Hooks = {};
 // local storage hook
 Hooks.LocalStorage = {
   mounted() {
-    this.handleEvent("write", (obj) => this.write(obj))
-    this.handleEvent("clear", (obj) => this.clear(obj))
-    this.handleEvent("read", (obj) => this.read(obj))
+    this.handleEvent("write", (obj) => this.write(obj));
+    this.handleEvent("clear", (obj) => this.clear(obj));
+    this.handleEvent("read", (obj) => this.read(obj));
   },
   write(obj) {
-    localStorage.setItem(obj.key, obj.data)
+    localStorage.setItem(obj.key, obj.data);
   },
   read(obj) {
-    var data = localStorage.getItem(obj.key)
-    this.pushEvent(obj.event, data)
+    const data = localStorage.getItem(obj.key);
+    this.pushEvent(obj.event, data);
   },
   clear(obj) {
-    localStorage.removeItem(obj.key)
+    localStorage.removeItem(obj.key);
   }
 };
 // logo reader hook 

@@ -1,6 +1,8 @@
 defmodule PlazaWeb.ProductLive do
   use PlazaWeb, :live_view
 
+  require Logger
+
   alias Ecto.Changeset
 
   alias Plaza.Accounts
@@ -14,6 +16,8 @@ defmodule PlazaWeb.ProductLive do
 
   ## @site "http://localhost:4000"
   @site "https://plazaaaaa-solitary-snowflake-7144-summer-wave-9195.fly.dev"
+
+  @local_storage_key "plaza-checkout-cart"
 
   @impl Phoenix.LiveView
   def mount(params, _session, socket) do
@@ -78,6 +82,14 @@ defmodule PlazaWeb.ProductLive do
               )
           )
           |> assign(name: nil)
+          |> assign(cart: [])
+          |> push_event(
+            "read",
+            %{
+              key: @local_storage_key,
+              event: "read-cart"
+            }
+          )
       else
         socket
         |> assign(waiting: true)
@@ -179,6 +191,79 @@ defmodule PlazaWeb.ProductLive do
   end
 
   @impl Phoenix.LiveView
+  def handle_event("add-to-cart", _, socket) do
+    cart = socket.assigns.cart
+    product = socket.assigns.product
+    cart = [product | cart]
+    cart = Enum.uniq_by(cart, fn p -> p.id end)
+
+    socket =
+      socket
+      |> push_event(
+        "write",
+        %{
+          key: @local_storage_key,
+          data: serialize_to_token(cart)
+        }
+      )
+      |> assign(cart: cart)
+
+    {:noreply, socket}
+  end
+
+  defp serialize_to_token(state_data) do
+    salt = Application.get_env(:plaza, PlazaWeb.Endpoint)[:live_view][:signing_salt]
+    Phoenix.Token.encrypt(PlazaWeb.Endpoint, salt, state_data)
+  end
+
+  def handle_event("read-cart", token_data, socket) when is_binary(token_data) do
+    socket =
+      case restore_from_token(token_data) do
+        {:ok, nil} ->
+          # do nothing with the previous state
+          socket
+
+        {:ok, restored} ->
+          socket
+          |> assign(cart: restored)
+
+        {:error, reason} ->
+          # We don't continue checking. Display error.
+          # Clear the token so it doesn't keep showing an error.
+          socket
+          |> put_flash(:error, reason)
+          |> clear_browser_storage()
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("read-cart", _token_data, socket) do
+    Logger.debug("No (valid) cart to restore")
+    {:noreply, socket}
+  end
+
+  defp restore_from_token(nil), do: {:ok, nil}
+
+  defp restore_from_token(token) do
+    salt = Application.get_env(:plaza, PlazaWeb.Endpoint)[:live_view][:signing_salt]
+    # Max age is 1 day. 86,400 seconds
+    case Phoenix.Token.decrypt(PlazaWeb.Endpoint, salt, token, max_age: 86_400) do
+      {:ok, data} ->
+        {:ok, data}
+
+      {:error, reason} ->
+        # handles `:invalid`, `:expired` and possibly other things?
+        {:error, "Failed to restore previous state. Reason: #{inspect(reason)}."}
+    end
+  end
+
+  # Push a websocket event down to the browser's JS hook.
+  # Clear any settings for the current my_storage_key.
+  defp clear_browser_storage(socket) do
+    push_event(socket, "clear", %{key: @local_storage_key})
+  end
+
   def handle_event("step", %{"step" => "2"}, socket) do
     socket =
       socket
@@ -566,6 +651,14 @@ defmodule PlazaWeb.ProductLive do
               <img src="svg/yellow-ellipse.svg" />
               <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
                 Purchase
+              </div>
+            </button>
+          </div>
+          <div style="align-self: center;">
+            <button phx-click="add-to-cart">
+              <img src="svg/yellow-ellipse.svg" />
+              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                Add to cart
               </div>
             </button>
           </div>
