@@ -9,6 +9,7 @@ defmodule PlazaWeb.CheckoutLive do
   def mount(_params, _session, socket) do
     socket =
       socket
+      |> assign(cart: [])
       |> push_event(
         "read",
         %{
@@ -74,8 +75,43 @@ defmodule PlazaWeb.CheckoutLive do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <div style="margin-top: 150px; margin-bottom: 150px; display: flex;">
-      <div>
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 150px; display: flex;">
+      <div style="margin-left: 50px; font-size: 44px;">
+        <div style="display: flex; border-bottom: 2px solid grey; width: 800px;">
+          <div>
+            carrinho
+          </div>
+          <div style="margin-left: 100px;">
+            item
+          </div>
+          <div style="margin-left: auto; margin-right: 10px;">
+            valor
+          </div>
+        </div>
+        <div style="margin-top: 20px;">
+          <div :for={product <- @cart} style="display: flex;">
+            <div style="width: 100px;">
+              <button>
+                <img src={
+                  if product.designs.display == 0, do: product.mocks.front, else: product.mocks.back
+                } />
+              </button>
+            </div>
+            <div style="margin-left: 127px; font-size: 32px;">
+              <%= product.name %>
+            </div>
+            <div style="margin-left: auto; margin-right: 10px;">
+              <div style="font-size: 32px;">
+                <%= "R$ #{String.replace(Float.to_string(product.price), ".", ",")}" %>
+              </div>
+              <div style="font-size: 28px; color: grey;">
+                here
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-left: 50px; font-size: 44px;">
         here
       </div>
     </div>
