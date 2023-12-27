@@ -62,25 +62,14 @@ defmodule PlazaWeb.Header do
             </div>
           </div>
         </div>
-        <div class="level-item pr-xmedium">carrinho</div>
+        <div class="level-item pr-xmedium">
+          <.checkout_href />
+        </div>
         <div class="level-item">
           <.no_store_yet_href />
         </div>
       </:right>
     </.left>
-    """
-  end
-
-  def header(%{header: :my_store, current_user: nil} = assigns) do
-    ~H"""
-    <.my_store>
-      <:login>
-        <.login_href />
-      </:login>
-      <:store>
-        <.no_store_yet_selected />
-      </:store>
-    </.my_store>
     """
   end
 
@@ -137,6 +126,45 @@ defmodule PlazaWeb.Header do
     """
   end
 
+  def header(%{header: :checkout, current_user: nil} = assigns) do
+    ~H"""
+    <.checkout>
+      <:login>
+        <.login_href />
+      </:login>
+      <:store>
+        <.no_store_yet_href />
+      </:store>
+    </.checkout>
+    """
+  end
+
+  def header(%{header: :checkout, seller: nil} = assigns) do
+    ~H"""
+    <.checkout>
+      <:login>
+        <.my_account_href />
+      </:login>
+      <:store>
+        <.no_store_yet_href />
+      </:store>
+    </.checkout>
+    """
+  end
+
+  def header(%{header: :checkout} = assigns) do
+    ~H"""
+    <.checkout>
+      <:login>
+        <.my_account_href />
+      </:login>
+      <:store>
+        <.my_store_href />
+      </:store>
+    </.checkout>
+    """
+  end
+
   slot :login, required: true
   slot :store, required: true
 
@@ -148,13 +176,49 @@ defmodule PlazaWeb.Header do
           <%= render_slot(@login) %>
         </div>
         <div class="level-item pr-xmedium">
-          carrinho
+          <.checkout_href />
         </div>
         <div class="level-item pr-xmedium">
           <%= render_slot(@store) %>
         </div>
       </:right>
     </.left>
+    """
+  end
+
+  slot :login, required: true
+  slot :store, required: true
+
+  defp checkout(assigns) do
+    ~H"""
+    <.left selected={false}>
+      <:right>
+        <div class="level-item pr-xmedium">
+          <%= render_slot(@login) %>
+        </div>
+        <div class="level-item pr-xmedium">
+          <.link navigate="/checkout">
+            carrinho
+            <div style="position: absolute;">
+              <div style="position: relative; left: 26px;">
+                <img src="/svg/yellow-circle.svg" />
+              </div>
+            </div>
+          </.link>
+        </div>
+        <div class="level-item pr-xmedium">
+          <%= render_slot(@store) %>
+        </div>
+      </:right>
+    </.left>
+    """
+  end
+
+  defp checkout_href(assigns) do
+    ~H"""
+    <.link navigate="/checkout">
+      carrinho
+    </.link>
     """
   end
 
@@ -211,7 +275,7 @@ defmodule PlazaWeb.Header do
       <:right>
         <div class="level-item pr-xmedium">
           <div>
-            conta
+            <.my_account_href />
             <div style="position: absolute;">
               <div style="position: relative; left: 13px;">
                 <img src="/svg/yellow-circle.svg" />
@@ -219,7 +283,9 @@ defmodule PlazaWeb.Header do
             </div>
           </div>
         </div>
-        <div class="level-item pr-xmedium">carrinho</div>
+        <div class="level-item pr-xmedium">
+          <.checkout_href />
+        </div>
         <div class="level-item">
           <%= render_slot(@store) %>
         </div>
@@ -238,7 +304,9 @@ defmodule PlazaWeb.Header do
         <div class="level-item pr-xmedium">
           <%= render_slot(@login) %>
         </div>
-        <div class="level-item pr-xmedium">carrinho</div>
+        <div class="level-item pr-xmedium">
+          <.checkout_href />
+        </div>
         <div class="level-item pr-xmedium">
           <%= render_slot(@store) %>
         </div>

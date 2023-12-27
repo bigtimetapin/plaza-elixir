@@ -3,20 +3,42 @@ defmodule PlazaWeb.CheckoutLive do
 
   require Logger
 
+  alias Plaza.Accounts
+
   @local_storage_key "plaza-checkout-cart"
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     socket =
+      case connected?(socket) do
+        false ->
+          socket
+
+        true ->
+          seller =
+            case socket.assigns.current_user do
+              nil ->
+                nil
+
+              %{id: id} ->
+                Accounts.get_seller_by_id(id)
+            end
+
+          socket
+          |> assign(seller: seller)
+          |> push_event(
+            "read",
+            %{
+              key: @local_storage_key,
+              event: "read-cart"
+            }
+          )
+      end
+
+    socket =
       socket
       |> assign(cart: [])
-      |> push_event(
-        "read",
-        %{
-          key: @local_storage_key,
-          event: "read-cart"
-        }
-      )
+      |> assign(header: :checkout)
 
     {:ok, socket}
   end
@@ -264,9 +286,7 @@ defmodule PlazaWeb.CheckoutLive do
           </div>
         </div>
       </div>
-      <div style="margin-left: 50px; font-size: 44px;">
-        here
-      </div>
+      <div style="margin-left: 50px; font-size: 44px;"></div>
     </div>
     """
   end
