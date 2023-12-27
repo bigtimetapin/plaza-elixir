@@ -83,6 +83,8 @@ defmodule PlazaWeb.ProductLive do
           )
           |> assign(name: nil)
           |> assign(cart: [])
+          |> assign(cart_product_size: "m")
+          |> assign(cart_product_quantity: 1)
           |> push_event(
             "read",
             %{
@@ -194,8 +196,17 @@ defmodule PlazaWeb.ProductLive do
   def handle_event("add-to-cart", _, socket) do
     cart = socket.assigns.cart
     product = socket.assigns.product
-    cart = [product | cart]
-    cart = Enum.uniq_by(cart, fn p -> p.id end)
+    size = socket.assigns.cart_product_size
+    quantity = socket.assigns.cart_product_quantity
+
+    item = %{
+      product: product,
+      size: size,
+      quantity: quantity
+    }
+
+    cart = [item | cart]
+    cart = Enum.uniq_by(cart, fn i -> i.product.id end)
 
     socket =
       socket
@@ -207,6 +218,30 @@ defmodule PlazaWeb.ProductLive do
         }
       )
       |> assign(cart: cart)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-size", %{"size" => size}, socket) do
+    socket =
+      socket
+      |> assign(cart_product_size: size)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-quantity", %{"op" => operator}, socket) do
+    quantity = socket.assigns.cart_product_quantity
+
+    quantity =
+      case operator do
+        "add" -> quantity + 1
+        "subtract" -> quantity - 1
+      end
+
+    socket =
+      socket
+      |> assign(cart_product_quantity: quantity)
 
     {:noreply, socket}
   end
@@ -654,13 +689,65 @@ defmodule PlazaWeb.ProductLive do
               </div>
             </button>
           </div>
-          <div style="align-self: center;">
-            <button phx-click="add-to-cart">
-              <img src="svg/yellow-ellipse.svg" />
-              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                Add to cart
+          <div style="align-self: center; display: flex;">
+            <div>
+              <button phx-click="add-to-cart">
+                <img src="svg/yellow-ellipse.svg" />
+                <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                  Add to cart
+                </div>
+              </button>
+            </div>
+            <div style="margin-left: 10px;">
+              <div>
+                <button
+                  phx-click="change-size"
+                  phx-value-size="s"
+                  style={
+                    if @cart_product_size == "s",
+                      do: "font-size: 44px; margin-left: 5px",
+                      else: "margin-left: 5px"
+                  }
+                >
+                  S
+                </button>
+                <button
+                  phx-click="change-size"
+                  phx-value-size="m"
+                  style={
+                    if @cart_product_size == "m",
+                      do: "font-size: 44px; margin-left: 5px",
+                      else: "margin-left: 5px"
+                  }
+                >
+                  M
+                </button>
+                <button
+                  phx-click="change-size"
+                  phx-value-size="l"
+                  style={if @cart_product_size == "l", do: "font-size: 44px;"}
+                >
+                  L
+                </button>
               </div>
-            </button>
+              <div style="display: flex;">
+                <div>
+                  <button phx-click="change-quantity" phx-value-op="add">
+                    +
+                  </button>
+                  <button
+                    :if={@cart_product_quantity > 0}
+                    phx-click="change-quantity"
+                    phx-value-op="subtract"
+                  >
+                    -
+                  </button>
+                </div>
+                <div style="border: 1px solid grey; width: 50px; text-align: center; margin-left: 5px;">
+                  <%= @cart_product_quantity %>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

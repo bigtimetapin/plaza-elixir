@@ -72,6 +72,93 @@ defmodule PlazaWeb.CheckoutLive do
     push_event(socket, "clear", %{key: @local_storage_key})
   end
 
+  defp serialize_to_token(state_data) do
+    salt = Application.get_env(:plaza, PlazaWeb.Endpoint)[:live_view][:signing_salt]
+    Phoenix.Token.encrypt(PlazaWeb.Endpoint, salt, state_data)
+  end
+
+  def handle_event("change-size", %{"size" => size, "product-id" => product_id}, socket) do
+    cart = socket.assigns.cart
+    product_id = String.to_integer(product_id)
+
+    {item, index} =
+      Enum.with_index(cart)
+      |> Enum.find(fn {item, _} -> item.product.id == product_id end)
+
+    item = %{item | size: size}
+    cart = List.replace_at(cart, index, item)
+
+    socket =
+      socket
+      |> assign(cart: cart)
+      |> push_event(
+        "write",
+        %{
+          key: @local_storage_key,
+          data: serialize_to_token(cart)
+        }
+      )
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-quantity", %{"op" => operator, "product-id" => product_id}, socket) do
+    cart = socket.assigns.cart
+    product_id = String.to_integer(product_id)
+
+    {item, index} =
+      Enum.with_index(cart)
+      |> Enum.find(fn {item, _} -> item.product.id == product_id end)
+
+    quantity = item.quantity
+
+    quantity =
+      case operator do
+        "add" -> quantity + 1
+        "subtract" -> quantity - 1
+      end
+
+    item = %{item | quantity: quantity}
+    cart = List.replace_at(cart, index, item)
+
+    socket =
+      socket
+      |> assign(cart: cart)
+      |> push_event(
+        "write",
+        %{
+          key: @local_storage_key,
+          data: serialize_to_token(cart)
+        }
+      )
+
+    {:noreply, socket}
+  end
+
+  def handle_event("remove-from-cart", %{"product-id" => product_id}, socket) do
+    cart = socket.assigns.cart
+    product_id = String.to_integer(product_id)
+
+    {_, index} =
+      Enum.with_index(cart)
+      |> Enum.find(fn {item, _} -> item.product.id == product_id end)
+
+    cart = List.delete_at(cart, index)
+
+    socket =
+      socket
+      |> assign(cart: cart)
+      |> push_event(
+        "write",
+        %{
+          key: @local_storage_key,
+          data: serialize_to_token(cart)
+        }
+      )
+
+    {:noreply, socket}
+  end
+
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
@@ -89,23 +176,89 @@ defmodule PlazaWeb.CheckoutLive do
           </div>
         </div>
         <div style="margin-top: 20px;">
-          <div :for={product <- @cart} style="display: flex;">
+          <div :for={item <- @cart} style="display: flex;">
             <div style="width: 100px;">
               <button>
                 <img src={
-                  if product.designs.display == 0, do: product.mocks.front, else: product.mocks.back
+                  if item.product.designs.display == 0,
+                    do: item.product.mocks.front,
+                    else: item.product.mocks.back
                 } />
               </button>
             </div>
-            <div style="margin-left: 127px; font-size: 32px;">
-              <%= product.name %>
+            <div style="margin-left: 127px;">
+              <div style="font-size: 32px;">
+                <%= item.product.name %>
+              </div>
+              <div style="font-size: 28px; color: grey;">
+                <button
+                  phx-click="change-size"
+                  phx-value-size="s"
+                  phx-value-product-id={item.product.id}
+                  style={
+                    if item.size == "s",
+                      do: "font-size: 38px; margin-left: 5px",
+                      else: "margin-left: 5px"
+                  }
+                >
+                  S
+                </button>
+                <button
+                  phx-click="change-size"
+                  phx-value-size="m"
+                  phx-value-product-id={item.product.id}
+                  style={
+                    if item.size == "m",
+                      do: "font-size: 38px; margin-left: 5px",
+                      else: "margin-left: 5px"
+                  }
+                >
+                  M
+                </button>
+                <button
+                  phx-click="change-size"
+                  phx-value-size="l"
+                  phx-value-product-id={item.product.id}
+                  style={if item.size == "l", do: "font-size: 38px;"}
+                >
+                  L
+                </button>
+              </div>
             </div>
             <div style="margin-left: auto; margin-right: 10px;">
               <div style="font-size: 32px;">
-                <%= "R$ #{String.replace(Float.to_string(product.price), ".", ",")}" %>
+                <%= "R$ #{String.replace(Float.to_string(item.product.price), ".", ",")}" %>
               </div>
-              <div style="font-size: 28px; color: grey;">
-                here
+              <div style="display: flex; font-size: 22px; margin-top: 5px;">
+                <div>
+                  <button
+                    phx-click="change-quantity"
+                    phx-value-op="add"
+                    phx-value-product-id={item.product.id}
+                  >
+                    +
+                  </button>
+                  <button
+                    :if={item.quantity > 1}
+                    phx-click="change-quantity"
+                    phx-value-op="subtract"
+                    phx-value-product-id={item.product.id}
+                  >
+                    -
+                  </button>
+                </div>
+                <div style="border: 1px solid grey; width: 40px; text-align: center; margin-left: 5px;">
+                  <%= item.quantity %>
+                </div>
+              </div>
+              <div>
+                <button
+                  style="font-size: 18px; color: grey; position: relative; bottom: 25px;"
+                  phx-click="remove-from-cart"
+                  phx-value-product-id={item.product.id}
+                >
+                  remover
+                </button>
               </div>
             </div>
           </div>
