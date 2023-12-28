@@ -85,6 +85,7 @@ defmodule PlazaWeb.ProductLive do
           |> assign(cart: [])
           |> assign(cart_product_size: "m")
           |> assign(cart_product_quantity: 1)
+          |> assign(already_in_cart: false)
           |> push_event(
             "read",
             %{
@@ -218,6 +219,32 @@ defmodule PlazaWeb.ProductLive do
         }
       )
       |> assign(cart: cart)
+      |> assign(already_in_cart: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("remove-from-cart", _, socket) do
+    cart = socket.assigns.cart
+    product = socket.assigns.product
+
+    {_, index} =
+      Enum.with_index(cart)
+      |> Enum.find(fn {item, _} -> item.product.id == product.id end)
+
+    cart = List.delete_at(cart, index)
+
+    socket =
+      socket
+      |> push_event(
+        "write",
+        %{
+          key: @local_storage_key,
+          data: serialize_to_token(cart)
+        }
+      )
+      |> assign(cart: cart)
+      |> assign(already_in_cart: false)
 
     {:noreply, socket}
   end
@@ -259,8 +286,12 @@ defmodule PlazaWeb.ProductLive do
           socket
 
         {:ok, restored} ->
+          product_id = socket.assigns.product.id
+          already_in_cart = Enum.any?(restored, fn item -> item.product.id == product_id end)
+
           socket
           |> assign(cart: restored)
+          |> assign(already_in_cart: already_in_cart)
 
         {:error, reason} ->
           # We don't continue checking. Display error.
@@ -689,7 +720,7 @@ defmodule PlazaWeb.ProductLive do
               </div>
             </button>
           </div>
-          <div style="align-self: center; display: flex;">
+          <div :if={!@already_in_cart} style="align-self: center; display: flex;">
             <div>
               <button phx-click="add-to-cart">
                 <img src="svg/yellow-ellipse.svg" />
@@ -736,7 +767,7 @@ defmodule PlazaWeb.ProductLive do
                     +
                   </button>
                   <button
-                    :if={@cart_product_quantity > 0}
+                    :if={@cart_product_quantity > 1}
                     phx-click="change-quantity"
                     phx-value-op="subtract"
                   >
@@ -747,6 +778,16 @@ defmodule PlazaWeb.ProductLive do
                   <%= @cart_product_quantity %>
                 </div>
               </div>
+            </div>
+          </div>
+          <div :if={@already_in_cart} style="align-self: center;">
+            <div>
+              <button phx-click="remove-from-cart">
+                <img src="svg/yellow-ellipse.svg" />
+                <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                  Remove from cart
+                </div>
+              </button>
             </div>
           </div>
         </div>
