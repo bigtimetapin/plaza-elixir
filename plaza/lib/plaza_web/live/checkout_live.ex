@@ -38,6 +38,8 @@ defmodule PlazaWeb.CheckoutLive do
     socket =
       socket
       |> assign(cart: [])
+      |> assign(cart_empty: true)
+      |> assign(cart_total_amount: 0)
       |> assign(header: :checkout)
 
     {:ok, socket}
@@ -51,11 +53,16 @@ defmodule PlazaWeb.CheckoutLive do
           # do nothing with the previous state
           socket
 
-        {:ok, restored} ->
-          IO.inspect(restored)
+        {:ok, cart} ->
+          cart_empty = Enum.empty?(cart)
+
+          cart_total_amount =
+            List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
 
           socket
-          |> assign(cart: restored)
+          |> assign(cart: cart)
+          |> assign(cart_empty: cart_empty)
+          |> assign(cart_total_amount: cart_total_amount)
 
         {:error, reason} ->
           # We don't continue checking. Display error.
@@ -109,10 +116,16 @@ defmodule PlazaWeb.CheckoutLive do
 
     item = %{item | size: size}
     cart = List.replace_at(cart, index, item)
+    cart_empty = Enum.empty?(cart)
+
+    cart_total_amount =
+      List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
 
     socket =
       socket
       |> assign(cart: cart)
+      |> assign(cart_empty: cart_empty)
+      |> assign(cart_total_amount: cart_total_amount)
       |> push_event(
         "write",
         %{
@@ -142,10 +155,16 @@ defmodule PlazaWeb.CheckoutLive do
 
     item = %{item | quantity: quantity}
     cart = List.replace_at(cart, index, item)
+    cart_empty = Enum.empty?(cart)
+
+    cart_total_amount =
+      List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
 
     socket =
       socket
       |> assign(cart: cart)
+      |> assign(cart_empty: cart_empty)
+      |> assign(cart_total_amount: cart_total_amount)
       |> push_event(
         "write",
         %{
@@ -166,10 +185,16 @@ defmodule PlazaWeb.CheckoutLive do
       |> Enum.find(fn {item, _} -> item.product.id == product_id end)
 
     cart = List.delete_at(cart, index)
+    cart_empty = Enum.empty?(cart)
+
+    cart_total_amount =
+      List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
 
     socket =
       socket
       |> assign(cart: cart)
+      |> assign(cart_empty: cart_empty)
+      |> assign(cart_total_amount: cart_total_amount)
       |> push_event(
         "write",
         %{
@@ -248,7 +273,7 @@ defmodule PlazaWeb.CheckoutLive do
               </div>
             </div>
             <div style="margin-left: auto; margin-right: 10px;">
-              <div style="font-size: 32px;">
+              <div style="font-size: 28px;">
                 <%= "R$ #{String.replace(Float.to_string(item.product.price), ".", ",")}" %>
               </div>
               <div style="display: flex; font-size: 22px; margin-top: 5px;">
@@ -282,6 +307,25 @@ defmodule PlazaWeb.CheckoutLive do
                   remover
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+        <div :if={!@cart_empty}>
+          <div style="display: flex; border-bottom: 2px solid grey; width: 800px;"></div>
+          <div style="display: flex; font-size: 28px;">
+            <div>
+              valor dos prodotus
+            </div>
+            <div style="margin-left: auto; margin-right: 10px;">
+              <%= "R$ #{Float.to_string(@cart_total_amount) |> String.replace(".", ",")}" %>
+            </div>
+          </div>
+          <div style="display: flex; font-size: 28px;">
+            <div>
+              valor do frete
+            </div>
+            <div style="margin-left: auto; margin-right: 10px;">
+              calculado no checkout
             </div>
           </div>
         </div>
