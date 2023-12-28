@@ -206,6 +206,12 @@ defmodule PlazaWeb.CheckoutLive do
     {:noreply, socket}
   end
 
+  def handle_event("product-href", %{"product-id" => product_id}, socket) do
+    params = %{"product-id" => product_id}
+    url = URI.encode_query(params)
+    {:noreply, push_navigate(socket, to: "/product?#{url}")}
+  end
+
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
@@ -225,7 +231,7 @@ defmodule PlazaWeb.CheckoutLive do
         <div style="margin-top: 20px;">
           <div :for={item <- @cart} style="display: flex;">
             <div style="width: 100px;">
-              <button>
+              <button phx-click="product-href" phx-value-product-id={item.product.id}>
                 <img src={
                   if item.product.designs.display == 0,
                     do: item.product.mocks.front,
