@@ -63,7 +63,7 @@ defmodule PlazaWeb.Auth.Login do
         class="has-font-3"
         placeholder="senha"
       />
-      <.input field={@form[:redirect_url]} style="display: none;" />
+      <.input :if={!@full} field={@form[:redirect_url]} style="display: none;" />
       <:actions :if={@full}>
         <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
         <.link href={~p"/users/reset_password"} class="text-sm font-semibold">
