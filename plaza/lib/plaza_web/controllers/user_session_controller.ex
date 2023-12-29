@@ -18,20 +18,14 @@ defmodule PlazaWeb.UserSessionController do
     create(conn, params, "Welcome back!")
   end
 
-  def create_quick(conn, %{"user" => user_params}) do
-    %{"email" => email, "password" => password} = user_params
-
-    last_path =
-      NavigationHistory.last_path(
-        conn,
-        0
-      )
+  def create_quick(conn, %{"user" => user_params} = params) do
+    %{"email" => email, "password" => password, "redirect_url" => redirect_url} = user_params
 
     conn =
       conn
       |> put_session(
         :user_return_to,
-        last_path
+        redirect_url
       )
 
     if user = Accounts.get_user_by_email_and_password(email, password) do
@@ -43,7 +37,7 @@ defmodule PlazaWeb.UserSessionController do
       conn
       |> put_flash(:error, "Invalid email or password")
       |> put_flash(:email, String.slice(email, 0, 160))
-      |> redirect(to: last_path)
+      |> redirect(to: redirect_url)
     end
   end
 

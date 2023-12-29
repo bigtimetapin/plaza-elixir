@@ -4,6 +4,10 @@ defmodule PlazaWeb.CheckoutLive do
   require Logger
 
   alias Plaza.Accounts
+  alias Plaza.Accounts.Address
+
+  @site "http://localhost:4000"
+  ## @site "https://plazaaaaa-solitary-snowflake-7144-summer-wave-9195.fly.dev"
 
   @local_storage_key "plaza-checkout-cart"
 
@@ -13,19 +17,79 @@ defmodule PlazaWeb.CheckoutLive do
       case connected?(socket) do
         false ->
           socket
+          |> assign(waiting: true)
 
         true ->
-          seller =
+          {socket, user_id} =
             case socket.assigns.current_user do
+              nil ->
+                {
+                  socket
+                  |> assign(
+                    login_form:
+                      to_form(
+                        %{
+                          "email" => nil,
+                          "redirect_url" => "/checkout"
+                        },
+                        as: "user"
+                      )
+                  )
+                  |> assign(
+                    email_form:
+                      to_form(
+                        %{
+                          "email" => nil
+                        },
+                        as: "email-form"
+                      )
+                  )
+                  |> assign(email: nil)
+                  |> assign(email_form_is_empty: true),
+                  nil
+                }
+
+              current_user ->
+                {
+                  socket
+                  |> assign(email: current_user.email),
+                  current_user.id
+                }
+            end
+
+          seller =
+            case user_id do
               nil ->
                 nil
 
-              %{id: id} ->
+              id ->
                 Accounts.get_seller_by_id(id)
             end
 
           socket
           |> assign(seller: seller)
+          |> assign(
+            address_form:
+              to_form(
+                Address.changeset(
+                  %Address{
+                    user_id: user_id
+                  },
+                  %{}
+                )
+              )
+          )
+          |> assign(
+            name_form:
+              to_form(
+                %{
+                  "name" => nil
+                },
+                as: "name-form"
+              )
+          )
+          |> assign(name: nil)
+          |> assign(waiting: false)
           |> push_event(
             "read",
             %{
@@ -41,6 +105,7 @@ defmodule PlazaWeb.CheckoutLive do
       |> assign(cart_empty: true)
       |> assign(cart_total_amount: 0)
       |> assign(header: :checkout)
+      |> assign(step: 1)
 
     {:ok, socket}
   end
@@ -212,8 +277,47 @@ defmodule PlazaWeb.CheckoutLive do
     {:noreply, push_navigate(socket, to: "/product?#{url}")}
   end
 
+  def handle_event("change-email-form", %{"email-form" => %{"email" => email}}, socket) do
+    is_empty =
+      case email do
+        "" -> true
+        _ -> false
+      end
+
+    socket =
+      socket
+      |> assign(email_form_is_empty: is_empty)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("submit-email-form", %{"email-form" => %{"email" => email}}, socket) do
+    socket =
+      socket
+      |> assign(email: email)
+      |> assign(step: 2)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("step", %{"step" => "2"}, socket) do
+    socket =
+      socket
+      |> assign(step: 2)
+
+    {:noreply, socket}
+  end
+
   @impl Phoenix.LiveView
-  def render(assigns) do
+  def render(%{waiting: true} = assigns) do
+    ~H"""
+    <div style="margin-top: 200px; display: flex; justify-content: center;">
+      <img src="gif/loading.gif" />
+    </div>
+    """
+  end
+
+  def render(%{step: 1} = assigns) do
     ~H"""
     <div class="has-font-3" style="margin-top: 150px; margin-bottom: 150px; display: flex;">
       <div style="margin-left: 50px; font-size: 44px;">
@@ -336,7 +440,87 @@ defmodule PlazaWeb.CheckoutLive do
           </div>
         </div>
       </div>
-      <div style="margin-left: 50px; font-size: 44px;"></div>
+      <div style="margin-left: 50px; font-size: 44px;">
+        <.sign_in_or_continue_as_guest
+          current_user={@current_user}
+          cart_empty={@cart_empty}
+          login_form={assigns[:login_form]}
+          email_form={assigns[:email_form]}
+          email_form_is_empty={assigns[:email_form_is_empty]}
+        />
+      </div>
+    </div>
+    """
+  end
+
+  defp sign_in_or_continue_as_guest(%{current_user: nil} = assigns) do
+    ~H"""
+    <div :if={!@cart_empty} style="display: flex; justify-content: center;">
+      <div style="margin-left: 150px;">
+        <div style="font-size: 40px;">
+          checkout
+        </div>
+        <div style="font-size: 22px;">
+          coloque seu email para fazer login
+        </div>
+        <div>
+          <PlazaWeb.Auth.Login.login_quick form={@login_form} redirect_url="/checkout" />
+        </div>
+        <div>
+          <div style="font-size: 22px;">
+            ou continue como convidado
+          </div>
+          <div>
+            <.form for={@email_form} phx-change="change-email-form" phx-submit="submit-email-form">
+              <.input
+                field={@email_form[:email]}
+                type="email"
+                placeholder="email"
+                autocomplete="email"
+              />
+              <div style={if @email_form_is_empty, do: "opacity: 50%;"}>
+                <div style="display: flex; justify-content: center; margin-top: 50px;">
+                  <button disabled={@email_form_is_empty}>
+                    <img src="svg/yellow-ellipse.svg" />
+                    <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                      Continue
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </.form>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  defp sign_in_or_continue_as_guest(assigns) do
+    ~H"""
+    <div
+      :if={!@cart_empty}
+      style="display: flex; justify-content: center; width: 500px; margin-top: 150px;"
+    >
+      <button phx-click="step" phx-value-step="2">
+        <img src="svg/yellow-ellipse.svg" />
+        <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+          checkout
+        </div>
+      </button>
+    </div>
+    """
+  end
+
+  def render(%{step: 2} = assigns) do
+    ~H"""
+    <div
+      class="has-font-3"
+      style="margin-top: 150px; margin-bottom: 150px; display: flex; justify-content: center;"
+    >
+      <div>
+        here
+      </div>
     </div>
     """
   end

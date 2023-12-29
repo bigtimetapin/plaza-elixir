@@ -45,20 +45,41 @@ defmodule PlazaWeb.Auth.Login do
       action={if @full, do: ~p"/users/log_in", else: ~p"/users/log_in_quick"}
       phx-update="ignore"
     >
-      <.input field={@form[:email]} type="email" label="Email" required />
-      <.input field={@form[:password]} type="password" label="Password" required />
-
+      <.input
+        field={@form[:email]}
+        type="email"
+        label="Email"
+        required
+        style="border-bottom: 2px solid grey; font-size: 28px; border-left: none; border-right: none; border-top: none; width: 400px;"
+        class="has-font-3"
+        placeholder="seu email"
+      />
+      <.input
+        field={@form[:password]}
+        type="password"
+        label="Password"
+        required
+        style="border-bottom: 2px solid grey; font-size: 28px; border-left: none; border-right: none; border-top: none; width: 400px;"
+        class="has-font-3"
+        placeholder="senha"
+      />
+      <.input field={@form[:redirect_url]} style="display: none;" />
       <:actions :if={@full}>
         <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
         <.link href={~p"/users/reset_password"} class="text-sm font-semibold">
           Forgot your password?
         </.link>
       </:actions>
-      <:actions>
-        <.button phx-disable-with="Signing in..." class="w-full">
-          Sign in <span aria-hidden="true">→</span>
-        </.button>
-      </:actions>
+      <div style="display: flex;">
+        <div style="margin-left: auto;">
+          <button phx-disable-with="signing in...">
+            <img src="svg/yellow-ellipse.svg" />
+            <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+              sign in
+            </div>
+          </button>
+        </div>
+      </div>
     </.simple_form>
     """
   end
