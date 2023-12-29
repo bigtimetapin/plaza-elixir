@@ -300,6 +300,11 @@ defmodule PlazaWeb.CheckoutLive do
     {:noreply, socket}
   end
 
+  def handle_event("send-email", _, socket) do
+    Plaza.Accounts.UserNotifier.send_test()
+    {:noreply, socket}
+  end
+
   def handle_event("step", %{"step" => "2"}, socket) do
     socket =
       socket
@@ -519,7 +524,9 @@ defmodule PlazaWeb.CheckoutLive do
       style="margin-top: 150px; margin-bottom: 150px; display: flex; justify-content: center;"
     >
       <div>
-        here
+        <button phx-click="send-email">
+          send text email
+        </button>
       </div>
     </div>
     """

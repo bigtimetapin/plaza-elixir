@@ -20,15 +20,6 @@ config :plaza, PlazaWeb.Endpoint,
   pubsub_server: Plaza.PubSub,
   live_view: [signing_salt: "Ja77BJrf"]
 
-# Configures the mailer
-#
-# By default it uses the "Local" adapter which stores the emails
-# locally. You can see the emails in your browser, at "/dev/mailbox".
-#
-# For production it's recommended to configure a different adapter
-# at the `config/runtime.exs`.
-config :plaza, Plaza.Mailer, adapter: Swoosh.Adapters.Local
-
 # Configure the Cron Scheduler
 config :plaza, Plaza.Scheduler,
   jobs: [

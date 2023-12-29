@@ -17,6 +17,19 @@ defmodule Plaza.Accounts.UserNotifier do
     end
   end
 
+  def send_test() do
+    email =
+      new()
+      |> from({"Plaza T-Shirts", "plaza@plazaaaaa.com"})
+      |> to({"mrmizz", "alexander@plazaaaaa.com"})
+      |> subject("hello from elixir")
+      |> text_body("just this text body here")
+
+    {:ok, metadata} = Mailer.deliver(email)
+    IO.inspect(metadata)
+    IO.inspect(email)
+  end
+
   @doc """
   Deliver instructions to confirm account.
   """
