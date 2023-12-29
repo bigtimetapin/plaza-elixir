@@ -7,27 +7,13 @@ defmodule Plaza.Accounts.UserNotifier do
   defp deliver(recipient, subject, body) do
     email =
       new()
+      |> from({"Plaza", "plaza@plazaaaaa.com"})
       |> to(recipient)
-      |> from({"Plaza", "contact@example.com"})
       |> subject(subject)
       |> text_body(body)
 
-    with {:ok, _metadata} <- Mailer.deliver(email) do
-      {:ok, email}
-    end
-  end
-
-  def send_test() do
-    email =
-      new()
-      |> from({"Plaza T-Shirts", "plaza@plazaaaaa.com"})
-      |> to({"mrmizz", "alexander@plazaaaaa.com"})
-      |> subject("hello from elixir")
-      |> text_body("just this text body here")
-
     {:ok, metadata} = Mailer.deliver(email)
-    IO.inspect(metadata)
-    IO.inspect(email)
+    {:ok, metadata}
   end
 
   @doc """
