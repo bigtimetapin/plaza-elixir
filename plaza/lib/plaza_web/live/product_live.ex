@@ -203,7 +203,8 @@ defmodule PlazaWeb.ProductLive do
     item = %{
       product: product,
       size: size,
-      quantity: quantity
+      quantity: quantity,
+      available: true
     }
 
     cart = [item | cart]

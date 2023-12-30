@@ -14,6 +14,12 @@ defmodule PlazaWeb.CheckoutLive do
 
   @local_storage_key "plaza-checkout-cart"
 
+  @sku_map %{
+    "white-s" => "010101110108",
+    "white-m" => "010101110109",
+    "white-l" => "010101110110"
+  }
+
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     socket =
@@ -106,6 +112,7 @@ defmodule PlazaWeb.CheckoutLive do
       socket
       |> assign(cart: [])
       |> assign(cart_empty: true)
+      |> assign(cart_out_of_stock: false)
       |> assign(cart_total_amount: 0)
       |> assign(header: :checkout)
       |> assign(step: 1)
@@ -126,6 +133,14 @@ defmodule PlazaWeb.CheckoutLive do
 
           cart_total_amount =
             List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
+
+          Enum.each(cart, fn item ->
+            Task.async(fn ->
+              sku = Map.get(@sku_map, "white-#{item.size}")
+              {:ok, value} = Dimona.Requests.Availability.get(sku)
+              {:availability, item.product.id, value}
+            end)
+          end)
 
           socket
           |> assign(cart: cart)
@@ -189,6 +204,14 @@ defmodule PlazaWeb.CheckoutLive do
     cart_total_amount =
       List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
 
+    Enum.each(cart, fn item ->
+      Task.async(fn ->
+        sku = Map.get(@sku_map, "white-#{item.size}")
+        {:ok, value} = Dimona.Requests.Availability.get(sku)
+        {:availability, item.product.id, value}
+      end)
+    end)
+
     socket =
       socket
       |> assign(cart: cart)
@@ -228,6 +251,14 @@ defmodule PlazaWeb.CheckoutLive do
     cart_total_amount =
       List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
 
+    Enum.each(cart, fn item ->
+      Task.async(fn ->
+        sku = Map.get(@sku_map, "white-#{item.size}")
+        {:ok, value} = Dimona.Requests.Availability.get(sku)
+        {:availability, item.product.id, value}
+      end)
+    end)
+
     socket =
       socket
       |> assign(cart: cart)
@@ -254,6 +285,7 @@ defmodule PlazaWeb.CheckoutLive do
 
     cart = List.delete_at(cart, index)
     cart_empty = Enum.empty?(cart)
+    cart_out_of_stock = Enum.any?(cart, fn i -> !i.available end)
 
     cart_total_amount =
       List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
@@ -263,6 +295,7 @@ defmodule PlazaWeb.CheckoutLive do
       |> assign(cart: cart)
       |> assign(cart_empty: cart_empty)
       |> assign(cart_total_amount: cart_total_amount)
+      |> assign(cart_out_of_stock: cart_out_of_stock)
       |> push_event(
         "write",
         %{
@@ -388,6 +421,32 @@ defmodule PlazaWeb.CheckoutLive do
   end
 
   @impl Phoenix.LiveView
+  def handle_info({ref, {:availability, product_id, value}}, socket) do
+    Process.demonitor(ref, [:flush])
+    cart = socket.assigns.cart
+
+    {item, index} =
+      Enum.with_index(cart)
+      |> Enum.find(fn {item, _} -> item.product.id == product_id end)
+
+    supply = Map.values(value) |> List.first()
+
+    available = item.quantity + 5 <= supply
+    IO.inspect(available)
+    available = Enum.random([available, false])
+    IO.inspect(available)
+    item = %{item | available: available}
+    cart = List.replace_at(cart, index, item)
+    cart_out_of_stock = Enum.any?(cart, fn i -> !i.available end)
+
+    socket =
+      socket
+      |> assign(cart: cart)
+      |> assign(cart_out_of_stock: cart_out_of_stock)
+
+    {:noreply, socket}
+  end
+
   def handle_info({ref, {:shipping_quote, result}}, socket) do
     Process.demonitor(ref, [:flush])
 
@@ -505,7 +564,7 @@ defmodule PlazaWeb.CheckoutLive do
               <div style="font-size: 28px;">
                 <%= "R$ #{String.replace(Float.to_string(item.product.price), ".", ",")}" %>
               </div>
-              <div style="display: flex; font-size: 22px; margin-top: 5px;">
+              <div :if={item.available} style="display: flex; font-size: 22px; margin-top: 5px;">
                 <div>
                   <button
                     phx-click="change-quantity"
@@ -526,6 +585,9 @@ defmodule PlazaWeb.CheckoutLive do
                 <div style="border: 1px solid grey; width: 40px; text-align: center; margin-left: 5px;">
                   <%= item.quantity %>
                 </div>
+              </div>
+              <div :if={!item.available} style="font-size: 22px; margin-top: 5px;">
+                out of stock
               </div>
               <div>
                 <button
@@ -563,6 +625,7 @@ defmodule PlazaWeb.CheckoutLive do
         <.sign_in_or_continue_as_guest
           current_user={@current_user}
           cart_empty={@cart_empty}
+          cart_out_of_stock={@cart_out_of_stock}
           login_form={assigns[:login_form]}
           email_form={assigns[:email_form]}
           email_form_is_empty={assigns[:email_form_is_empty]}
@@ -621,7 +684,12 @@ defmodule PlazaWeb.CheckoutLive do
       :if={!@cart_empty}
       style="display: flex; justify-content: center; width: 500px; margin-top: 150px;"
     >
-      <button phx-click="step" phx-value-step="2">
+      <button
+        phx-click="step"
+        phx-value-step="2"
+        style={if @cart_out_of_stock, do: "opacity: 50%"}
+        disabled={@cart_out_of_stock}
+      >
         <img src="svg/yellow-ellipse.svg" />
         <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
           checkout

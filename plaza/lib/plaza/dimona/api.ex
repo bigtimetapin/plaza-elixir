@@ -24,7 +24,34 @@ defmodule Plaza.Dimona.Api do
         {:ok, Poison.decode!(body, keys: :atoms)}
 
       {:ok, %{body: body}} = resp ->
-        IO.inspect(resp)
+        {:error, body}
+
+      _ ->
+        {:error, :bad_network}
+    end
+  end
+
+  def get(url) do
+    case HTTPoison.get(@base_url <> url, headers()) do
+      {:ok, %{status_code: 404}} ->
+        {:error, :not_found}
+
+      {:ok, %{status_code: 401}} ->
+        {:error, :unauthorised}
+
+      {:ok, %{status_code: 400}} ->
+        {:error, :bad_request}
+
+      {:ok, %{status_code: 204}} ->
+        {:ok, nil}
+
+      {:ok, %{body: body, status_code: 201}} ->
+        {:ok, Poison.decode!(body, keys: :atoms)}
+
+      {:ok, %{body: body, status_code: 200}} ->
+        {:ok, Poison.decode!(body, keys: :atoms)}
+
+      {:ok, %{body: body}} = resp ->
         {:error, body}
 
       _ ->
