@@ -3,8 +3,11 @@ defmodule PlazaWeb.CheckoutLive do
 
   require Logger
 
+  alias Ecto.Changeset
+
   alias Plaza.Accounts
   alias Plaza.Accounts.Address
+  alias Plaza.Dimona
 
   @site "http://localhost:4000"
   ## @site "https://plazaaaaa-solitary-snowflake-7144-summer-wave-9195.fly.dev"
@@ -300,8 +303,71 @@ defmodule PlazaWeb.CheckoutLive do
     {:noreply, socket}
   end
 
-  def handle_event("send-email", _, socket) do
-    Plaza.Accounts.UserNotifier.send_test()
+  def handle_event("change-name-form", %{"name-form" => %{"name" => name}}, socket) do
+    socket =
+      socket
+      |> assign(name: name)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-address-form", params, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("submit-address-form", %{"address" => attrs}, socket) do
+    changes =
+      Address.changeset(
+        %Address{},
+        attrs
+      )
+      |> Changeset.apply_action(:update)
+
+    socket =
+      case changes do
+        {:error, changeset} ->
+          socket
+          |> assign(address_form: changeset |> to_form)
+
+        {:ok, address} ->
+          Task.async(fn ->
+            {
+              :shipping_quote,
+              Dimona.Requests.Shipping.post(%{
+                "zipcode" => address.postal_code,
+                "quantity" => 1
+              })
+            }
+          end)
+
+          socket
+          |> assign(shipping_address: address)
+          |> assign(waiting: true)
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "select-delivery-method",
+        %{"id" => id, "price" => price, "name" => name, "days" => days},
+        socket
+      ) do
+    {price, _} = Float.parse(price)
+    price = (price * 100) |> Kernel.round()
+
+    socket =
+      socket
+      |> assign(
+        delivery_method: %{
+          id: id,
+          price: price,
+          name: name,
+          days: days
+        }
+      )
+      |> assign(step: 4)
+
     {:noreply, socket}
   end
 
@@ -309,6 +375,54 @@ defmodule PlazaWeb.CheckoutLive do
     socket =
       socket
       |> assign(step: 2)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("step", %{"step" => "3"}, socket) do
+    socket =
+      socket
+      |> assign(step: 3)
+
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({ref, {:shipping_quote, result}}, socket) do
+    Process.demonitor(ref, [:flush])
+
+    result =
+      case result do
+        {:error, payload} ->
+          :error
+
+        {:ok, many} ->
+          case many do
+            [] ->
+              :error
+
+            nel ->
+              {:ok, nel}
+          end
+      end
+
+    socket =
+      case result do
+        :error ->
+          socket
+          |> assign(error: "unable to resolve cep, try again")
+          |> assign(delivery_methods: nil)
+
+        {:ok, nel} ->
+          socket
+          |> assign(delivery_methods: nel)
+          |> assign(error: nil)
+      end
+
+    socket =
+      socket
+      |> assign(step: 3)
+      |> assign(waiting: false)
 
     {:noreply, socket}
   end
@@ -519,14 +633,138 @@ defmodule PlazaWeb.CheckoutLive do
 
   def render(%{step: 2} = assigns) do
     ~H"""
-    <div
-      class="has-font-3"
-      style="margin-top: 150px; margin-bottom: 150px; display: flex; justify-content: center;"
-    >
-      <div>
-        <button phx-click="send-email">
-          send text email
-        </button>
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column;">
+          <div style="align-self: center; font-size: 40px;">
+            Entrega
+          </div>
+          <div style="align-self: center; font-size: 22px;">
+            coloque o endereço para entrega do seu pedido
+          </div>
+          <div style="margin-bottom: 50px;">
+            <.form for={@name_form} phx-change="change-name-form">
+              <.input
+                field={@name_form[:name]}
+                type="text"
+                placeholder="nome"
+                class="text-input-1"
+                autocomplete="name"
+                phx-debounce="500"
+              >
+              </.input>
+            </.form>
+          </div>
+          <div>
+            <.form
+              for={@address_form}
+              phx-change="change-address-form"
+              phx-submit="submit-address-form"
+            >
+              <.input
+                field={@address_form[:line1]}
+                type="text"
+                placeholder="endereço"
+                class="text-input-1"
+                autocomplete="shipping address-line1"
+                phx-debounce="500"
+              >
+              </.input>
+              <.input
+                field={@address_form[:line2]}
+                type="text"
+                placeholder="complemento"
+                class="text-input-1"
+                autocomplete="shipping address-line2"
+                phx-debounce="500"
+              >
+              </.input>
+              <.input
+                field={@address_form[:postal_code]}
+                type="text"
+                placeholder="cep"
+                class="text-input-1"
+                autocomplete="shipping postal-code"
+                phx-debounce="500"
+              >
+              </.input>
+              <div style="display: flex; justify-content: center; margin-top: 50px;">
+                <button>
+                  <img src="svg/yellow-ellipse.svg" />
+                  <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                    Submit
+                  </div>
+                </button>
+              </div>
+            </.form>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{delivery_methods: nil, error: error} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column;">
+          <div>
+            could not resolve your shipping address
+          </div>
+          <div>
+            <button phx-click="step" phx-value-step="2">
+              <img src="svg/yellow-ellipse.svg" />
+              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                Try Again
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{step: 3, delivery_methods: delivery_methods} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column; position: relative; top: 100px; left: 50px;">
+          <button
+            :for={opt <- delivery_methods}
+            phx-click="select-delivery-method"
+            phx-value-id={opt.delivery_method_id}
+            phx-value-price={opt.value}
+            phx-value-name={opt.name}
+            phx-value-days={opt.business_days}
+            style="margin-top: 15px;"
+          >
+            <%= "#{opt.name}: R$ #{opt.value} at #{opt.business_days} days" %>
+          </button>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{step: 4} = assigns) do
+    ~H"""
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
+          <div>
+            <%= "#{@delivery_method.name}: R$ #{@delivery_method.price / 100.0}" %>
+          </div>
+          <div>
+            <button phx-click="checkout">
+              <img src="svg/yellow-ellipse.svg" />
+              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                Checkout
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     """
