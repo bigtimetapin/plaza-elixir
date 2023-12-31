@@ -130,7 +130,7 @@ Hooks.FileReader = {
         const files = frontInput.files;
         if (files.length == 1) {
           const file = files[0];
-          frontFileName = file.name.replace(" ", "");
+          frontFileName = crypto.randomUUID();
           const designUrl = URL.createObjectURL(file);
           Jimp.read(designUrl)
             .then(async (image) => {
@@ -166,7 +166,7 @@ Hooks.FileReader = {
         const files = backInput.files;
         if (files.length == 1) {
           const file = files[0];
-          backFileName = file.name.replace(" ", "");
+          backFileName = crypto.randomUUID();
           const designUrl = URL.createObjectURL(file);
           Jimp.read(designUrl)
             .then(async (image) => {
