@@ -14,8 +14,8 @@ defmodule PlazaWeb.MyStoreLive do
 
   alias ExAws.S3
 
-  ## @site "http://localhost:4000"
-  @site "https://plazaaaaa-solitary-snowflake-7144-summer-wave-9195.fly.dev"
+  @site "http://localhost:4000"
+  ## @site "https://plazaaaaa-solitary-snowflake-7144-summer-wave-9195.fly.dev"
   @local_storage_key "plaza-product-form"
 
   @aws_s3_region "us-west-2"
@@ -278,7 +278,18 @@ defmodule PlazaWeb.MyStoreLive do
 
   def handle_event("stripe-link-account", _params, socket) do
     Task.async(fn ->
-      {:ok, %Stripe.Account{id: stripe_id}} = Stripe.Account.create(%{type: :express})
+      {:ok, %Stripe.Account{id: stripe_id}} =
+        Stripe.Account.create(%{
+          type: :express,
+          capabilities: %{
+            card_payments: %{
+              requested: true
+            },
+            transfers: %{
+              requested: true
+            }
+          }
+        })
 
       {:ok, %Stripe.AccountLink{url: stripe_account_link_url}} =
         Stripe.AccountLink.create(%{
@@ -327,15 +338,15 @@ defmodule PlazaWeb.MyStoreLive do
         true ->
           {:ok,
            %Stripe.Account{
-             details_submitted: details_submitted
+             capabilities: capabilities
            } = stripe_account} = Stripe.Account.retrieve(stripe_id)
 
           seller = Accounts.get_seller_by_id(socket.assigns.current_user.id)
           products = socket.assigns.products
 
           {seller, products} =
-            case details_submitted do
-              true ->
+            case capabilities do
+              %{card_payments: "active", transfers: "active"} ->
                 seller = %{seller | stripe_id: stripe_id}
                 {:ok, seller} = Accounts.update_seller(seller)
 
@@ -346,12 +357,26 @@ defmodule PlazaWeb.MyStoreLive do
                       [product]
 
                     [] ->
-                      []
+                      case socket.assigns.product_buffer do
+                        nil ->
+                          []
+
+                        product ->
+                          product = %{
+                            product
+                            | user_id: seller.user_id,
+                              user_name: seller.user_name
+                          }
+
+                          {:ok, product} = Products.create_product(product)
+                          {:ok, product} = Products.activate_product(product)
+                          [product]
+                      end
                   end
 
                 {seller, products}
 
-              false ->
+              _ ->
                 {seller, products}
             end
 
