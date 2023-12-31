@@ -137,18 +137,12 @@ defmodule PlazaWeb.CheckoutLive do
               )
 
               Task.async(fn ->
-                {:ok, stripe_session} =
-                  stripe_session = Stripe.Session.retrieve(purchase.stripe_session_id)
+                {:ok, stripe_session} = Stripe.Session.retrieve(purchase.stripe_session_id)
 
                 {:ok, payment_intent} =
                   Stripe.PaymentIntent.retrieve(stripe_session.payment_intent, %{})
 
-                IO.inspect(payment_intent)
-
-                IO.inspect(stripe_session)
-
                 charges = List.first(payment_intent.charges.data)
-                IO.inspect(charges)
 
                 payment_status = payment_intent.status
                 payment_status = Purchases.normalize_payment_status(payment_status)
@@ -468,13 +462,42 @@ defmodule PlazaWeb.CheckoutLive do
         Enum.map(
           cart,
           fn item ->
+            IO.inspect(item)
+
             %{
               product_id: item.product.id,
+              user_id: item.product.user_id,
               size: item.size,
-              quantity: item.quantity
+              quantity: item.quantity,
+              price: item.product.price
             }
           end
         )
+
+      sellers =
+        List.foldl(products, [], fn item, acc ->
+          case Enum.find(acc |> Enum.with_index(), fn {i, _} -> i.user_id == item.user_id end) do
+            nil ->
+              new = %{
+                user_id: item.user_id,
+                total_price: item.price * item.quantity,
+                total_quantity: item.quantity,
+                paid: false
+              }
+
+              [new | acc]
+
+            {found, index} ->
+              new = %{
+                found
+                | total_price: found.total_price + item.price * item.quantity,
+                  total_quantity: found.total_quantity + item.quantity
+              }
+
+              acc = List.replace_at(acc, index, new)
+              acc
+          end
+        end)
 
       delivery_method = socket.assigns.delivery_method
       shipping_address = socket.assigns.shipping_address
@@ -491,6 +514,8 @@ defmodule PlazaWeb.CheckoutLive do
         Purchases.create(%{
           user_id: user_id,
           products: products,
+          sellers: sellers,
+          sellers_paid: false,
           email: email,
           stripe_session_id: "pending",
           dimona_delivery_method_id: delivery_method.id,
