@@ -15,13 +15,6 @@ defmodule Plaza.StripeHandler do
       {:payment_status, "succeeded"}
     )
 
-    purchase = Purchases.get!(purchase_id)
-    IO.inspect(purchase)
-
-    response = UserNotifier.deliver_quick(%{email: purchase.email})
-
-    IO.inspect(response)
-
     :ok
   end
 end

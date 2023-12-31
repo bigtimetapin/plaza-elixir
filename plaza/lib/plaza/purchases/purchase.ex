@@ -4,7 +4,7 @@ defmodule Plaza.Purchases.Purchase do
 
   schema "purchases" do
     field :user_id, :id
-    field :product_id, :id
+    field :products, {:array, :map}
     field :email, :string
     field :stripe_session_id, :string
     field :dimona_delivery_method_id, :integer
@@ -21,7 +21,7 @@ defmodule Plaza.Purchases.Purchase do
     purchase
     |> cast(attrs, [
       :user_id,
-      :product_id,
+      :products,
       :email,
       :stripe_session_id,
       :dimona_delivery_method_id,
@@ -33,7 +33,7 @@ defmodule Plaza.Purchases.Purchase do
       :shipping_address_country
     ])
     |> validate_required([
-      :product_id,
+      :products,
       :email,
       :stripe_session_id,
       :dimona_delivery_method_id,

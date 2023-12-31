@@ -8,6 +8,8 @@ defmodule PlazaWeb.CheckoutLive do
   alias Plaza.Accounts
   alias Plaza.Accounts.Address
   alias Plaza.Dimona
+  alias Plaza.Products.Product
+  alias Plaza.Purchases
 
   @site "http://localhost:4000"
   ## @site "https://plazaaaaa-solitary-snowflake-7144-summer-wave-9195.fly.dev"
@@ -121,6 +123,58 @@ defmodule PlazaWeb.CheckoutLive do
   end
 
   @impl Phoenix.LiveView
+  def handle_params(%{"purchase-id" => purchase_id} = params, _uri, socket) do
+    socket =
+      case connected?(socket) do
+        true ->
+          case params do
+            %{"success" => "true"} ->
+              purchase = Purchases.get!(purchase_id)
+
+              Phoenix.PubSub.subscribe(
+                Plaza.PubSub,
+                "payment-status-#{purchase.id}"
+              )
+
+              Task.async(fn ->
+                {:ok, stripe_session} =
+                  stripe_session = Stripe.Session.retrieve(purchase.stripe_session_id)
+
+                {:ok, payment_intent} =
+                  Stripe.PaymentIntent.retrieve(stripe_session.payment_intent, %{})
+
+                IO.inspect(payment_intent)
+
+                IO.inspect(stripe_session)
+
+                charges = List.first(payment_intent.charges.data)
+                IO.inspect(charges)
+
+                payment_status = payment_intent.status
+                payment_status = Purchases.normalize_payment_status(payment_status)
+                {:payment_status, payment_status}
+              end)
+
+              socket
+              |> assign(payment_status: "processing")
+              |> assign(step: 5)
+
+            %{"cancel" => "true"} ->
+              socket
+          end
+
+        false ->
+          socket
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_params(_params, _uri, socket) do
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
   def handle_event("read-cart", token_data, socket) when is_binary(token_data) do
     socket =
       case restore_from_token(token_data) do
@@ -141,6 +195,8 @@ defmodule PlazaWeb.CheckoutLive do
               {:availability, item.product.id, value}
             end)
           end)
+
+          IO.inspect(cart)
 
           socket
           |> assign(cart: cart)
@@ -404,6 +460,153 @@ defmodule PlazaWeb.CheckoutLive do
     {:noreply, socket}
   end
 
+  def handle_event("checkout", _, socket) do
+    Task.async(fn ->
+      cart = socket.assigns.cart
+
+      products =
+        Enum.map(
+          cart,
+          fn item ->
+            %{
+              product_id: item.product.id,
+              size: item.size,
+              quantity: item.quantity
+            }
+          end
+        )
+
+      delivery_method = socket.assigns.delivery_method
+      shipping_address = socket.assigns.shipping_address
+      email = socket.assigns.email
+      name = socket.assigns.name
+
+      user_id =
+        case socket.assigns.current_user do
+          nil -> nil
+          current_user -> current_user.id
+        end
+
+      {:ok, purchase} =
+        Purchases.create(%{
+          user_id: user_id,
+          products: products,
+          email: email,
+          stripe_session_id: "pending",
+          dimona_delivery_method_id: delivery_method.id,
+          shipping_address_line1: shipping_address.line1,
+          shipping_address_line2: shipping_address.line2,
+          shipping_address_postal_code: shipping_address.postal_code
+        })
+
+      params = %{
+        "purchase-id" => purchase.id
+      }
+
+      success_query_params =
+        URI.encode_query(
+          Map.put(
+            params,
+            "success",
+            true
+          )
+        )
+
+      cancel_query_params =
+        URI.encode_query(
+          Map.put(
+            params,
+            "cancel",
+            true
+          )
+        )
+
+      create_stripe_product_stream =
+        Task.async_stream(cart, fn item ->
+          product = item.product
+
+          mock_url =
+            if product.designs.display == 0, do: product.mocks.front, else: product.mocks.back
+
+          {:ok, stripe_product} =
+            Stripe.Product.create(%{
+              images: [mock_url],
+              name: product.name,
+              url: "#{@site}/product?product_id=#{product.id}",
+              default_price_data: %{
+                unit_amount: Product.price_unit_amount(product),
+                currency: "brl"
+              }
+            })
+
+          %{stripe_product: stripe_product, quantity: item.quantity}
+        end)
+
+      stripe_products = Enum.to_list(create_stripe_product_stream)
+
+      line_items =
+        Enum.map(
+          stripe_products,
+          fn {:ok, item} ->
+            %{
+              price: item.stripe_product.default_price,
+              quantity: item.quantity
+            }
+          end
+        )
+
+      transfer_group = UUID.uuid1()
+
+      {:ok, stripe_session} =
+        Stripe.Session.create(%{
+          mode: "payment",
+          line_items: line_items,
+          payment_intent_data: %{
+            receipt_email: email,
+            metadata: %{"purchase_id" => purchase.id},
+            transfer_group: transfer_group
+          },
+          shipping_options: [
+            %{
+              shipping_rate_data: %{
+                type: "fixed_amount",
+                fixed_amount: %{
+                  amount: delivery_method.price,
+                  currency: "brl"
+                },
+                display_name: delivery_method.name,
+                delivery_estimate: %{
+                  maximum: %{
+                    unit: "business_day",
+                    value: delivery_method.days
+                  }
+                }
+              }
+            }
+          ],
+          customer_email: email,
+          success_url: "#{@site}/checkout?#{success_query_params}",
+          cancel_url: "#{@site}/checkout?#{cancel_query_params}"
+        })
+
+      IO.inspect(stripe_session)
+
+      {:ok, purchase} =
+        Purchases.update(
+          purchase,
+          %{"stripe_session_id" => stripe_session.id}
+        )
+
+      {:stripe_redirect, stripe_session.url}
+    end)
+
+    socket =
+      socket
+      |> assign(waiting: true)
+
+    {:noreply, socket}
+  end
+
   def handle_event("step", %{"step" => "2"}, socket) do
     socket =
       socket
@@ -432,9 +635,6 @@ defmodule PlazaWeb.CheckoutLive do
     supply = Map.values(value) |> List.first()
 
     available = item.quantity + 5 <= supply
-    IO.inspect(available)
-    available = Enum.random([available, false])
-    IO.inspect(available)
     item = %{item | available: available}
     cart = List.replace_at(cart, index, item)
     cart_out_of_stock = Enum.any?(cart, fn i -> !i.available end)
@@ -473,6 +673,8 @@ defmodule PlazaWeb.CheckoutLive do
           |> assign(delivery_methods: nil)
 
         {:ok, nel} ->
+          IO.inspect(nel)
+
           socket
           |> assign(delivery_methods: nel)
           |> assign(error: nil)
@@ -482,6 +684,42 @@ defmodule PlazaWeb.CheckoutLive do
       socket
       |> assign(step: 3)
       |> assign(waiting: false)
+
+    {:noreply, socket}
+  end
+
+  def handle_info({ref, {:stripe_redirect, url}}, socket) do
+    Process.demonitor(
+      ref,
+      [:flush]
+    )
+
+    socket =
+      socket
+      |> redirect(external: url)
+
+    {:noreply, socket}
+  end
+
+  ## from task
+  def handle_info({ref, {:payment_status, payment_status}}, socket) do
+    Process.demonitor(
+      ref,
+      [:flush]
+    )
+
+    socket =
+      socket
+      |> assign(payment_status: payment_status)
+
+    {:noreply, socket}
+  end
+
+  ## from pubsub
+  def handle_info({:payment_status, payment_status}, socket) do
+    socket =
+      socket
+      |> assign(payment_status: payment_status)
 
     {:noreply, socket}
   end
@@ -834,6 +1072,14 @@ defmodule PlazaWeb.CheckoutLive do
           </div>
         </div>
       </div>
+    </div>
+    """
+  end
+
+  def render(%{step: 5} = assigns) do
+    ~H"""
+    <div>
+      here
     </div>
     """
   end

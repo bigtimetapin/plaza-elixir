@@ -4,7 +4,7 @@ defmodule Plaza.Repo.Migrations.AddPurchasesTable do
   def change do
     create table(:purchases) do
       add :user_id, references(:users, on_delete: :delete_all), null: true
-      add :product_id, references(:products), null: false
+      add :products, {:array, :map}, null: false
       add :email, :string, null: false
       add :stripe_session_id, :string, null: false
       add :dimona_delivery_method_id, :integer, null: false

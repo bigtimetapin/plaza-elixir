@@ -58,10 +58,9 @@ defmodule Plaza.MixProject do
       {:httpoison, "~> 2.0"},
       {:poison, "5.0.0"},
       {:stripity_stripe, "~> 2.17.2"},
-      {:navigation_history, "~> 0.4"},
       {:quantum, "~> 3.0"},
       {:image, "~> 0.37"},
-      {:uuid, "~> 1.1" },
+      {:uuid, "~> 1.1"},
       {:paginator, "~> 1.2.0"}
     ]
   end
