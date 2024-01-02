@@ -29,6 +29,7 @@ defmodule PlazaWeb.MyStoreLive do
           user_id = socket.assigns.current_user.id
           seller = Accounts.get_seller_by_id(user_id)
           products = Products.list_products_by_user_id(user_id, 3)
+          IO.inspect(products)
 
           seller_form =
             to_form(
@@ -357,21 +358,7 @@ defmodule PlazaWeb.MyStoreLive do
                       [product]
 
                     [] ->
-                      case socket.assigns.product_buffer do
-                        nil ->
-                          []
-
-                        product ->
-                          product = %{
-                            product
-                            | user_id: seller.user_id,
-                              user_name: seller.user_name
-                          }
-
-                          {:ok, product} = Products.create_product(product)
-                          {:ok, product} = Products.activate_product(product)
-                          [product]
-                      end
+                      []
                   end
 
                 {seller, products}
@@ -462,38 +449,14 @@ defmodule PlazaWeb.MyStoreLive do
     {:noreply, socket}
   end
 
-  def create_or_update_seller(socket, seller) do
+  defp create_or_update_seller(socket, seller) do
     socket =
       case socket.assigns.seller do
         nil ->
-          case Accounts.create_seller(seller) do
-            {:ok, seller} ->
-              socket =
-                case socket.assigns.product_buffer do
-                  nil ->
-                    socket
+          create_seller(socket, seller)
 
-                  product ->
-                    product = %{
-                      product
-                      | user_id: seller.user_id,
-                        user_name: seller.user_name
-                    }
-
-                    {:ok, product} = Products.create_product(product)
-
-                    socket =
-                      socket
-                      |> assign(products: [product])
-                end
-
-              socket
-              |> assign(seller: seller)
-
-            {:error, changeset} ->
-              socket
-              |> assign(seller_form: changeset |> to_form)
-          end
+        %{id: nil} ->
+          create_seller(socket, seller)
 
         _ ->
           {:ok, seller} = Accounts.update_seller(seller)
@@ -505,6 +468,35 @@ defmodule PlazaWeb.MyStoreLive do
 
     socket
     |> assign(waiting: false)
+  end
+
+  defp create_seller(socket, seller) do
+    case Accounts.create_seller(seller) do
+      {:ok, seller} ->
+        products =
+          case socket.assigns.product_buffer do
+            nil ->
+              []
+
+            product ->
+              product = %{
+                product
+                | user_id: seller.user_id,
+                  user_name: seller.user_name
+              }
+
+              {:ok, product} = Products.create_product(product)
+              [product]
+          end
+
+        socket
+        |> assign(seller: seller)
+        |> assign(products: products)
+
+      {:error, changeset} ->
+        socket
+        |> assign(seller_form: changeset |> to_form)
+    end
   end
 
   @impl Phoenix.LiveView
@@ -897,7 +889,7 @@ defmodule PlazaWeb.MyStoreLive do
             </.input>
             <div style="position: relative; top: 100px;">
               <button>
-                <img src="svg/yellow-ellipse.svg" />
+                <img src="/svg/yellow-ellipse.svg" />
                 <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
                   <%= if !@seller, do: "Criar Loja", else: "Editar Loja" %>
                 </div>
