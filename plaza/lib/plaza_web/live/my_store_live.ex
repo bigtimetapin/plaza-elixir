@@ -29,7 +29,6 @@ defmodule PlazaWeb.MyStoreLive do
           user_id = socket.assigns.current_user.id
           seller = Accounts.get_seller_by_id(user_id)
           products = Products.list_products_by_user_id(user_id, 3)
-          IO.inspect(products)
 
           seller_form =
             to_form(
