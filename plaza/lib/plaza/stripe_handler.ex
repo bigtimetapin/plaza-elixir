@@ -2,7 +2,6 @@ defmodule Plaza.StripeHandler do
   @behaviour Stripe.WebhookHandler
 
   alias Plaza.Accounts
-  alias Plaza.Products
   alias Plaza.Products.Product
   alias Plaza.Purchases
 
@@ -48,7 +47,6 @@ defmodule Plaza.StripeHandler do
               source_transaction: charge.id
             })
 
-          ## TODO; write paid to db, record level and top level
           case transfer_result do
             {:ok, _} ->
               %{params | "paid" => true}
@@ -61,8 +59,23 @@ defmodule Plaza.StripeHandler do
       )
 
     transfers = Enum.to_list(transfer_tasks)
-    IO.inspect(transfers)
+    sellers_paid = Enum.all?(transfers, fn el -> validate_paid(el) end)
+    sellers = Enum.map(transfers, fn {_, seller} -> seller end)
+    IO.inspect(sellers)
+
+    Purchases.update(
+      purchase,
+      %{"sellers" => sellers, "sellers_paid" => sellers_paid}
+    )
 
     :ok
+  end
+
+  defp validate_paid({:ok, %{"paid" => true}}) do
+    true
+  end
+
+  defp validate_paid(_) do
+    false
   end
 end

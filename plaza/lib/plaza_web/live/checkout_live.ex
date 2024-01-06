@@ -518,7 +518,8 @@ defmodule PlazaWeb.CheckoutLive do
           sellers_paid: false,
           email: email,
           stripe_session_id: "pending",
-          dimona_delivery_method_id: delivery_method.id,
+          shipping_method_id: delivery_method.id,
+          shipping_method_price: delivery_method.price,
           shipping_address_line1: shipping_address.line1,
           shipping_address_line2: shipping_address.line2,
           shipping_address_postal_code: shipping_address.postal_code
