@@ -73,7 +73,7 @@ defmodule PlazaWeb.Auth.Login do
       <div style="display: flex;">
         <div style="margin-left: auto;">
           <button phx-disable-with="signing in...">
-            <img src="svg/yellow-ellipse.svg" />
+            <img src="/svg/yellow-ellipse.svg" />
             <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
               sign in
             </div>
