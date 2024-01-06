@@ -2,6 +2,7 @@ defmodule PlazaWeb.UserConfirmationLive do
   use PlazaWeb, :live_view
 
   alias Plaza.Accounts
+  alias Plaza.Accounts.UserNotifier
 
   def render(%{live_action: :edit} = assigns) do
     ~H"""
@@ -17,8 +18,7 @@ defmodule PlazaWeb.UserConfirmationLive do
 
       <p class="text-center mt-4">
         <.link href={~p"/users/register"}>Register</.link>
-        |
-        <.link href={~p"/users/log_in"}>Log in</.link>
+        | <.link href={~p"/users/log_in"}>Log in</.link>
       </p>
     </div>
     """
@@ -33,7 +33,9 @@ defmodule PlazaWeb.UserConfirmationLive do
   # leaked token giving the user access to the account.
   def handle_event("confirm_account", %{"user" => %{"token" => token}}, socket) do
     case Accounts.confirm_user(token) do
-      {:ok, _} ->
+      {:ok, user} ->
+        UserNotifier.deliver_confirmation_confirmation(user)
+
         {:noreply,
          socket
          |> put_flash(:info, "User confirmed successfully.")

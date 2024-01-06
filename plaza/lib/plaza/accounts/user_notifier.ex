@@ -17,6 +17,22 @@ defmodule Plaza.Accounts.UserNotifier do
   end
 
   @doc """
+  Deliver confirmation that the email was confirmed.
+  """
+  def deliver_confirmation_confirmation(user) do
+    deliver(user.email, "Confirmation success", """
+
+    ==============================
+
+    Hi #{user.email},
+
+    Your Plaza account was confirmed successfully.
+
+    ==============================
+    """)
+  end
+
+  @doc """
   Deliver instructions to confirm account.
   """
   def deliver_confirmation_instructions(user, url) do
