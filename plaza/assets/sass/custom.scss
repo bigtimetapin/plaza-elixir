@@ -181,7 +181,7 @@ input[type="radio"] {
   border-right: 1px solid #707070;
 }
 
-.is-navbar-child, .is-hero-body {
+.is-hero-body {
   padding-left: 4rem;
   padding-right: 4rem;
 }
@@ -318,6 +318,28 @@ $spacing-values: (
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Bulma Extensions ///////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+.is-navbar-desktop { 
+  @include until($tablet) {
+    display: none;
+  }
+}
+
+.is-navbar-mobile {
+  @include from($tablet) {
+    display: none;
+  }
+  @include until($tablet) {
+    overflow: hidden;
+    position: fixed; /* Set the navbar to fixed position */
+    top: 0; /* Position the navbar at the top of the page */
+    width: 100%; /* Full width */
+    height: 100px;
+    z-index: 101;
+    // blend in
+    background-color: #FFFFFF;
+  }
+}
+
 .is-search-bar-1 {
   @include until($tablet) {
     width: 15rem;

@@ -321,8 +321,8 @@ defmodule PlazaWeb.Header do
   defp left(assigns) do
     ~H"""
     <div class="hero-head has-font-3">
-      <div class="is-navbar">
-        <nav class="level is-navbar-child" style="position: relative; top: 20px;">
+      <div class="is-navbar is-navbar-desktop">
+        <nav class="level" style="position: relative; top: 20px; margin-left: 50px">
           <div class="level-left">
             <div class="level-item pr-large">
               <div class="is-size-1-desktop is-size-2-touch">plazaaaaa</div>
@@ -352,6 +352,15 @@ defmodule PlazaWeb.Header do
             <%= render_slot(@right) %>
           </div>
         </nav>
+      </div>
+      <div class="is-navbar-mobile">
+        <.live_component
+          module={PlazaWeb.Header.MobileHeader}
+          id="mobile-header-component"
+          selected={@selected}
+          right={@right}
+          open={false}
+        />
       </div>
     </div>
     """
