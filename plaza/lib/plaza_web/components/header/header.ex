@@ -353,7 +353,7 @@ defmodule PlazaWeb.Header do
           </div>
         </nav>
       </div>
-      <div class="is-navbar-mobile">
+      <div>
         <.live_component
           module={PlazaWeb.Header.MobileHeader}
           id="mobile-header-component"

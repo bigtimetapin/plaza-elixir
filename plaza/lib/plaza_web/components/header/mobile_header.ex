@@ -20,7 +20,7 @@ defmodule PlazaWeb.Header.MobileHeader do
   def render(assigns) do
     ~H"""
     <div id="mobile-header-target">
-      <nav :if={!@open} style="display: flex;">
+      <nav :if={!@open} class="is-navbar-mobile-closed" style="display: flex;">
         <div style="margin-left: auto; margin-right: 50px; display: flex; flex-direction: column; justify-content: center; height: 100px;">
           <button
             class="has-font-3"
@@ -32,34 +32,28 @@ defmodule PlazaWeb.Header.MobileHeader do
           </button>
         </div>
       </nav>
-      <nav :if={@open} style="position: relative; top: 20px; margin-left: 50px">
-        <div class="level-left">
-          <div class="level-item pr-large">
-            <div class="is-size-1-desktop is-size-2-touch">plazaaaaa</div>
-          </div>
-          <div class="level-item pr-xmedium">
-            <div class="is-size-5" style="position: relative; top: 11px;">
-              <.link :if={@selected} navigate="/">
-                loja
-                <div style="position: absolute;">
-                  <div style="position: relative; left: 2px;">
-                    <img src="/svg/yellow-circle.svg" />
-                  </div>
+      <nav :if={@open} class="is-navbar-mobile-open" style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <div>plazaaaaa</div>
+          <div>
+            <.link :if={@selected} navigate="/">
+              loja
+              <div style="position: absolute;">
+                <div style="position: relative; left: 2px;">
+                  <img src="/svg/yellow-circle.svg" />
                 </div>
-              </.link>
-              <.link :if={!@selected} navigate="/">
-                loja
-              </.link>
-            </div>
+              </div>
+            </.link>
+            <.link :if={!@selected} navigate="/">
+              loja
+            </.link>
           </div>
-          <div class="level-item">
-            <div class="is-size-5" style="position: relative; top: 11px;">
-              <div class="has-dark-gray-text">buscar</div>
-            </div>
+          <div>
+            <div class="has-dark-gray-text">buscar</div>
           </div>
-        </div>
-        <div class="level-right is-size-5" style="position: relative; top: 11px;">
-          <%= render_slot(@right) %>
+          <div>
+            <%= render_slot(@right) %>
+          </div>
         </div>
       </nav>
     </div>

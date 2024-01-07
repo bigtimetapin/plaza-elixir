@@ -324,7 +324,7 @@ $spacing-values: (
   }
 }
 
-.is-navbar-mobile {
+.is-navbar-mobile-open, .is-navebar-mobile-closed {
   @include from($tablet) {
     display: none;
   }
@@ -333,11 +333,16 @@ $spacing-values: (
     position: fixed; /* Set the navbar to fixed position */
     top: 0; /* Position the navbar at the top of the page */
     width: 100%; /* Full width */
-    height: 100px;
     z-index: 101;
     // blend in
     background-color: #FFFFFF;
   }
+}
+.is-navbar-mobile-open {
+  height: 100%;
+}
+.is-navbar-mobile-closed {
+  height: 100px;
 }
 
 .is-search-bar-1 {
