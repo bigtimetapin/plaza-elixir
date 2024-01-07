@@ -5,6 +5,9 @@ defmodule Plaza.StripeHandler do
   alias Plaza.Products.Product
   alias Plaza.Purchases
 
+  ## TODO: send email to buyer 
+  ##  gen-server to handle processing?
+  ##  stripe wants a 200 response as fast as possible
   @impl true
   def handle_event(%Stripe.Event{type: "payment_intent.succeeded", data: data}) do
     %{object: %{metadata: %{"purchase_id" => purchase_id}}} = data
