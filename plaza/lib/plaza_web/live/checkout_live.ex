@@ -643,21 +643,30 @@ defmodule PlazaWeb.CheckoutLive do
     Process.demonitor(ref, [:flush])
     cart = socket.assigns.cart
 
-    {item, index} =
-      Enum.with_index(cart)
-      |> Enum.find(fn {item, _} -> item.product.id == product_id end)
-
-    supply = Map.values(value) |> List.first()
-
-    available = item.quantity + 5 <= supply
-    item = %{item | available: available}
-    cart = List.replace_at(cart, index, item)
-    cart_out_of_stock = Enum.any?(cart, fn i -> !i.available end)
-
+    ## race condition where read-cart/availability-check is fired off at mount-callback 
+    ## but the handle-params callback on-purchase-success clears the cart 
+    ## and this handler ends up with an empty cart
     socket =
-      socket
-      |> assign(cart: cart)
-      |> assign(cart_out_of_stock: cart_out_of_stock)
+      case cart do
+        [] ->
+          socket
+
+        _ ->
+          {item, index} =
+            Enum.with_index(cart)
+            |> Enum.find(fn {item, _} -> item.product.id == product_id end)
+
+          supply = Map.values(value) |> List.first()
+
+          available = item.quantity + 5 <= supply
+          item = %{item | available: available}
+          cart = List.replace_at(cart, index, item)
+          cart_out_of_stock = Enum.any?(cart, fn i -> !i.available end)
+
+          socket
+          |> assign(cart: cart)
+          |> assign(cart_out_of_stock: cart_out_of_stock)
+      end
 
     {:noreply, socket}
   end
