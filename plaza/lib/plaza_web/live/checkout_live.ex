@@ -123,43 +123,32 @@ defmodule PlazaWeb.CheckoutLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_params(%{"purchase-id" => purchase_id} = params, _uri, socket) do
-    socket =
-      case connected?(socket) do
-        true ->
-          case params do
-            %{"success" => "true"} ->
-              purchase = Purchases.get!(purchase_id)
+  def handle_params(%{"purchase-id" => purchase_id, "success" => "true"} = params, _uri, socket) do
+    case connected?(socket) do
+      true ->
+        purchase = Purchases.get!(purchase_id)
 
-              Phoenix.PubSub.subscribe(
-                Plaza.PubSub,
-                "payment-status-#{purchase.id}"
-              )
+        Task.async(fn ->
+          {:ok, stripe_session} = Stripe.Session.retrieve(purchase.stripe_session_id)
 
-              Task.async(fn ->
-                {:ok, stripe_session} = Stripe.Session.retrieve(purchase.stripe_session_id)
+          {:ok, payment_intent} =
+            Stripe.PaymentIntent.retrieve(stripe_session.payment_intent, %{})
 
-                {:ok, payment_intent} =
-                  Stripe.PaymentIntent.retrieve(stripe_session.payment_intent, %{})
+          charges = List.first(payment_intent.charges.data)
 
-                charges = List.first(payment_intent.charges.data)
+          payment_status = payment_intent.status
+          payment_status = Purchases.normalize_payment_status(payment_status)
+          {:payment_status, payment_status}
+        end)
 
-                payment_status = payment_intent.status
-                payment_status = Purchases.normalize_payment_status(payment_status)
-                {:payment_status, payment_status}
-              end)
+      false ->
+        purchase = Purchases.get!(purchase_id)
 
-              socket
-              |> assign(payment_status: "processing")
-              |> assign(step: 5)
-
-            %{"cancel" => "true"} ->
-              socket
-          end
-
-        false ->
-          socket
-      end
+        Phoenix.PubSub.subscribe(
+          Plaza.PubSub,
+          "payment-status-#{purchase.id}"
+        )
+    end
 
     {:noreply, socket}
   end
@@ -735,8 +724,23 @@ defmodule PlazaWeb.CheckoutLive do
     )
 
     socket =
-      socket
-      |> assign(payment_status: payment_status)
+      case payment_status do
+        "succeeded" ->
+          socket
+          |> assign(cart: [])
+          |> assign(cart_empty: true)
+          |> assign(cart_total_amount: 0)
+          |> assign(step: 5)
+          |> push_event(
+            "clear",
+            %{
+              key: @local_storage_key
+            }
+          )
+
+        _ ->
+          socket
+      end
 
     {:noreply, socket}
   end
@@ -744,8 +748,23 @@ defmodule PlazaWeb.CheckoutLive do
   ## from pubsub
   def handle_info({:payment_status, payment_status}, socket) do
     socket =
-      socket
-      |> assign(payment_status: payment_status)
+      case payment_status do
+        "suceeded" ->
+          socket
+          |> assign(cart: [])
+          |> assign(cart_empty: true)
+          |> assign(cart_total_amount: 0)
+          |> assign(step: 5)
+          |> push_event(
+            "clear",
+            %{
+              key: @local_storage_key
+            }
+          )
+
+        _ ->
+          socket
+      end
 
     {:noreply, socket}
   end
@@ -755,6 +774,26 @@ defmodule PlazaWeb.CheckoutLive do
     ~H"""
     <div style="margin-top: 200px; display: flex; justify-content: center;">
       <img src="gif/loading.gif" />
+    </div>
+    """
+  end
+
+  def render(%{step: 1, cart: []} = assigns) do
+    ~H"""
+    <div
+      class="has-font-3"
+      style="margin-top: 150px; margin-bottom: 150px; display: flex; justify-content: center;"
+    >
+      <div style="display: flex; flex-direction: column; text-align: center;">
+        <div style="font-size: 40px;">
+          Seu carrinho está vazio
+        </div>
+        <div style="font-size: 40px;">
+          <.link navigate="/" style="text-decoration: underline;">
+            Voltar para Loja
+          </.link>
+        </div>
+      </div>
     </div>
     """
   end
@@ -1104,8 +1143,29 @@ defmodule PlazaWeb.CheckoutLive do
 
   def render(%{step: 5} = assigns) do
     ~H"""
-    <div>
-      here
+    <div
+      class="has-font-3"
+      style="margin-top: 150px; margin-bottom: 150px; display: flex; justify-content: center;"
+    >
+      <div style="display: flex; flex-direction: column; text-align: center;">
+        <div style="font-size: 36px;">
+          Compra realizada com sucesso!
+        </div>
+        <div style="font-size: 30px; margin-top: 10px;">
+          check your email for your receipt and updates
+        </div>
+        <div style="display: flex; justify-content: center; margin-top: 50px;">
+          <div style="display: flex; flex-direction: column; width: 300px;">
+            <img src="svg/yellow-ellipse.svg" />
+            <div class="has-font-3" style="position: relative; bottom: 115px; font-size: 55px;">
+              Successo!
+            </div>
+          </div>
+        </div>
+        <div style="font-size: 30px; margin-top: 10px;">
+          Ficou alguma dúvida? clique aqui
+        </div>
+      </div>
     </div>
     """
   end
