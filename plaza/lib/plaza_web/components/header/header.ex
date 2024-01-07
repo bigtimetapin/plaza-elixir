@@ -197,14 +197,14 @@ defmodule PlazaWeb.Header do
           <%= render_slot(@login) %>
         </div>
         <div class="level-item pr-xmedium">
-          <button phx-target="#mobile-header-target" phx-click="href" phx-value-href="/checkout">
+          <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/checkout">
             carrinho
             <div style="position: absolute;">
               <div style="position: relative; left: 26px;">
                 <img src="/svg/yellow-circle.svg" />
               </div>
             </div>
-          </button>
+          </.link>
         </div>
         <div class="level-item pr-xmedium">
           <%= render_slot(@store) %>
@@ -216,33 +216,33 @@ defmodule PlazaWeb.Header do
 
   defp checkout_href(assigns) do
     ~H"""
-    <button phx-target="#mobile-header-target" phx-click="href" phx-value-href="/checkout">
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/checkout">
       carrinho
-    </button>
+    </.link>
     """
   end
 
   defp login_href(assigns) do
     ~H"""
-    <button phx-target="#mobile-header-target" phx-click="href" phx-value-href="/users/log_in">
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/users/log_in">
       log in
-    </button>
+    </.link>
     """
   end
 
   defp my_store_href(assigns) do
     ~H"""
-    <button phx-target="#mobile-header-target" phx-click="href" phx-value-href="/my-store">
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-store">
       minha loja
-    </button>
+    </.link>
     """
   end
 
   defp no_store_yet_href(assigns) do
     ~H"""
-    <button phx-target="#mobile-header-target" phx-click="href" phx-value-href="/upload">
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/upload">
       quero vender
-    </button>
+    </.link>
     """
   end
 
@@ -261,9 +261,9 @@ defmodule PlazaWeb.Header do
 
   defp my_account_href(assigns) do
     ~H"""
-    <button phx-target="#mobile-header-target" phx-click="href" phx-value-href="/my-account">
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-account">
       conta
-    </button>
+    </.link>
     """
   end
 
@@ -329,17 +329,17 @@ defmodule PlazaWeb.Header do
             </div>
             <div class="level-item pr-xmedium">
               <div class="is-size-5" style="position: relative; top: 11px;">
-                <button :if={@selected} phx-click="href" phx-value-href="/">
+                <.link :if={@selected} navigate="/">
                   loja
                   <div style="position: absolute;">
                     <div style="position: relative; left: 2px;">
                       <img src="/svg/yellow-circle.svg" />
                     </div>
                   </div>
-                </button>
-                <button :if={!@selected} phx-click="href" phx-value-href="/">
+                </.link>
+                <.link :if={!@selected} navigate="/">
                   loja
-                </button>
+                </.link>
               </div>
             </div>
             <div class="level-item">

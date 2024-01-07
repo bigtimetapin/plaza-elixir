@@ -9,11 +9,10 @@ defmodule PlazaWeb.Header.MobileHeader do
     {:noreply, socket}
   end
 
-  def handle_event("href", %{"href" => href}, socket) do
+  def handle_event("close-header", _, socket) do
     socket =
       socket
       |> assign(open: false)
-      |> push_navigate(to: href)
 
     {:noreply, socket}
   end
