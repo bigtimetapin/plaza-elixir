@@ -1,11 +1,6 @@
 defmodule PlazaWeb.Header.MobileHeader do
   use Phoenix.LiveComponent
 
-  ## def update(assigns, socket) do
-  ##   IO.inspect(assigns)
-  ##   {:ok, socket}
-  ## end
-
   def handle_event("open-header", _, socket) do
     socket =
       socket
@@ -14,9 +9,18 @@ defmodule PlazaWeb.Header.MobileHeader do
     {:noreply, socket}
   end
 
+  def handle_event("href", %{"href" => href}, socket) do
+    socket =
+      socket
+      |> assign(open: false)
+      |> push_navigate(to: href)
+
+    {:noreply, socket}
+  end
+
   def render(assigns) do
     ~H"""
-    <div>
+    <div id="mobile-header-target">
       <nav :if={!@open} style="display: flex;">
         <div style="margin-left: auto; margin-right: 50px; display: flex; flex-direction: column; justify-content: center; height: 100px;">
           <button

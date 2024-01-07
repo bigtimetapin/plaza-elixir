@@ -197,14 +197,14 @@ defmodule PlazaWeb.Header do
           <%= render_slot(@login) %>
         </div>
         <div class="level-item pr-xmedium">
-          <.link navigate="/checkout">
+          <button phx-target="#mobile-header-target" phx-click="href" phx-value-href="/checkout">
             carrinho
             <div style="position: absolute;">
               <div style="position: relative; left: 26px;">
                 <img src="/svg/yellow-circle.svg" />
               </div>
             </div>
-          </.link>
+          </button>
         </div>
         <div class="level-item pr-xmedium">
           <%= render_slot(@store) %>
@@ -216,33 +216,33 @@ defmodule PlazaWeb.Header do
 
   defp checkout_href(assigns) do
     ~H"""
-    <.link navigate="/checkout">
+    <button phx-target="#mobile-header-target" phx-click="href" phx-value-href="/checkout">
       carrinho
-    </.link>
+    </button>
     """
   end
 
   defp login_href(assigns) do
     ~H"""
-    <.link navigate="/users/log_in">
+    <button phx-target="#mobile-header-target" phx-click="href" phx-value-href="/users/log_in">
       log in
-    </.link>
+    </button>
     """
   end
 
   defp my_store_href(assigns) do
     ~H"""
-    <.link navigate="/my-store">
+    <button phx-target="#mobile-header-target" phx-click="href" phx-value-href="/my-store">
       minha loja
-    </.link>
+    </button>
     """
   end
 
   defp no_store_yet_href(assigns) do
     ~H"""
-    <.link navigate="/upload">
+    <button phx-target="#mobile-header-target" phx-click="href" phx-value-href="/upload">
       quero vender
-    </.link>
+    </button>
     """
   end
 
@@ -261,9 +261,9 @@ defmodule PlazaWeb.Header do
 
   defp my_account_href(assigns) do
     ~H"""
-    <.link navigate="/my-account">
+    <button phx-target="#mobile-header-target" phx-click="href" phx-value-href="/my-account">
       conta
-    </.link>
+    </button>
     """
   end
 
@@ -329,17 +329,17 @@ defmodule PlazaWeb.Header do
             </div>
             <div class="level-item pr-xmedium">
               <div class="is-size-5" style="position: relative; top: 11px;">
-                <.link :if={@selected} navigate="/">
+                <button :if={@selected} phx-click="href" phx-value-href="/">
                   loja
                   <div style="position: absolute;">
                     <div style="position: relative; left: 2px;">
                       <img src="/svg/yellow-circle.svg" />
                     </div>
                   </div>
-                </.link>
-                <.link :if={!@selected} navigate="/">
+                </button>
+                <button :if={!@selected} phx-click="href" phx-value-href="/">
                   loja
-                </.link>
+                </button>
               </div>
             </div>
             <div class="level-item">
