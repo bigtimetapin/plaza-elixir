@@ -1,176 +1,297 @@
 defmodule PlazaWeb.Header do
-  use Phoenix.Component
+  use Phoenix.LiveComponent
 
-  def get(%{header: header}) do
-    header
+  def update(%{header: header, current_user: current_user, seller: seller}, socket) do
+    header =
+      case header do
+        nil -> :landing
+        _ -> header
+      end
+
+    socket =
+      socket
+      |> assign(header: header)
+      |> assign(current_user: current_user)
+      |> assign(seller: seller)
+      |> assign(mobile_open: false)
+
+    {:ok, socket}
   end
 
-  def get(_) do
-    :landing
+  def handle_event("open-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_open: true)
+
+    {:noreply, socket}
   end
 
-  def header(%{header: :landing, current_user: nil} = assigns) do
+  def handle_event("close-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_open: false)
+
+    {:noreply, socket}
+  end
+
+  def render(%{header: :landing, current_user: nil} = assigns) do
     ~H"""
-    <.landing>
-      <:login>
-        <.login_href />
-      </:login>
-      <:store>
-        <.no_store_yet_href />
-      </:store>
-    </.landing>
+    <div>
+      <.landing_desktop>
+        <:login>
+          <.login_href />
+        </:login>
+        <:store>
+          <.no_store_yet_href />
+        </:store>
+      </.landing_desktop>
+      <.mobile open={@mobile_open}>
+        <:landing>
+          <.landing_href_selected_mobile />
+        </:landing>
+        <:my_account>
+          <.login_href_mobile />
+        </:my_account>
+        <:checkout>
+          <.checkout_href_mobile />
+        </:checkout>
+        <:my_store>
+          <.no_store_yet_href_mobile />
+        </:my_store>
+      </.mobile>
+    </div>
     """
   end
 
-  def header(%{header: :landing, seller: nil} = assigns) do
+  def render(%{header: :landing, seller: nil} = assigns) do
     ~H"""
-    <.landing>
-      <:login>
-        <.my_account_href />
-      </:login>
-      <:store>
-        <.no_store_yet_href />
-      </:store>
-    </.landing>
+    <div>
+      <.landing_desktop>
+        <:login>
+          <.my_account_href />
+        </:login>
+        <:store>
+          <.no_store_yet_href />
+        </:store>
+      </.landing_desktop>
+      <.mobile open={@mobile_open}>
+        <:landing></:landing>
+        <:my_account></:my_account>
+        <:checkout></:checkout>
+        <:my_store></:my_store>
+      </.mobile>
+    </div>
     """
   end
 
-  def header(%{header: :landing} = assigns) do
+  def render(%{header: :landing} = assigns) do
     ~H"""
-    <.landing>
-      <:login>
-        <.my_account_href />
-      </:login>
-      <:store>
-        <.my_store_href />
-      </:store>
-    </.landing>
+    <div>
+      <.landing_desktop>
+        <:login>
+          <.my_account_href />
+        </:login>
+        <:store>
+          <.my_store_href />
+        </:store>
+      </.landing_desktop>
+      <.mobile open={@mobile_open}>
+        <:landing></:landing>
+        <:my_account></:my_account>
+        <:checkout></:checkout>
+        <:my_store></:my_store>
+      </.mobile>
+    </div>
     """
   end
 
-  def header(%{header: :login} = assigns) do
+  def render(%{header: :login} = assigns) do
     ~H"""
-    <.left>
-      <:right>
-        <div class="level-item pr-xmedium">
+    <div>
+      <.left_desktop>
+        <:right>
+          <div class="level-item pr-xmedium">
+            <div>
+              log in
+              <div style="position: absolute;">
+                <div style="position: relative; left: 11px;">
+                  <img src="/svg/yellow-circle.svg" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="level-item pr-xmedium">
+            <.checkout_href />
+          </div>
+          <div class="level-item">
+            <.no_store_yet_href />
+          </div>
+        </:right>
+      </.left_desktop>
+      <.mobile open={@mobile_open}>
+        <:landing></:landing>
+        <:my_account></:my_account>
+        <:checkout></:checkout>
+        <:my_store></:my_store>
+      </.mobile>
+    </div>
+    """
+  end
+
+  def render(%{header: :my_store, seller: nil} = assigns) do
+    ~H"""
+    <div>
+      <.my_store_desktop>
+        <:login>
+          <.my_account_href />
+        </:login>
+        <:store>
+          <.no_store_yet_href_selected />
+        </:store>
+      </.my_store_desktop>
+      <.mobile open={@mobile_open}>
+        <:landing></:landing>
+        <:my_account></:my_account>
+        <:checkout></:checkout>
+        <:my_store></:my_store>
+      </.mobile>
+    </div>
+    """
+  end
+
+  def render(%{header: :my_store} = assigns) do
+    ~H"""
+    <div>
+      <.my_store_desktop>
+        <:login>
+          <.my_account_href />
+        </:login>
+        <:store>
           <div>
-            log in
+            <.my_store_href />
             <div style="position: absolute;">
-              <div style="position: relative; left: 11px;">
+              <div style="position: relative; left: 35px;">
                 <img src="/svg/yellow-circle.svg" />
               </div>
             </div>
           </div>
-        </div>
-        <div class="level-item pr-xmedium">
-          <.checkout_href />
-        </div>
-        <div class="level-item">
+        </:store>
+      </.my_store_desktop>
+      <.mobile open={@mobile_open}>
+        <:landing></:landing>
+        <:my_account></:my_account>
+        <:checkout></:checkout>
+        <:my_store></:my_store>
+      </.mobile>
+    </div>
+    """
+  end
+
+  def render(%{header: :my_account, seller: nil} = assigns) do
+    ~H"""
+    <div>
+      <.my_account_desktop>
+        <:store>
           <.no_store_yet_href />
-        </div>
-      </:right>
-    </.left>
+        </:store>
+      </.my_account_desktop>
+      <.mobile open={@mobile_open}>
+        <:landing></:landing>
+        <:my_account></:my_account>
+        <:checkout></:checkout>
+        <:my_store></:my_store>
+      </.mobile>
+    </div>
     """
   end
 
-  def header(%{header: :my_store, seller: nil} = assigns) do
+  def render(%{header: :my_account} = assigns) do
     ~H"""
-    <.my_store>
-      <:login>
-        <.my_account_href />
-      </:login>
-      <:store>
-        <.no_store_yet_selected />
-      </:store>
-    </.my_store>
-    """
-  end
-
-  def header(%{header: :my_store} = assigns) do
-    ~H"""
-    <.my_store>
-      <:login>
-        <.my_account_href />
-      </:login>
-      <:store>
-        <div>
+    <div>
+      <.my_account_desktop>
+        <:store>
           <.my_store_href />
-          <div style="position: absolute;">
-            <div style="position: relative; left: 35px;">
-              <img src="/svg/yellow-circle.svg" />
-            </div>
-          </div>
-        </div>
-      </:store>
-    </.my_store>
+        </:store>
+      </.my_account_desktop>
+      <.mobile open={@mobile_open}>
+        <:landing></:landing>
+        <:my_account></:my_account>
+        <:checkout></:checkout>
+        <:my_store></:my_store>
+      </.mobile>
+    </div>
     """
   end
 
-  def header(%{header: :my_account, seller: nil} = assigns) do
+  def render(%{header: :checkout, current_user: nil} = assigns) do
     ~H"""
-    <.my_account>
-      <:store>
-        <.no_store_yet_href />
-      </:store>
-    </.my_account>
+    <div>
+      <.checkout_desktop>
+        <:login>
+          <.login_href />
+        </:login>
+        <:store>
+          <.no_store_yet_href />
+        </:store>
+      </.checkout_desktop>
+      <.mobile open={@mobile_open}>
+        <:landing></:landing>
+        <:my_account></:my_account>
+        <:checkout></:checkout>
+        <:my_store></:my_store>
+      </.mobile>
+    </div>
     """
   end
 
-  def header(%{header: :my_account} = assigns) do
+  def render(%{header: :checkout, seller: nil} = assigns) do
     ~H"""
-    <.my_account>
-      <:store>
-        <.my_store_href />
-      </:store>
-    </.my_account>
+    <div>
+      <.checkout_desktop>
+        <:login>
+          <.my_account_href />
+        </:login>
+        <:store>
+          <.no_store_yet_href />
+        </:store>
+      </.checkout_desktop>
+      <.mobile open={@mobile_open}>
+        <:landing></:landing>
+        <:my_account></:my_account>
+        <:checkout></:checkout>
+        <:my_store></:my_store>
+      </.mobile>
+    </div>
     """
   end
 
-  def header(%{header: :checkout, current_user: nil} = assigns) do
+  def render(%{header: :checkout} = assigns) do
     ~H"""
-    <.checkout>
-      <:login>
-        <.login_href />
-      </:login>
-      <:store>
-        <.no_store_yet_href />
-      </:store>
-    </.checkout>
-    """
-  end
-
-  def header(%{header: :checkout, seller: nil} = assigns) do
-    ~H"""
-    <.checkout>
-      <:login>
-        <.my_account_href />
-      </:login>
-      <:store>
-        <.no_store_yet_href />
-      </:store>
-    </.checkout>
-    """
-  end
-
-  def header(%{header: :checkout} = assigns) do
-    ~H"""
-    <.checkout>
-      <:login>
-        <.my_account_href />
-      </:login>
-      <:store>
-        <.my_store_href />
-      </:store>
-    </.checkout>
+    <div>
+      <.checkout_desktop>
+        <:login>
+          <.my_account_href />
+        </:login>
+        <:store>
+          <.my_store_href />
+        </:store>
+      </.checkout_desktop>
+      <.mobile open={@mobile_open}>
+        <:landing></:landing>
+        <:my_account></:my_account>
+        <:checkout></:checkout>
+        <:my_store></:my_store>
+      </.mobile>
+    </div>
     """
   end
 
   slot :login, required: true
   slot :store, required: true
 
-  defp landing(assigns) do
+  defp landing_desktop(assigns) do
     ~H"""
-    <.left selected={true}>
+    <.left_desktop selected={true}>
       <:right>
         <div class="level-item pr-xmedium">
           <%= render_slot(@login) %>
@@ -182,16 +303,16 @@ defmodule PlazaWeb.Header do
           <%= render_slot(@store) %>
         </div>
       </:right>
-    </.left>
+    </.left_desktop>
     """
   end
 
   slot :login, required: true
   slot :store, required: true
 
-  defp checkout(assigns) do
+  defp checkout_desktop(assigns) do
     ~H"""
-    <.left selected={false}>
+    <.left_desktop selected={false}>
       <:right>
         <div class="level-item pr-xmedium">
           <%= render_slot(@login) %>
@@ -210,7 +331,138 @@ defmodule PlazaWeb.Header do
           <%= render_slot(@store) %>
         </div>
       </:right>
-    </.left>
+    </.left_desktop>
+    """
+  end
+
+  slot :store, required: true
+
+  defp my_account_desktop(assigns) do
+    ~H"""
+    <.left_desktop>
+      <:right>
+        <div class="level-item pr-xmedium">
+          <div>
+            <.my_account_href />
+            <div style="position: absolute;">
+              <div style="position: relative; left: 13px;">
+                <img src="/svg/yellow-circle.svg" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="level-item pr-xmedium">
+          <.checkout_href />
+        </div>
+        <div class="level-item">
+          <%= render_slot(@store) %>
+        </div>
+      </:right>
+    </.left_desktop>
+    """
+  end
+
+  slot :login, required: true
+  slot :store, required: true
+
+  defp my_store_desktop(assigns) do
+    ~H"""
+    <.left_desktop>
+      <:right>
+        <div class="level-item pr-xmedium">
+          <%= render_slot(@login) %>
+        </div>
+        <div class="level-item pr-xmedium">
+          <.checkout_href />
+        </div>
+        <div class="level-item pr-xmedium">
+          <%= render_slot(@store) %>
+        </div>
+      </:right>
+    </.left_desktop>
+    """
+  end
+
+  attr :selected, :boolean, default: false
+  attr :header, :atom, required: true
+  slot :right, required: true
+
+  defp left_desktop(assigns) do
+    ~H"""
+    <div class="hero-head has-font-3">
+      <div class="is-navbar is-navbar-desktop">
+        <nav class="level" style="position: relative; top: 20px; margin-left: 50px">
+          <div class="level-left">
+            <div class="level-item pr-large">
+              <div class="is-size-1-desktop is-size-2-touch">plazaaaaa</div>
+            </div>
+            <div class="level-item pr-xmedium">
+              <div class="is-size-5" style="position: relative; top: 11px;">
+                <.link :if={@selected} navigate="/">
+                  loja
+                  <div style="position: absolute;">
+                    <div style="position: relative; left: 2px;">
+                      <img src="/svg/yellow-circle.svg" />
+                    </div>
+                  </div>
+                </.link>
+                <.link :if={!@selected} navigate="/">
+                  loja
+                </.link>
+              </div>
+            </div>
+            <div class="level-item">
+              <div class="is-size-5" style="position: relative; top: 11px;">
+                <div class="has-dark-gray-text">buscar</div>
+              </div>
+            </div>
+          </div>
+          <div class="level-right is-size-5" style="position: relative; top: 11px;">
+            <%= render_slot(@right) %>
+          </div>
+        </nav>
+      </div>
+    </div>
+    """
+  end
+
+  defp mobile(assigns) do
+    ~H"""
+    <div id="mobile-header-target">
+      <nav :if={!@open} class="is-navbar-mobile-closed" style="display: flex;">
+        <div style="margin-left: auto; margin-right: 50px; display: flex; flex-direction: column; justify-content: center; height: 100px;">
+          <button
+            class="has-font-3"
+            style="font-size: 32px;"
+            phx-click="open-header"
+            phx-target="#mobile-header-target"
+          >
+            open header
+          </button>
+        </div>
+      </nav>
+      <nav
+        :if={@open}
+        class="is-navbar-mobile-open"
+        style="display: flex; justify-content: center; margin-top: 50px;"
+      >
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <div style="font-size: 60px;">plazaaaaa</div>
+          <div style="padding-top: 100px;">
+            <%= render_slot(@landing) %>
+          </div>
+          <div style="margin-top: 100px;">
+            <%= render_slot(@my_account) %>
+          </div>
+          <div style="margin-top: 100px;">
+            <%= render_slot(@checkout) %>
+          </div>
+          <div style="margin-top: 100px;">
+            <%= render_slot(@my_store) %>
+          </div>
+        </div>
+      </nav>
+    </div>
     """
   end
 
@@ -246,7 +498,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  defp no_store_yet_selected(assigns) do
+  defp no_store_yet_href_selected(assigns) do
     ~H"""
     <div>
       quero vender
@@ -267,102 +519,48 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  slot :store, required: true
-
-  defp my_account(assigns) do
+  defp landing_href_selected_mobile(assigns) do
     ~H"""
-    <.left>
-      <:right>
-        <div class="level-item pr-xmedium">
-          <div>
-            <.my_account_href />
-            <div style="position: absolute;">
-              <div style="position: relative; left: 13px;">
-                <img src="/svg/yellow-circle.svg" />
-              </div>
-            </div>
-          </div>
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/">
+      <div style="display: flex; align-items: center;">
+        <div class="has-font-3" style="font-size: 40px;">
+          loja
         </div>
-        <div class="level-item pr-xmedium">
-          <.checkout_href />
+        <div style="margin-left: 10px;">
+          <img src="/svg/yellow-circle.svg" />
         </div>
-        <div class="level-item">
-          <%= render_slot(@store) %>
-        </div>
-      </:right>
-    </.left>
+      </div>
+    </.link>
     """
   end
 
-  slot :login, required: true
-  slot :store, required: true
-
-  defp my_store(assigns) do
+  defp login_href_mobile(assigns) do
     ~H"""
-    <.left>
-      <:right>
-        <div class="level-item pr-xmedium">
-          <%= render_slot(@login) %>
-        </div>
-        <div class="level-item pr-xmedium">
-          <.checkout_href />
-        </div>
-        <div class="level-item pr-xmedium">
-          <%= render_slot(@store) %>
-        </div>
-      </:right>
-    </.left>
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/users/log_in">
+      <div class="has-font-3" style="font-size: 40px;">
+        log in
+      </div>
+    </.link>
     """
   end
 
-  attr :selected, :boolean, default: false
-  slot :right, required: true
-
-  defp left(assigns) do
+  defp checkout_href_mobile(assigns) do
     ~H"""
-    <div class="hero-head has-font-3">
-      <div class="is-navbar is-navbar-desktop">
-        <nav class="level" style="position: relative; top: 20px; margin-left: 50px">
-          <div class="level-left">
-            <div class="level-item pr-large">
-              <div class="is-size-1-desktop is-size-2-touch">plazaaaaa</div>
-            </div>
-            <div class="level-item pr-xmedium">
-              <div class="is-size-5" style="position: relative; top: 11px;">
-                <.link :if={@selected} navigate="/">
-                  loja
-                  <div style="position: absolute;">
-                    <div style="position: relative; left: 2px;">
-                      <img src="/svg/yellow-circle.svg" />
-                    </div>
-                  </div>
-                </.link>
-                <.link :if={!@selected} navigate="/">
-                  loja
-                </.link>
-              </div>
-            </div>
-            <div class="level-item">
-              <div class="is-size-5" style="position: relative; top: 11px;">
-                <div class="has-dark-gray-text">buscar</div>
-              </div>
-            </div>
-          </div>
-          <div class="level-right is-size-5" style="position: relative; top: 11px;">
-            <%= render_slot(@right) %>
-          </div>
-        </nav>
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/checkout">
+      <div class="has-font-3" style="font-size: 40px;">
+        carrinho
       </div>
-      <div>
-        <.live_component
-          module={PlazaWeb.Header.MobileHeader}
-          id="mobile-header-component"
-          selected={@selected}
-          right={@right}
-          open={false}
-        />
+    </.link>
+    """
+  end
+
+  defp no_store_yet_href_mobile(assigns) do
+    ~H"""
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/upload">
+      <div class="has-font-3" style="font-size: 40px;">
+        quero vender
       </div>
-    </div>
+    </.link>
     """
   end
 end

@@ -7,6 +7,7 @@ defmodule PlazaWeb.LandingLive do
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
+    IO.inspect(socket.assigns.current_user)
     curated_products = Products.top_4_paginated(%{before: nil, after: nil})
     uncurated_products = Products.top_8_uncurated_paginated(%{before: nil, after: nil})
     first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
