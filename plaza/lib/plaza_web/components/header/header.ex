@@ -75,10 +75,18 @@ defmodule PlazaWeb.Header do
         </:store>
       </.landing_desktop>
       <.mobile open={@mobile_open}>
-        <:landing></:landing>
-        <:my_account></:my_account>
-        <:checkout></:checkout>
-        <:my_store></:my_store>
+        <:landing>
+          <.landing_href_selected_mobile />
+        </:landing>
+        <:my_account>
+          <.my_account_href_mobile />
+        </:my_account>
+        <:checkout>
+          <.checkout_href_mobile />
+        </:checkout>
+        <:my_store>
+          <.no_store_yet_href_mobile />
+        </:my_store>
       </.mobile>
     </div>
     """
@@ -96,10 +104,18 @@ defmodule PlazaWeb.Header do
         </:store>
       </.landing_desktop>
       <.mobile open={@mobile_open}>
-        <:landing></:landing>
-        <:my_account></:my_account>
-        <:checkout></:checkout>
-        <:my_store></:my_store>
+        <:landing>
+          <.landing_href_selected_mobile />
+        </:landing>
+        <:my_account>
+          <.my_account_href_mobile />
+        </:my_account>
+        <:checkout>
+          <.checkout_href_mobile />
+        </:checkout>
+        <:my_store>
+          <.my_store_href_mobile />
+        </:my_store>
       </.mobile>
     </div>
     """
@@ -128,6 +144,27 @@ defmodule PlazaWeb.Header do
           </div>
         </:right>
       </.left_desktop>
+      <.mobile open={@mobile_open}>
+        <:landing></:landing>
+        <:my_account></:my_account>
+        <:checkout></:checkout>
+        <:my_store></:my_store>
+      </.mobile>
+    </div>
+    """
+  end
+
+  def render(%{header: :my_store, current_user: nil, seller: nil} = assigns) do
+    ~H"""
+    <div>
+      <.my_store_desktop>
+        <:login>
+          <.login_href />
+        </:login>
+        <:store>
+          <.no_store_yet_href_selected />
+        </:store>
+      </.my_store_desktop>
       <.mobile open={@mobile_open}>
         <:landing></:landing>
         <:my_account></:my_account>
@@ -354,7 +391,7 @@ defmodule PlazaWeb.Header do
         <div class="level-item pr-xmedium">
           <.checkout_href />
         </div>
-        <div class="level-item">
+        <div class="level-item pr-xmedium">
           <%= render_slot(@store) %>
         </div>
       </:right>
@@ -444,11 +481,11 @@ defmodule PlazaWeb.Header do
       <nav
         :if={@open}
         class="is-navbar-mobile-open"
-        style="display: flex; justify-content: center; margin-top: 50px;"
+        style="display: flex; justify-content: center; padding-top: 100px;"
       >
         <div style="display: flex; flex-direction: column; align-items: center;">
           <div style="font-size: 60px;">plazaaaaa</div>
-          <div style="padding-top: 100px;">
+          <div style="margin-top: 100px;">
             <%= render_slot(@landing) %>
           </div>
           <div style="margin-top: 100px;">
@@ -559,6 +596,26 @@ defmodule PlazaWeb.Header do
     <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/upload">
       <div class="has-font-3" style="font-size: 40px;">
         quero vender
+      </div>
+    </.link>
+    """
+  end
+
+  defp my_account_href_mobile(assigns) do
+    ~H"""
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-account">
+      <div class="has-font-3" style="font-size: 40px;">
+        conta
+      </div>
+    </.link>
+    """
+  end
+
+  defp my_store_href_mobile(assigns) do
+    ~H"""
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-store">
+      <div class="has-font-3" style="font-size: 40px;">
+        minha loja
       </div>
     </.link>
     """
