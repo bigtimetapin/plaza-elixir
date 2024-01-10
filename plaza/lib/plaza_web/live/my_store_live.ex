@@ -14,8 +14,8 @@ defmodule PlazaWeb.MyStoreLive do
 
   alias ExAws.S3
 
-  @site "http://localhost:4000"
-  ## @site "https://plazaaaaa-solitary-snowflake-7144-summer-wave-9195.fly.dev"
+  ## @site "http://localhost:4000"
+  @site "https://plazaaaaa-solitary-snowflake-7144-summer-wave-9195.fly.dev"
   @local_storage_key "plaza-product-form"
 
   @aws_s3_region "us-west-2"

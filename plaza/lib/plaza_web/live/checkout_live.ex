@@ -11,8 +11,8 @@ defmodule PlazaWeb.CheckoutLive do
   alias Plaza.Products.Product
   alias Plaza.Purchases
 
-  @site "http://localhost:4000"
-  ## @site "https://plazaaaaa-solitary-snowflake-7144-summer-wave-9195.fly.dev"
+  ## @site "http://localhost:4000"
+  @site "https://plazaaaaa-solitary-snowflake-7144-summer-wave-9195.fly.dev"
 
   @local_storage_key "plaza-checkout-cart"
 
