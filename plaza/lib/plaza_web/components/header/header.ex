@@ -1,40 +1,15 @@
 defmodule PlazaWeb.Header do
-  use Phoenix.LiveComponent
+  use Phoenix.Component
 
-  def update(%{header: header, current_user: current_user, seller: seller}, socket) do
-    header =
-      case header do
-        nil -> :landing
-        _ -> header
-      end
-
-    socket =
-      socket
-      |> assign(header: header)
-      |> assign(current_user: current_user)
-      |> assign(seller: seller)
-      |> assign(mobile_open: false)
-
-    {:ok, socket}
+  def get(%{header: header}) do
+    header
   end
 
-  def handle_event("open-header", _, socket) do
-    socket =
-      socket
-      |> assign(mobile_open: true)
-
-    {:noreply, socket}
+  def get(_) do
+    :landing
   end
 
-  def handle_event("close-header", _, socket) do
-    socket =
-      socket
-      |> assign(mobile_open: false)
-
-    {:noreply, socket}
-  end
-
-  def render(%{header: :landing, current_user: nil} = assigns) do
+  def header(%{header: :landing, current_user: nil} = assigns) do
     ~H"""
     <div>
       <.landing_desktop>
@@ -63,7 +38,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  def render(%{header: :landing, seller: nil} = assigns) do
+  def header(%{header: :landing, seller: nil} = assigns) do
     ~H"""
     <div>
       <.landing_desktop>
@@ -92,7 +67,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  def render(%{header: :landing} = assigns) do
+  def header(%{header: :landing} = assigns) do
     ~H"""
     <div>
       <.landing_desktop>
@@ -121,7 +96,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  def render(%{header: :login} = assigns) do
+  def header(%{header: :login} = assigns) do
     ~H"""
     <div>
       <.left_desktop>
@@ -162,7 +137,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  def render(%{header: :my_store, current_user: nil, seller: nil} = assigns) do
+  def header(%{header: :my_store, current_user: nil, seller: nil} = assigns) do
     ~H"""
     <div>
       <.my_store_desktop>
@@ -191,7 +166,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  def render(%{header: :my_store, seller: nil} = assigns) do
+  def header(%{header: :my_store, seller: nil} = assigns) do
     ~H"""
     <div>
       <.my_store_desktop>
@@ -220,7 +195,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  def render(%{header: :my_store} = assigns) do
+  def header(%{header: :my_store} = assigns) do
     ~H"""
     <div>
       <.my_store_desktop>
@@ -256,7 +231,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  def render(%{header: :my_account, seller: nil} = assigns) do
+  def header(%{header: :my_account, seller: nil} = assigns) do
     ~H"""
     <div>
       <.my_account_desktop>
@@ -282,7 +257,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  def render(%{header: :my_account} = assigns) do
+  def header(%{header: :my_account} = assigns) do
     ~H"""
     <div>
       <.my_account_desktop>
@@ -308,7 +283,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  def render(%{header: :checkout, current_user: nil} = assigns) do
+  def header(%{header: :checkout, current_user: nil} = assigns) do
     ~H"""
     <div>
       <.checkout_desktop>
@@ -337,7 +312,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  def render(%{header: :checkout, seller: nil} = assigns) do
+  def header(%{header: :checkout, seller: nil} = assigns) do
     ~H"""
     <div>
       <.checkout_desktop>
@@ -366,7 +341,7 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  def render(%{header: :checkout} = assigns) do
+  def header(%{header: :checkout} = assigns) do
     ~H"""
     <div>
       <.checkout_desktop>
@@ -427,7 +402,7 @@ defmodule PlazaWeb.Header do
           <%= render_slot(@login) %>
         </div>
         <div class="level-item pr-xmedium">
-          <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/checkout">
+          <.link phx-click="close-mobile-header" navigate="/checkout">
             carrinho
             <div style="position: absolute;">
               <div style="position: relative; left: 26px;">
@@ -540,12 +515,7 @@ defmodule PlazaWeb.Header do
     <div id="mobile-header-target">
       <nav :if={!@open} class="is-navbar-mobile-closed" style="display: flex;">
         <div style="margin-left: auto; margin-right: 50px; display: flex; flex-direction: column; justify-content: center; height: 100px;">
-          <button
-            class="has-font-3"
-            style="font-size: 32px;"
-            phx-click="open-header"
-            phx-target="#mobile-header-target"
-          >
+          <button class="has-font-3" style="font-size: 32px;" phx-click="open-mobile-header">
             open header
           </button>
         </div>
@@ -577,7 +547,7 @@ defmodule PlazaWeb.Header do
 
   defp checkout_href(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/checkout">
+    <.link phx-click="close-mobile-header" navigate="/checkout">
       carrinho
     </.link>
     """
@@ -585,7 +555,7 @@ defmodule PlazaWeb.Header do
 
   defp login_href(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/users/log_in">
+    <.link phx-click="close-mobile-header" navigate="/users/log_in">
       log in
     </.link>
     """
@@ -593,7 +563,7 @@ defmodule PlazaWeb.Header do
 
   defp my_store_href(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-store">
+    <.link phx-click="close-mobile-header" navigate="/my-store">
       minha loja
     </.link>
     """
@@ -601,7 +571,7 @@ defmodule PlazaWeb.Header do
 
   defp no_store_yet_href(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/upload">
+    <.link phx-click="close-mobile-header" navigate="/upload">
       quero vender
     </.link>
     """
@@ -622,7 +592,7 @@ defmodule PlazaWeb.Header do
 
   defp my_account_href(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-account">
+    <.link phx-click="close-mobile-header" navigate="/my-account">
       conta
     </.link>
     """
@@ -630,7 +600,7 @@ defmodule PlazaWeb.Header do
 
   defp landing_href_selected_mobile(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/">
+    <.link phx-click="close-mobile-header" navigate="/">
       <div style="display: flex; align-items: center;">
         <div class="has-font-3" style="font-size: 40px;">
           loja
@@ -645,7 +615,7 @@ defmodule PlazaWeb.Header do
 
   defp landing_href_mobile(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/">
+    <.link phx-click="close-mobile-header" navigate="/">
       <div class="has-font-3" style="font-size: 40px;">
         loja
       </div>
@@ -655,7 +625,7 @@ defmodule PlazaWeb.Header do
 
   defp login_href_mobile(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/users/log_in">
+    <.link phx-click="close-mobile-header" navigate="/users/log_in">
       <div class="has-font-3" style="font-size: 40px;">
         log in
       </div>
@@ -665,7 +635,7 @@ defmodule PlazaWeb.Header do
 
   defp login_href_selected_mobile(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/users/log_in">
+    <.link phx-click="close-mobile-header" navigate="/users/log_in">
       <div style="display: flex; align-items: center;">
         <div class="has-font-3" style="font-size: 40px;">
           log in
@@ -680,7 +650,7 @@ defmodule PlazaWeb.Header do
 
   defp checkout_href_mobile(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/checkout">
+    <.link phx-click="close-mobile-header" navigate="/checkout">
       <div class="has-font-3" style="font-size: 40px;">
         carrinho
       </div>
@@ -690,7 +660,7 @@ defmodule PlazaWeb.Header do
 
   defp checkout_href_selected_mobile(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/checkout">
+    <.link phx-click="close-mobile-header" navigate="/checkout">
       <div style="display: flex; align-items: center;">
         <div class="has-font-3" style="font-size: 40px;">
           carrinho
@@ -705,7 +675,7 @@ defmodule PlazaWeb.Header do
 
   defp no_store_yet_href_mobile(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/upload">
+    <.link phx-click="close-mobile-header" navigate="/upload">
       <div class="has-font-3" style="font-size: 40px;">
         quero vender
       </div>
@@ -715,7 +685,7 @@ defmodule PlazaWeb.Header do
 
   defp no_store_yet_href_selected_mobile(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/upload">
+    <.link phx-click="close-mobile-header" navigate="/upload">
       <div style="display: flex; align-items: center;">
         <div class="has-font-3" style="font-size: 40px;">
           quero vender
@@ -730,7 +700,7 @@ defmodule PlazaWeb.Header do
 
   defp my_account_href_mobile(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-account">
+    <.link phx-click="close-mobile-header" navigate="/my-account">
       <div class="has-font-3" style="font-size: 40px;">
         conta
       </div>
@@ -740,7 +710,7 @@ defmodule PlazaWeb.Header do
 
   defp my_account_href_selected_mobile(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-account">
+    <.link phx-click="close-mobile-header" navigate="/my-account">
       <div style="display: flex; align-items: center;">
         <div class="has-font-3" style="font-size: 40px;">
           conta
@@ -755,7 +725,7 @@ defmodule PlazaWeb.Header do
 
   defp my_store_href_mobile(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-store">
+    <.link phx-click="close-mobile-header" navigate="/my-store">
       <div class="has-font-3" style="font-size: 40px;">
         minha loja
       </div>
@@ -765,7 +735,7 @@ defmodule PlazaWeb.Header do
 
   defp my_store_href_selected_mobile(assigns) do
     ~H"""
-    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-store">
+    <.link phx-click="close-mobile-header" navigate="/my-store">
       <div style="display: flex; align-items: center;">
         <div class="has-font-3" style="font-size: 40px;">
           minha loja
