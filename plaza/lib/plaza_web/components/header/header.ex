@@ -512,7 +512,7 @@ defmodule PlazaWeb.Header do
 
   defp mobile(assigns) do
     ~H"""
-    <div id="mobile-header-target">
+    <div>
       <nav :if={!@open} class="is-navbar-mobile-closed" style="display: flex;">
         <div style="margin-left: auto; margin-right: 50px; display: flex; flex-direction: column; justify-content: center; height: 100px;">
           <button class="has-font-3" style="font-size: 32px;" phx-click="open-mobile-header">
@@ -520,24 +520,22 @@ defmodule PlazaWeb.Header do
           </button>
         </div>
       </nav>
-      <nav
-        :if={@open}
-        class="is-navbar-mobile-open"
-        style="display: flex; justify-content: center; padding-top: 100px;"
-      >
-        <div style="display: flex; flex-direction: column; align-items: center;">
-          <div style="font-size: 60px;">plazaaaaa</div>
-          <div style="margin-top: 100px;">
-            <%= render_slot(@landing) %>
-          </div>
-          <div style="margin-top: 100px;">
-            <%= render_slot(@my_account) %>
-          </div>
-          <div style="margin-top: 100px;">
-            <%= render_slot(@checkout) %>
-          </div>
-          <div style="margin-top: 100px;">
-            <%= render_slot(@my_store) %>
+      <nav :if={@open} class="is-navbar-mobile-open">
+        <div style="display: flex; justify-content: center; padding-top: 100px;">
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <div style="font-size: 60px;">plazaaaaa</div>
+            <div style="margin-top: 100px;">
+              <%= render_slot(@landing) %>
+            </div>
+            <div style="margin-top: 100px;">
+              <%= render_slot(@my_account) %>
+            </div>
+            <div style="margin-top: 100px;">
+              <%= render_slot(@checkout) %>
+            </div>
+            <div style="margin-top: 100px;">
+              <%= render_slot(@my_store) %>
+            </div>
           </div>
         </div>
       </nav>
