@@ -145,10 +145,18 @@ defmodule PlazaWeb.Header do
         </:right>
       </.left_desktop>
       <.mobile open={@mobile_open}>
-        <:landing></:landing>
-        <:my_account></:my_account>
-        <:checkout></:checkout>
-        <:my_store></:my_store>
+        <:landing>
+          <.landing_href_mobile />
+        </:landing>
+        <:my_account>
+          <.login_href_selected_mobile />
+        </:my_account>
+        <:checkout>
+          <.checkout_href_mobile />
+        </:checkout>
+        <:my_store>
+          <.no_store_yet_href_mobile />
+        </:my_store>
       </.mobile>
     </div>
     """
@@ -166,10 +174,18 @@ defmodule PlazaWeb.Header do
         </:store>
       </.my_store_desktop>
       <.mobile open={@mobile_open}>
-        <:landing></:landing>
-        <:my_account></:my_account>
-        <:checkout></:checkout>
-        <:my_store></:my_store>
+        <:landing>
+          <.landing_href_mobile />
+        </:landing>
+        <:my_account>
+          <.login_href_mobile />
+        </:my_account>
+        <:checkout>
+          <.checkout_href_mobile />
+        </:checkout>
+        <:my_store>
+          <.no_store_yet_href_selected_mobile />
+        </:my_store>
       </.mobile>
     </div>
     """
@@ -187,10 +203,18 @@ defmodule PlazaWeb.Header do
         </:store>
       </.my_store_desktop>
       <.mobile open={@mobile_open}>
-        <:landing></:landing>
-        <:my_account></:my_account>
-        <:checkout></:checkout>
-        <:my_store></:my_store>
+        <:landing>
+          <.landing_href_mobile />
+        </:landing>
+        <:my_account>
+          <.my_account_href_mobile />
+        </:my_account>
+        <:checkout>
+          <.checkout_href_mobile />
+        </:checkout>
+        <:my_store>
+          <.no_store_yet_href_selected_mobile />
+        </:my_store>
       </.mobile>
     </div>
     """
@@ -215,10 +239,18 @@ defmodule PlazaWeb.Header do
         </:store>
       </.my_store_desktop>
       <.mobile open={@mobile_open}>
-        <:landing></:landing>
-        <:my_account></:my_account>
-        <:checkout></:checkout>
-        <:my_store></:my_store>
+        <:landing>
+          <.landing_href_mobile />
+        </:landing>
+        <:my_account>
+          <.my_account_href_mobile />
+        </:my_account>
+        <:checkout>
+          <.checkout_href_mobile />
+        </:checkout>
+        <:my_store>
+          <.my_store_href_selected_mobile />
+        </:my_store>
       </.mobile>
     </div>
     """
@@ -233,10 +265,18 @@ defmodule PlazaWeb.Header do
         </:store>
       </.my_account_desktop>
       <.mobile open={@mobile_open}>
-        <:landing></:landing>
-        <:my_account></:my_account>
-        <:checkout></:checkout>
-        <:my_store></:my_store>
+        <:landing>
+          <.landing_href_mobile />
+        </:landing>
+        <:my_account>
+          <.my_account_href_selected_mobile />
+        </:my_account>
+        <:checkout>
+          <.checkout_href_mobile />
+        </:checkout>
+        <:my_store>
+          <.no_store_yet_href_mobile />
+        </:my_store>
       </.mobile>
     </div>
     """
@@ -251,10 +291,18 @@ defmodule PlazaWeb.Header do
         </:store>
       </.my_account_desktop>
       <.mobile open={@mobile_open}>
-        <:landing></:landing>
-        <:my_account></:my_account>
-        <:checkout></:checkout>
-        <:my_store></:my_store>
+        <:landing>
+          <.landing_href_mobile />
+        </:landing>
+        <:my_account>
+          <.my_account_href_selected_mobile />
+        </:my_account>
+        <:checkout>
+          <.checkout_href_mobile />
+        </:checkout>
+        <:my_store>
+          <.my_store_href_mobile />
+        </:my_store>
       </.mobile>
     </div>
     """
@@ -571,11 +619,36 @@ defmodule PlazaWeb.Header do
     """
   end
 
+  defp landing_href_mobile(assigns) do
+    ~H"""
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/">
+      <div class="has-font-3" style="font-size: 40px;">
+        loja
+      </div>
+    </.link>
+    """
+  end
+
   defp login_href_mobile(assigns) do
     ~H"""
     <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/users/log_in">
       <div class="has-font-3" style="font-size: 40px;">
         log in
+      </div>
+    </.link>
+    """
+  end
+
+  defp login_href_selected_mobile(assigns) do
+    ~H"""
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/users/log_in">
+      <div style="display: flex; align-items: center;">
+        <div class="has-font-3" style="font-size: 40px;">
+          log in
+        </div>
+        <div style="margin-left: 10px;">
+          <img src="/svg/yellow-circle.svg" />
+        </div>
       </div>
     </.link>
     """
@@ -601,6 +674,21 @@ defmodule PlazaWeb.Header do
     """
   end
 
+  defp no_store_yet_href_selected_mobile(assigns) do
+    ~H"""
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/upload">
+      <div style="display: flex; align-items: center;">
+        <div class="has-font-3" style="font-size: 40px;">
+          quero vender
+        </div>
+        <div style="margin-left: 10px;">
+          <img src="/svg/yellow-circle.svg" />
+        </div>
+      </div>
+    </.link>
+    """
+  end
+
   defp my_account_href_mobile(assigns) do
     ~H"""
     <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-account">
@@ -611,11 +699,41 @@ defmodule PlazaWeb.Header do
     """
   end
 
+  defp my_account_href_selected_mobile(assigns) do
+    ~H"""
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-account">
+      <div style="display: flex; align-items: center;">
+        <div class="has-font-3" style="font-size: 40px;">
+          conta
+        </div>
+        <div style="margin-left: 10px;">
+          <img src="/svg/yellow-circle.svg" />
+        </div>
+      </div>
+    </.link>
+    """
+  end
+
   defp my_store_href_mobile(assigns) do
     ~H"""
     <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-store">
       <div class="has-font-3" style="font-size: 40px;">
         minha loja
+      </div>
+    </.link>
+    """
+  end
+
+  defp my_store_href_selected_mobile(assigns) do
+    ~H"""
+    <.link phx-target="#mobile-header-target" phx-click="close-header" navigate="/my-store">
+      <div style="display: flex; align-items: center;">
+        <div class="has-font-3" style="font-size: 40px;">
+          minha loja
+        </div>
+        <div style="margin-left: 10px;">
+          <img src="/svg/yellow-circle.svg" />
+        </div>
       </div>
     </.link>
     """
