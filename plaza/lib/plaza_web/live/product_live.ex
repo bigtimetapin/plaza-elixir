@@ -194,6 +194,22 @@ defmodule PlazaWeb.ProductLive do
   end
 
   @impl Phoenix.LiveView
+  def handle_event("open-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("close-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: false)
+
+    {:noreply, socket}
+  end
+
   def handle_event("add-to-cart", _, socket) do
     cart = socket.assigns.cart
     product = socket.assigns.product

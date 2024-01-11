@@ -16,14 +16,29 @@ defmodule PlazaWeb.UserConfirmationInstructionsLive do
 
     <p>
       <.link href={~p"/users/register"}>Register</.link>
-      |
-      <.link href={~p"/users/log_in"}>Log in</.link>
+      | <.link href={~p"/users/log_in"}>Log in</.link>
     </p>
     """
   end
 
   def mount(_params, _session, socket) do
     {:ok, assign(socket, form: to_form(%{}, as: "user"))}
+  end
+
+  def handle_event("open-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("close-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: false)
+
+    {:noreply, socket}
   end
 
   def handle_event("send_instructions", %{"user" => %{"email" => email}}, socket) do

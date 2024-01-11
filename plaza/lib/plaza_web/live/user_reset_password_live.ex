@@ -32,8 +32,7 @@ defmodule PlazaWeb.UserResetPasswordLive do
 
       <p class="text-center mt-4">
         <.link href={~p"/users/register"}>Register</.link>
-        |
-        <.link href={~p"/users/log_in"}>Log in</.link>
+        | <.link href={~p"/users/log_in"}>Log in</.link>
       </p>
     </div>
     """
@@ -52,6 +51,22 @@ defmodule PlazaWeb.UserResetPasswordLive do
       end
 
     {:ok, assign_form(socket, form_source), temporary_assigns: [form: nil]}
+  end
+
+  def handle_event("open-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("close-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: false)
+
+    {:noreply, socket}
   end
 
   # Do not log in the user after reset password to avoid a

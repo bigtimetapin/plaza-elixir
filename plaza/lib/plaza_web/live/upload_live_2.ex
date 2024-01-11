@@ -104,6 +104,22 @@ defmodule PlazaWeb.UploadLive2 do
   end
 
   @impl Phoenix.LiveView
+  def handle_event("open-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("close-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: false)
+
+    {:noreply, socket}
+  end
+
   def handle_event("step", %{"step" => "noop"}, socket) do
     {:noreply, socket}
   end

@@ -19,6 +19,22 @@ defmodule PlazaWeb.MyAccountLive do
   end
 
   @impl Phoenix.LiveView
+  def handle_event("open-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("close-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: false)
+
+    {:noreply, socket}
+  end
+
   def handle_event("user-name-change", %{"user-name" => str}, socket) do
     socket =
       socket

@@ -158,6 +158,22 @@ defmodule PlazaWeb.CheckoutLive do
   end
 
   @impl Phoenix.LiveView
+  def handle_event("open-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("close-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: false)
+
+    {:noreply, socket}
+  end
+
   def handle_event("read-cart", token_data, socket) when is_binary(token_data) do
     socket =
       case restore_from_token(token_data) do

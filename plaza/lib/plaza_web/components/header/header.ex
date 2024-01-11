@@ -521,7 +521,7 @@ defmodule PlazaWeb.Header do
         </div>
       </nav>
       <nav :if={@open} class="is-navbar-mobile-open">
-        <div style="display: flex; justify-content: center; padding-top: 100px;">
+        <div style="display: flex; justify-content: center; padding-top: 100px; padding-bottom: 250px;">
           <div style="display: flex; flex-direction: column; align-items: center;">
             <div style="font-size: 60px;">plazaaaaa</div>
             <div style="margin-top: 100px;">
@@ -600,7 +600,7 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/">
       <div style="display: flex; align-items: center;">
-        <div class="has-font-3" style="font-size: 40px;">
+        <div class="has-font-3" style="font-size: 24px;">
           loja
         </div>
         <div style="margin-left: 10px;">
@@ -614,7 +614,7 @@ defmodule PlazaWeb.Header do
   defp landing_href_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/">
-      <div class="has-font-3" style="font-size: 40px;">
+      <div class="has-font-3" style="font-size: 24px;">
         loja
       </div>
     </.link>
@@ -624,7 +624,7 @@ defmodule PlazaWeb.Header do
   defp login_href_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/users/log_in">
-      <div class="has-font-3" style="font-size: 40px;">
+      <div class="has-font-3" style="font-size: 24px;">
         log in
       </div>
     </.link>
@@ -635,7 +635,7 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/users/log_in">
       <div style="display: flex; align-items: center;">
-        <div class="has-font-3" style="font-size: 40px;">
+        <div class="has-font-3" style="font-size: 24px;">
           log in
         </div>
         <div style="margin-left: 10px;">
@@ -649,7 +649,7 @@ defmodule PlazaWeb.Header do
   defp checkout_href_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/checkout">
-      <div class="has-font-3" style="font-size: 40px;">
+      <div class="has-font-3" style="font-size: 24px;">
         carrinho
       </div>
     </.link>
@@ -660,7 +660,7 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/checkout">
       <div style="display: flex; align-items: center;">
-        <div class="has-font-3" style="font-size: 40px;">
+        <div class="has-font-3" style="font-size: 24px;">
           carrinho
         </div>
         <div style="margin-left: 10px;">
@@ -674,7 +674,7 @@ defmodule PlazaWeb.Header do
   defp no_store_yet_href_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/upload">
-      <div class="has-font-3" style="font-size: 40px;">
+      <div class="has-font-3" style="font-size: 24px;">
         quero vender
       </div>
     </.link>
@@ -685,7 +685,7 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/upload">
       <div style="display: flex; align-items: center;">
-        <div class="has-font-3" style="font-size: 40px;">
+        <div class="has-font-3" style="font-size: 24px;">
           quero vender
         </div>
         <div style="margin-left: 10px;">
@@ -699,7 +699,7 @@ defmodule PlazaWeb.Header do
   defp my_account_href_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/my-account">
-      <div class="has-font-3" style="font-size: 40px;">
+      <div class="has-font-3" style="font-size: 24px;">
         conta
       </div>
     </.link>
@@ -710,7 +710,7 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/my-account">
       <div style="display: flex; align-items: center;">
-        <div class="has-font-3" style="font-size: 40px;">
+        <div class="has-font-3" style="font-size: 24px;">
           conta
         </div>
         <div style="margin-left: 10px;">
@@ -724,7 +724,7 @@ defmodule PlazaWeb.Header do
   defp my_store_href_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/my-store">
-      <div class="has-font-3" style="font-size: 40px;">
+      <div class="has-font-3" style="font-size: 24px;">
         minha loja
       </div>
     </.link>
@@ -735,7 +735,7 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/my-store">
       <div style="display: flex; align-items: center;">
-        <div class="has-font-3" style="font-size: 40px;">
+        <div class="has-font-3" style="font-size: 24px;">
           minha loja
         </div>
         <div style="margin-left: 10px;">

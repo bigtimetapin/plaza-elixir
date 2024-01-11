@@ -29,6 +29,22 @@ defmodule PlazaWeb.AdminLive do
   end
 
   @impl Phoenix.LiveView
+  def handle_event("open-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("close-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: false)
+
+    {:noreply, socket}
+  end
+
   def handle_event("change-search-form", %{"seller_user_name" => seller_user_name}, socket) do
     sellers = Accounts.get_sellers_by_user_name_that_contain(seller_user_name)
 
