@@ -33,7 +33,6 @@ defmodule PlazaWeb.LandingLive do
       |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
       |> assign(page_title: "Hello Plaza")
       |> assign(header: :landing)
-      |> assign(mobile_header_open: false)
       |> assign(seller: seller)
 
     {:ok, socket}
