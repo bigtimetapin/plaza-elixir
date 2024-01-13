@@ -5,7 +5,7 @@ defmodule PlazaWeb.AdminLive do
   alias Plaza.Products
   alias PlazaWeb.ProductComponent
 
-  @admin_list ["bigtimetapin@gmail.com"]
+  @admin_list ["bigtimetapin@gmail.com", "alexander@plazaaaaa.com"]
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do

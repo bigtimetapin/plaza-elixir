@@ -523,7 +523,7 @@ defmodule PlazaWeb.Header do
       <nav :if={@open} class="is-navbar-mobile-open">
         <div style="display: flex; justify-content: center; padding-top: 100px; padding-bottom: 250px;">
           <div style="display: flex; flex-direction: column; align-items: center;">
-            <div style="font-size: 60px;">plazaaaaa</div>
+            <div class="has-font-3" style="font-size: 60px;">plazaaaaa</div>
             <div style="margin-top: 100px;">
               <%= render_slot(@landing) %>
             </div>

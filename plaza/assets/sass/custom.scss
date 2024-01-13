@@ -222,8 +222,6 @@ input[type="radio"] {
 
 .is-product-1 {
   height: 428px;
-  max-width: 370px;
-  min-width: 225px;
   position: relative;
   top: 10px;
   left: 10px;
@@ -365,6 +363,29 @@ $spacing-values: (
 
   @include from($tablet) {
     width: 18rem;
+  }
+}
+
+.is-landing-desktop {
+  @include until($tablet) {
+    display: none;
+  }
+}
+
+.is-landing-mobile {
+  @include from($tablet) {
+    display: none;
+  }
+}
+
+.is-product-1 {
+  @include from($tablet) {
+    max-width: 370px;
+    min-width: 225px;
+  }
+
+  @include until($tablet) {
+    width: 100%;
   }
 }
 

@@ -10,8 +10,11 @@ defmodule PlazaWeb.LandingLive do
     IO.inspect(socket.assigns.current_user)
     curated_products = Products.top_4_paginated(%{before: nil, after: nil})
     uncurated_products = Products.top_8_uncurated_paginated(%{before: nil, after: nil})
+    just_1_uncurated_product = Products.just_1_uncurated_product(%{before: nil, after: nil})
     first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
     second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
+    just_1_uncurated_product_after = just_1_uncurated_product.metadata.after
+    just_1_uncurated_product = List.first(just_1_uncurated_product.entries)
 
     seller =
       case socket.assigns.current_user do
@@ -31,6 +34,9 @@ defmodule PlazaWeb.LandingLive do
       |> assign(second_4_uncurated_products: second_4_uncurated_products)
       |> assign(uncurated_cursor_before: nil)
       |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
+      |> assign(just_1_uncurated_product_before: nil)
+      |> assign(just_1_uncurated_product_after: just_1_uncurated_product_after)
+      |> assign(just_1_uncurated_product: just_1_uncurated_product)
       |> assign(page_title: "Hello Plaza")
       |> assign(header: :landing)
       |> assign(seller: seller)
@@ -127,9 +133,49 @@ defmodule PlazaWeb.LandingLive do
     {:noreply, socket}
   end
 
+  def handle_event("just-1-uncurated-cursor-after", _, socket) do
+    just_1_uncurated_product =
+      Products.just_1_uncurated_product(%{
+        before: nil,
+        after: socket.assigns.just_1_uncurated_product_after
+      })
+
+    cursor_before = just_1_uncurated_product.metadata.before
+    cursor_after = just_1_uncurated_product.metadata.after
+    product = List.first(just_1_uncurated_product.entries)
+
+    socket =
+      socket
+      |> assign(just_1_uncurated_product_before: cursor_before)
+      |> assign(just_1_uncurated_product_after: cursor_after)
+      |> assign(just_1_uncurated_product: product)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("just-1-uncurated-cursor-before", _, socket) do
+    just_1_uncurated_product =
+      Products.just_1_uncurated_product(%{
+        before: socket.assigns.just_1_uncurated_product_before,
+        after: nil
+      })
+
+    cursor_before = just_1_uncurated_product.metadata.before
+    cursor_after = just_1_uncurated_product.metadata.after
+    product = List.first(just_1_uncurated_product.entries)
+
+    socket =
+      socket
+      |> assign(just_1_uncurated_product_before: cursor_before)
+      |> assign(just_1_uncurated_product_after: cursor_after)
+      |> assign(just_1_uncurated_product: product)
+
+    {:noreply, socket}
+  end
+
   def render(assigns) do
     ~H"""
-    <div class="mt-large mx-large">
+    <div class="is-landing-desktop mt-large mx-large">
       <div>
         <ProductComponent.products4 products={@curated_products} />
         <div style="display: flex; justify-content: space-around;">
@@ -187,6 +233,55 @@ defmodule PlazaWeb.LandingLive do
           </div>
         </div>
         <div style="min-width: 300px; max-width: 1650px; height: 495px; border: 1px solid gray; margin-bottom: 1000px;" />
+      </div>
+    </div>
+    <div class="is-landing-mobile has-font-3">
+      <div style="display: flex;">
+        <div style="display: flex; flex-direction: column; text-align: center;">
+          <h1 style="font-size: 54px; margin-bottom: 100px;">
+            plazaaaaa
+          </h1>
+          <div :for={product <- @curated_products} style="margin-bottom: 150px; padding-right: 20px;">
+            <ProductComponent.product product={product} meta={true} disabled={false} />
+          </div>
+          <div style="display: flex; justify-content: space-around; margin-bottom: 500px;">
+            <div>
+              <button :if={@curated_cursor_before} phx-click="curated-cursor-before">
+                prev
+              </button>
+            </div>
+            <div>
+              <button :if={@curated_cursor_after} phx-click="curated-cursor-after">
+                next
+              </button>
+            </div>
+          </div>
+          <div style="display: flex; margin-left: auto; margin-right: 20px; font-size: 22px;">
+            em alta esta semana
+          </div>
+          <div style="display: flex; justify-content: space-around;">
+            <div>
+              <button
+                :if={@just_1_uncurated_product_before}
+                phx-click="just-1-uncurated-cursor-before"
+              >
+                prev
+              </button>
+            </div>
+            <div>
+              <button :if={@just_1_uncurated_product_after} phx-click="just-1-uncurated-cursor-after">
+                next
+              </button>
+            </div>
+          </div>
+          <div :if={@just_1_uncurated_product} style="margin-bottom: 150px; padding-right: 20px;">
+            <ProductComponent.product
+              product={@just_1_uncurated_product}
+              meta={true}
+              disabled={false}
+            />
+          </div>
+        </div>
       </div>
     </div>
     """
