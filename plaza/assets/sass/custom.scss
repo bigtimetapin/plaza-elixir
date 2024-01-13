@@ -378,6 +378,18 @@ $spacing-values: (
   }
 }
 
+.is-footer-desktop {
+  @include until($tablet) {
+    display: none;
+  }
+}
+
+.is-footer-mobile {
+  @include from($tablet) {
+    display: none;
+  }
+}
+
 .is-product-1 {
   @include from($tablet) {
     max-width: 370px;

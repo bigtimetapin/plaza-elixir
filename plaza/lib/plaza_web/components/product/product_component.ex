@@ -31,10 +31,11 @@ defmodule PlazaWeb.ProductComponent do
 
   attr :product, :map, required: true
   attr :meta, :boolean, required: true
+  attr :disabled, :boolean, default: true
 
   def product(assigns) do
     ~H"""
-    <.productp product={@product} meta={@meta} disabled={true} />
+    <.productp product={@product} meta={@meta} disabled={@disabled} />
     """
   end
 

@@ -8,13 +8,25 @@
       <%= @inner_content %>
     </main>
     <div :if={!assigns[:mobile_header_open]} class="hero-foot">
-      <footer style="height: 500px; display: flex; flex-direction: column; justify-content: center;">
-        <div style="position: relative; left: 100px;">
+      <footer class="is-footer-desktop" style="height: 500px;">
+        <div style="margin-left: 150px; margin-right: 150px;">
           <div>
             <img src="/svg/big-yellow-circle.svg" />
           </div>
           <div class="has-font-3" style="font-size: 52px;">
             plaza web
+          </div>
+        </div>
+      </footer>
+      <footer class="is-footer-mobile" style="height: 500px;">
+        <div style="display: flex; justify-content: center;">
+          <div style="display: flex; flex-direction: column; margin-top: 100px;">
+            <div>
+              <img src="/svg/big-yellow-circle.svg" />
+            </div>
+            <div class="has-font-3" style="font-size: 52px;">
+              plaza web
+            </div>
           </div>
         </div>
       </footer>

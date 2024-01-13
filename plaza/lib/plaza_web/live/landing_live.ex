@@ -244,7 +244,10 @@ defmodule PlazaWeb.LandingLive do
           <div :for={product <- @curated_products} style="margin-bottom: 150px; padding-right: 20px;">
             <ProductComponent.product product={product} meta={true} disabled={false} />
           </div>
-          <div style="display: flex; justify-content: space-around; margin-bottom: 500px;">
+          <div
+            :if={@curated_products}
+            style="display: flex; justify-content: space-around; margin-bottom: 500px;"
+          >
             <div>
               <button :if={@curated_cursor_before} phx-click="curated-cursor-before">
                 prev
@@ -274,12 +277,32 @@ defmodule PlazaWeb.LandingLive do
               </button>
             </div>
           </div>
-          <div :if={@just_1_uncurated_product} style="margin-bottom: 150px; padding-right: 20px;">
+          <div :if={@just_1_uncurated_product} style="margin-bottom: 350px; padding-right: 20px;">
             <ProductComponent.product
               product={@just_1_uncurated_product}
               meta={true}
               disabled={false}
             />
+          </div>
+          <h2 style="font-size: 50px; margin-bottom: 50px;">
+            plazaaaaa é uma loja aberta para vender camisetas estampadas
+          </h2>
+          <div style="display: flex; justify-content: center; margin-bottom: 50px;">
+            <img src="svg/star.svg" />
+          </div>
+          <h3 style="font-size: 28px; line-height: 35px; margin-bottom: 25px; margin-left: 2px; margin-right: 2px;">
+            qualquer um pode publicar seus designs e vender por aqui, basta escolher sua margem de lucro e subir a arte, o resto a gente cuida.
+          </h3>
+          <h3 style="font-size: 28px; line-height: 35px; margin-bottom: 25px; margin-left: 2px; margin-right: 2px;">
+            cada produto vendido é produzido sob demanda e chega na casa do cliente final em até 7 dias úteis.
+          </h3>
+          <h3 style="font-size: 28px; line-height: 35px; margin-bottom: 25px; margin-left: 2px; margin-right: 2px;">
+            produzimos sob demanda e não tem desperdício, você recebe seus lucros e basicamente é isso, bem simples e facil como tudo deveria ser.
+          </h3>
+          <div style="margin-bottom: 250px;">
+            <.link navigate="/upload" style="text-decoration: underline; font-size: 28px;">
+              quero vender
+            </.link>
           </div>
         </div>
       </div>
