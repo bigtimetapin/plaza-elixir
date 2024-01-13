@@ -22,7 +22,8 @@ body {
   height: auto;
 }
 
-a:link, a:visited {
+a:link,
+a:visited {
   color: #000000;
 }
 
@@ -126,11 +127,12 @@ label {
   cursor: pointer;
 }
 
-label.white, label.yellow { 
+label.white,
+label.yellow {
   height: 35px;
   width: 35px;
-  border:1px solid gray; 
-  border-radius:50%;
+  border: 1px solid gray;
+  border-radius: 50%;
   font-size: 1.85rem;
 }
 
@@ -169,9 +171,12 @@ input[type="radio"] {
 
 .is-navbar {
   overflow: hidden;
-  position: fixed; /* Set the navbar to fixed position */
-  top: 0; /* Position the navbar at the top of the page */
-  width: 100%; /* Full width */
+  position: fixed;
+  /* Set the navbar to fixed position */
+  top: 0;
+  /* Position the navbar at the top of the page */
+  width: 100%;
+  /* Full width */
   height: 200px;
   z-index: 101;
   // blend in
@@ -208,36 +213,32 @@ input[type="radio"] {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // buttons /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 .has-three-products {
-  width: 1200px; // TODO; responsive
+  max-width: 1200px;
 }
 
 .has-four-products {
-  width: 1600px; // TODO;responsive
+  max-width: 1600px;
 }
 
-
-.is-product-1 { 
-  height: 428px; // TODO; responsive
-  width: 370px; // TODO; responsive 
+.is-product-1 {
+  height: 428px;
+  max-width: 370px;
+  min-width: 225px;
   position: relative;
   top: 10px;
   left: 10px;
-  background-color: #FFFFFF;  
+  background-color: #FFFFFF;
 }
 
-.is-selected-product-1 {
-  height: 448px;
-  width: 390px;
-  background-color: #F9FD5F;
-  outline: 1px solid #707070;
-}
-
-.is-button-1, .is-button-2, .is-button-3 {
+.is-button-1,
+.is-button-2,
+.is-button-3 {
   height: 30px;
   text-align: center;
 }
 
-.is-button-1, .is-button-2 {
+.is-button-1,
+.is-button-2 {
   background-color: #241F20;
   border: 1px dotted #4a4a4a;
   color: #FDF9EF;
@@ -258,7 +259,10 @@ input[type="radio"] {
   border-top-right-radius: 5px;
 }
 
-.is-button-1:hover, .is-button-2:hover, .is-active-header-tab, .is-active-button {
+.is-button-1:hover,
+.is-button-2:hover,
+.is-active-header-tab,
+.is-active-button {
   background-color: #FDF9EF;
   color: #241F20;
 }
@@ -276,7 +280,8 @@ input[type="radio"] {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // images /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-.is-image-1, .is-image-2 {
+.is-image-1,
+.is-image-2 {
   margin-bottom: 5px;
   margin-right: 5px;
   box-shadow: 1px 1px 5px grey;
@@ -301,12 +306,12 @@ $size-7: 1.00rem;
 
 
 $spacing-values: (
-        "xxsmall": 0.50rem,
-        "xsmall": 0.75rem,
-        "small": 1.85rem,
-        "medium": 2.50rem,
-        "xmedium": 3.50rem,
-        "large": 7.50rem
+  "xxsmall": 0.50rem,
+  "xsmall": 0.75rem,
+  "small": 1.85rem,
+  "medium": 2.50rem,
+  "xmedium": 3.50rem,
+  "large": 7.50rem
 );
 
 
@@ -318,13 +323,14 @@ $spacing-values: (
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Bulma Extensions ///////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-.is-navbar-desktop { 
+.is-navbar-desktop {
   @include until($tablet) {
     display: none;
   }
 }
 
-.is-navbar-mobile-open, .is-navbar-mobile-closed {
+.is-navbar-mobile-open,
+.is-navbar-mobile-closed {
   @include from($tablet) {
     display: none;
   }
@@ -333,9 +339,12 @@ $spacing-values: (
 .is-navbar-mobile-closed {
   @include until($tablet) {
     overflow: hidden;
-    position: fixed; /* Set the navbar to fixed position */
-    top: 0; /* Position the navbar at the top of the page */
-    width: 100%; /* Full width */
+    position: fixed;
+    /* Set the navbar to fixed position */
+    top: 0;
+    /* Position the navbar at the top of the page */
+    width: 100%;
+    /* Full width */
     height: 100px;
     z-index: 101;
     // blend in
@@ -353,6 +362,7 @@ $spacing-values: (
   @include until($tablet) {
     width: 15rem;
   }
+
   @include from($tablet) {
     width: 18rem;
   }
@@ -362,6 +372,7 @@ $spacing-values: (
   @include until($tablet) {
     font-size: 1.75rem;
   }
+
   @include from($tablet) {
     font-size: 2.00rem;
   }
@@ -371,6 +382,7 @@ $spacing-values: (
   @include until($tablet) {
     font-size: medium;
   }
+
   @include from($tablet) {
     font-size: large;
   }
@@ -381,6 +393,7 @@ $spacing-values: (
     width: 160px;
     height: 238px;
   }
+
   @include from($tablet) {
     width: 225px;
     height: 350px;
@@ -391,6 +404,7 @@ $spacing-values: (
   @include until($tablet) {
     width: 325px;
   }
+
   @include from($tablet) {
     width: 455px;
   }
@@ -400,6 +414,7 @@ $spacing-values: (
   @include until($tablet) {
     margin-right: 3px !important;
   }
+
   @include from($tablet) {
     margin-right: 6px !important;
   }

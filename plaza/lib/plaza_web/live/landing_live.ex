@@ -150,20 +150,20 @@ defmodule PlazaWeb.LandingLive do
           <h2 style="font-size: 63px; margin-bottom: 25px;">
             plazaaaaa é um espaço público para venda de camisetas
           </h2>
-          <h3 style="font-size: 38px; width: 1005px; line-height: 45px; margin-bottom: 25px;">
+          <h3 style="font-size: 38px; min-width: 300px; max-width: 1005px; line-height: 45px; margin-bottom: 25px;">
             qualquer um pode publicar seus designs e vender por aqui, basta escolher sua margem de lucro e subir a arte, o resto a gente cuida.
           </h3>
-          <h3 style="font-size: 38px; width: 970px; line-height: 45px; margin-bottom: 25px;">
+          <h3 style="font-size: 38px; min-width: 300px; max-width: 970px; line-height: 45px; margin-bottom: 25px;">
             cada produto vendido é produzido sob demanda e chega na casa do cliente final em até 7 dias úteis.
           </h3>
-          <h3 style="font-size: 38px; width: 970px; line-height: 45px; margin-bottom: 25px;">
+          <h3 style="font-size: 38px; min-width: 300px; max-width: 970px; line-height: 45px; margin-bottom: 25px;">
             produzimos sob demanda e não tem desperdício.
             <.link navigate="/upload" style="text-decoration: underline; margin-left: 50px;">
               quero vender
             </.link>
           </h3>
         </div>
-        <div>
+        <div style="min-width: 250px;">
           <img src="svg/star.svg" />
         </div>
       </div>
@@ -186,7 +186,7 @@ defmodule PlazaWeb.LandingLive do
             </button>
           </div>
         </div>
-        <div style="width: 1650px; height: 495px; border: 1px solid gray; margin-bottom: 1000px;" />
+        <div style="min-width: 300px; max-width: 1650px; height: 495px; border: 1px solid gray; margin-bottom: 1000px;" />
       </div>
     </div>
     """

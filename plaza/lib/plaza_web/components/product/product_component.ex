@@ -21,7 +21,7 @@ defmodule PlazaWeb.ProductComponent do
     ~H"""
     <div class="columns is-multiline is-size-6 has-four-products">
       <%= for product <- @products do %>
-        <div class="column is-one-quarter">
+        <div class="column is-one-quarter-widescreen is-one-third-desktop is-half-tablet">
           <.productp product={product} meta={true} disabled={false} />
         </div>
       <% end %>
