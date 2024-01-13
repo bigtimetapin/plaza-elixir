@@ -245,7 +245,7 @@ defmodule PlazaWeb.LandingLive do
             <ProductComponent.product product={product} meta={true} disabled={false} />
           </div>
           <div
-            :if={@curated_products}
+            :if={@curated_products != []}
             style="display: flex; justify-content: space-around; margin-bottom: 500px;"
           >
             <div>
