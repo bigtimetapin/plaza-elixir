@@ -45,24 +45,7 @@ defmodule Plaza.Products do
         before: cursors.before,
         after: cursors.after,
         cursor_fields: [{:updated_at, :desc}, {:id, :desc}],
-        limit: 8
-      )
-
-    %{entries: entries, metadata: metadata}
-  end
-
-  def just_1_uncurated_product(cursors) do
-    %{entries: entries, metadata: metadata} =
-      Repo.paginate(
-        from(
-          p in Product,
-          where: [active: true, curated: false],
-          order_by: [desc: :updated_at, desc: :id]
-        ),
-        before: cursors.before,
-        after: cursors.after,
-        cursor_fields: [{:updated_at, :desc}, {:id, :desc}],
-        limit: 1
+        limit: 3
       )
 
     %{entries: entries, metadata: metadata}

@@ -8,13 +8,16 @@ defmodule PlazaWeb.LandingLive do
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     IO.inspect(socket.assigns.current_user)
+    ## curated products 
     curated_products = Products.top_4_paginated(%{before: nil, after: nil})
+    ## uncurated products
     uncurated_products = Products.top_8_uncurated_paginated(%{before: nil, after: nil})
-    just_1_uncurated_product = Products.just_1_uncurated_product(%{before: nil, after: nil})
+    ## split first 4 and second 4 uncurated products
     first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
     second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
-    just_1_uncurated_product_after = just_1_uncurated_product.metadata.after
-    just_1_uncurated_product = List.first(just_1_uncurated_product.entries)
+    ## split first, last, and middle uncurated products 
+    {first_uncurated_product, last_uncurated_product, middle_uncurated_products} =
+      split_uncurated_products(uncurated_products.entries)
 
     seller =
       case socket.assigns.current_user do
@@ -32,11 +35,11 @@ defmodule PlazaWeb.LandingLive do
       |> assign(curated_cursor_after: curated_products.metadata.after)
       |> assign(first_4_uncurated_products: first_4_uncurated_products)
       |> assign(second_4_uncurated_products: second_4_uncurated_products)
+      |> assign(first_uncurated_product: first_uncurated_product)
+      |> assign(last_uncurated_product: last_uncurated_product)
+      |> assign(middle_uncurated_products: middle_uncurated_products)
       |> assign(uncurated_cursor_before: nil)
       |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
-      |> assign(just_1_uncurated_product_before: nil)
-      |> assign(just_1_uncurated_product_after: just_1_uncurated_product_after)
-      |> assign(just_1_uncurated_product: just_1_uncurated_product)
       |> assign(page_title: "Hello Plaza")
       |> assign(header: :landing)
       |> assign(seller: seller)
@@ -103,10 +106,17 @@ defmodule PlazaWeb.LandingLive do
     first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
     second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
 
+    ## split first, last, and middle uncurated products 
+    {first_uncurated_product, last_uncurated_product, middle_uncurated_products} =
+      split_uncurated_products(uncurated_products.entries)
+
     socket =
       socket
       |> assign(first_4_uncurated_products: first_4_uncurated_products)
       |> assign(second_4_uncurated_products: second_4_uncurated_products)
+      |> assign(first_uncurated_product: first_uncurated_product)
+      |> assign(last_uncurated_product: last_uncurated_product)
+      |> assign(middle_uncurated_products: middle_uncurated_products)
       |> assign(uncurated_cursor_before: uncurated_products.metadata.before)
       |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
 
@@ -122,55 +132,40 @@ defmodule PlazaWeb.LandingLive do
 
     first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
     second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
+    ## split first, last, and middle uncurated products 
+    {first_uncurated_product, last_uncurated_product, middle_uncurated_products} =
+      split_uncurated_products(uncurated_products.entries)
 
     socket =
       socket
       |> assign(first_4_uncurated_products: first_4_uncurated_products)
       |> assign(second_4_uncurated_products: second_4_uncurated_products)
+      |> assign(first_uncurated_product: first_uncurated_product)
+      |> assign(last_uncurated_product: last_uncurated_product)
+      |> assign(middle_uncurated_products: middle_uncurated_products)
       |> assign(uncurated_cursor_before: uncurated_products.metadata.before)
       |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
 
     {:noreply, socket}
   end
 
-  def handle_event("just-1-uncurated-cursor-after", _, socket) do
-    just_1_uncurated_product =
-      Products.just_1_uncurated_product(%{
-        before: nil,
-        after: socket.assigns.just_1_uncurated_product_after
-      })
+  defp split_uncurated_products(uncurated_products) do
+    ## split first, last, and middle uncurated products 
+    case Enum.count(uncurated_products) do
+      0 ->
+        {nil, nil, []}
 
-    cursor_before = just_1_uncurated_product.metadata.before
-    cursor_after = just_1_uncurated_product.metadata.after
-    product = List.first(just_1_uncurated_product.entries)
+      1 ->
+        {List.first(uncurated_products), nil, []}
 
-    socket =
-      socket
-      |> assign(just_1_uncurated_product_before: cursor_before)
-      |> assign(just_1_uncurated_product_after: cursor_after)
-      |> assign(just_1_uncurated_product: product)
+      2 ->
+        {List.first(uncurated_products), List.last(uncurated_products), []}
 
-    {:noreply, socket}
-  end
+      _ ->
+        middle = uncurated_products |> Enum.drop(1) |> Enum.drop(-1)
 
-  def handle_event("just-1-uncurated-cursor-before", _, socket) do
-    just_1_uncurated_product =
-      Products.just_1_uncurated_product(%{
-        before: socket.assigns.just_1_uncurated_product_before,
-        after: nil
-      })
-
-    cursor_before = just_1_uncurated_product.metadata.before
-    cursor_after = just_1_uncurated_product.metadata.after
-    product = List.first(just_1_uncurated_product.entries)
-
-    socket =
-      socket
-      |> assign(just_1_uncurated_product_before: cursor_before)
-      |> assign(just_1_uncurated_product_after: cursor_after)
-      |> assign(just_1_uncurated_product: product)
-
-    {:noreply, socket}
+        {List.first(uncurated_products), List.last(uncurated_products), middle}
+    end
   end
 
   def render(assigns) do
@@ -235,9 +230,13 @@ defmodule PlazaWeb.LandingLive do
         <div style="min-width: 300px; max-width: 1650px; height: 495px; border: 1px solid gray; margin-bottom: 1000px;" />
       </div>
     </div>
-    <div class="is-landing-mobile has-font-3">
-      <div style="display: flex;">
-        <div style="display: flex; flex-direction: column; text-align: center;">
+    <div
+      class="is-landing-mobile has-font-3"
+      phx-hook="LandingInfiniteScroll"
+      id="landing-scroll-container"
+    >
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column; text-align: center; width: 400px;">
           <h1 style="font-size: 54px; margin-bottom: 100px;">
             plazaaaaa
           </h1>
@@ -262,27 +261,31 @@ defmodule PlazaWeb.LandingLive do
           <div style="display: flex; margin-left: auto; margin-right: 20px; font-size: 22px;">
             em alta esta semana
           </div>
-          <div style="display: flex; justify-content: space-around;">
-            <div>
-              <button
-                :if={@just_1_uncurated_product_before}
-                phx-click="just-1-uncurated-cursor-before"
-              >
-                prev
-              </button>
+          <div style="display: flex; overflow-x: scroll;" id="landing-scroll">
+            <div
+              :if={@first_uncurated_product}
+              style="margin-right: 25px;"
+              id={if @uncurated_cursor_before, do: "landing-scroll-first"}
+            >
+              <ProductComponent.product
+                product={@first_uncurated_product}
+                meta={true}
+                disabled={false}
+              />
             </div>
-            <div>
-              <button :if={@just_1_uncurated_product_after} phx-click="just-1-uncurated-cursor-after">
-                next
-              </button>
+            <div :for={product <- @middle_uncurated_products} style="margin-right: 25px;">
+              <ProductComponent.product product={product} meta={true} disabled={false} />
             </div>
-          </div>
-          <div :if={@just_1_uncurated_product} style="margin-bottom: 350px; padding-right: 20px;">
-            <ProductComponent.product
-              product={@just_1_uncurated_product}
-              meta={true}
-              disabled={false}
-            />
+            <div
+              :if={@last_uncurated_product}
+              id={if @uncurated_cursor_after, do: "landing-scroll-last"}
+            >
+              <ProductComponent.product
+                product={@last_uncurated_product}
+                meta={true}
+                disabled={false}
+              />
+            </div>
           </div>
           <h2 style="font-size: 50px; margin-bottom: 50px;">
             plazaaaaa é uma loja aberta para vender camisetas estampadas
