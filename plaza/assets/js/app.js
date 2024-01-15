@@ -28,44 +28,6 @@ let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("
 
 // hooks 
 let Hooks = {};
-// infinite scroll hook 
-Hooks.LandingInfiniteScroll = {
-  mounted() {
-    this.scroll(this)
-  },
-  updated() {
-    this.scroll(this)
-  },
-  scroll(that) {
-    const options = {
-      root: document.querySelector("#landing-scroll"),
-      threshold: 0.75,
-    };
-    let callback = (entries, _observer) => {
-      entries.forEach((entry) => {
-        console.log(entry);
-        if (entry.isIntersecting) {
-          console.log(entry.target.id);
-          if (entry.target.id == "landing-scroll-first") {
-            that.pushEvent("uncurated-cursor-before", {});
-          }
-          if (entry.target.id == "landing-scroll-last") {
-            that.pushEvent("uncurated-cursor-after", {});
-          }
-        }
-      });
-    };
-    const observer = new IntersectionObserver(callback, options);
-    const first = document.querySelector("#landing-scroll-first");
-    if (first) {
-      observer.observe(first);
-    }
-    const last = document.querySelector("#landing-scroll-last");
-    if (last) {
-      observer.observe(last);
-    }
-  },
-}
 // local storage hook
 Hooks.LocalStorage = {
   mounted() {

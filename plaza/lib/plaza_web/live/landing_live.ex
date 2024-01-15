@@ -15,9 +15,6 @@ defmodule PlazaWeb.LandingLive do
     ## split first 4 and second 4 uncurated products
     first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
     second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
-    ## split first, last, and middle uncurated products 
-    {first_uncurated_product, last_uncurated_product, middle_uncurated_products} =
-      split_uncurated_products(uncurated_products.entries)
 
     seller =
       case socket.assigns.current_user do
@@ -35,9 +32,6 @@ defmodule PlazaWeb.LandingLive do
       |> assign(curated_cursor_after: curated_products.metadata.after)
       |> assign(first_4_uncurated_products: first_4_uncurated_products)
       |> assign(second_4_uncurated_products: second_4_uncurated_products)
-      |> assign(first_uncurated_product: first_uncurated_product)
-      |> assign(last_uncurated_product: last_uncurated_product)
-      |> assign(middle_uncurated_products: middle_uncurated_products)
       |> assign(uncurated_cursor_before: nil)
       |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
       |> assign(page_title: "Hello Plaza")
@@ -106,17 +100,10 @@ defmodule PlazaWeb.LandingLive do
     first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
     second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
 
-    ## split first, last, and middle uncurated products 
-    {first_uncurated_product, last_uncurated_product, middle_uncurated_products} =
-      split_uncurated_products(uncurated_products.entries)
-
     socket =
       socket
       |> assign(first_4_uncurated_products: first_4_uncurated_products)
       |> assign(second_4_uncurated_products: second_4_uncurated_products)
-      |> assign(first_uncurated_product: first_uncurated_product)
-      |> assign(last_uncurated_product: last_uncurated_product)
-      |> assign(middle_uncurated_products: middle_uncurated_products)
       |> assign(uncurated_cursor_before: uncurated_products.metadata.before)
       |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
 
@@ -132,40 +119,15 @@ defmodule PlazaWeb.LandingLive do
 
     first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
     second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
-    ## split first, last, and middle uncurated products 
-    {first_uncurated_product, last_uncurated_product, middle_uncurated_products} =
-      split_uncurated_products(uncurated_products.entries)
 
     socket =
       socket
       |> assign(first_4_uncurated_products: first_4_uncurated_products)
       |> assign(second_4_uncurated_products: second_4_uncurated_products)
-      |> assign(first_uncurated_product: first_uncurated_product)
-      |> assign(last_uncurated_product: last_uncurated_product)
-      |> assign(middle_uncurated_products: middle_uncurated_products)
       |> assign(uncurated_cursor_before: uncurated_products.metadata.before)
       |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
 
     {:noreply, socket}
-  end
-
-  defp split_uncurated_products(uncurated_products) do
-    ## split first, last, and middle uncurated products 
-    case Enum.count(uncurated_products) do
-      0 ->
-        {nil, nil, []}
-
-      1 ->
-        {List.first(uncurated_products), nil, []}
-
-      2 ->
-        {List.first(uncurated_products), List.last(uncurated_products), []}
-
-      _ ->
-        middle = uncurated_products |> Enum.drop(1) |> Enum.drop(-1)
-
-        {List.first(uncurated_products), List.last(uncurated_products), middle}
-    end
   end
 
   def render(assigns) do
@@ -230,13 +192,9 @@ defmodule PlazaWeb.LandingLive do
         <div style="min-width: 300px; max-width: 1650px; height: 495px; border: 1px solid gray; margin-bottom: 1000px;" />
       </div>
     </div>
-    <div
-      class="is-landing-mobile has-font-3"
-      phx-hook="LandingInfiniteScroll"
-      id="landing-scroll-container"
-    >
+    <div class="is-landing-mobile has-font-3">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column; text-align: center; width: 400px;">
+        <div style="display: flex; flex-direction: column; text-align: center; width: 355px;">
           <h1 style="font-size: 54px; margin-bottom: 100px;">
             plazaaaaa
           </h1>
@@ -261,30 +219,15 @@ defmodule PlazaWeb.LandingLive do
           <div style="display: flex; margin-left: auto; margin-right: 20px; font-size: 22px;">
             em alta esta semana
           </div>
-          <div style="display: flex; overflow-x: scroll;" id="landing-scroll">
+          <div style="display: flex; margin-left: auto; margin-right: 20px; font-size: 22px;">
+            <img src="/svg/right-arrow.svg" />
+          </div>
+          <div style="display: flex; overflow-x: scroll;">
             <div
-              :if={@first_uncurated_product}
+              :for={product <- @first_4_uncurated_products ++ @second_4_uncurated_products}
               style="margin-right: 25px;"
-              id={if @uncurated_cursor_before, do: "landing-scroll-first"}
             >
-              <ProductComponent.product
-                product={@first_uncurated_product}
-                meta={true}
-                disabled={false}
-              />
-            </div>
-            <div :for={product <- @middle_uncurated_products} style="margin-right: 25px;">
               <ProductComponent.product product={product} meta={true} disabled={false} />
-            </div>
-            <div
-              :if={@last_uncurated_product}
-              id={if @uncurated_cursor_after, do: "landing-scroll-last"}
-            >
-              <ProductComponent.product
-                product={@last_uncurated_product}
-                meta={true}
-                disabled={false}
-              />
             </div>
           </div>
           <h2 style="font-size: 50px; margin-bottom: 50px;">

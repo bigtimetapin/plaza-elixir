@@ -45,7 +45,7 @@ defmodule Plaza.Products do
         before: cursors.before,
         after: cursors.after,
         cursor_fields: [{:updated_at, :desc}, {:id, :desc}],
-        limit: 3
+        limit: 8
       )
 
     %{entries: entries, metadata: metadata}
