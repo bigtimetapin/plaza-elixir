@@ -1,4 +1,4 @@
-defmodule PlazaWeb.UploadLive2 do
+defmodule PlazaWeb.UploadLive do
   use PlazaWeb, :live_view
 
   alias Ecto.Changeset
@@ -606,7 +606,7 @@ defmodule PlazaWeb.UploadLive2 do
     ~H"""
     <div style="margin-top: 100px;">
       <div style="opacity: 50%; margin-bottom: 100px;">
-        <PlazaWeb.UploadLive2.header
+        <PlazaWeb.UploadLive.header
           step={@step}
           disabled={true}
           front_local_upload={@front_local_upload}
@@ -665,7 +665,7 @@ defmodule PlazaWeb.UploadLive2 do
   def render(%{step: 6} = assigns) do
     ~H"""
     <div style="margin-top: 150px; margin-bottom: 750px;">
-      <PlazaWeb.UploadLive2.header
+      <PlazaWeb.UploadLive.header
         step={@step}
         front_local_upload={@front_local_upload}
         back_local_upload={@back_local_upload}
@@ -707,7 +707,7 @@ defmodule PlazaWeb.UploadLive2 do
   def render(%{step: 7} = assigns) do
     ~H"""
     <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
-      <PlazaWeb.UploadLive2.header
+      <PlazaWeb.UploadLive.header
         step={@step}
         front_local_upload={@front_local_upload}
         back_local_upload={@back_local_upload}
@@ -834,7 +834,7 @@ defmodule PlazaWeb.UploadLive2 do
   def render(%{step: 8} = assigns) do
     ~H"""
     <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
-      <PlazaWeb.UploadLive2.header
+      <PlazaWeb.UploadLive.header
         step={@step}
         front_local_upload={@front_local_upload}
         back_local_upload={@back_local_upload}
@@ -1100,7 +1100,7 @@ defmodule PlazaWeb.UploadLive2 do
       phx-hook="FileReader"
       style="margin-top: 150px; margin-bottom: 750px;"
     >
-      <PlazaWeb.UploadLive2.header
+      <PlazaWeb.UploadLive.header
         step={@step}
         front_local_upload={@front_local_upload}
         back_local_upload={@back_local_upload}
