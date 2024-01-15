@@ -1,6 +1,8 @@
 defmodule PlazaWeb.UploadLive do
   use PlazaWeb, :live_view
 
+  require Logger
+
   alias Ecto.Changeset
 
   alias Plaza.Accounts
@@ -94,6 +96,13 @@ defmodule PlazaWeb.UploadLive do
           |> assign(:uuid, UUID.uuid1())
           |> assign(step: step)
           |> assign(waiting: false)
+          |> push_event(
+            "read",
+            %{
+              key: @local_storage_key,
+              event: "read-product-form"
+            }
+          )
 
         false ->
           socket
@@ -120,6 +129,60 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
+  def handle_event("read-product-form", token_data, socket) when is_binary(token_data) do
+    socket =
+      case restore_from_token(token_data) do
+        {:ok, nil} ->
+          # do nothing with the previous state
+          socket
+
+        {:ok, restored} ->
+          case socket.assigns.step do
+            1 ->
+              socket
+              |> assign(product_buffer: restored)
+              |> assign(step: -2)
+
+            _ ->
+              socket
+          end
+
+        {:error, reason} ->
+          # We don't continue checking. Display error.
+          # Clear the token so it doesn't keep showing an error.
+          socket
+          |> clear_browser_storage()
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event("read-product-form", _token_data, socket) do
+    Logger.debug("No (valid) prodouct-form to restore")
+    {:noreply, socket}
+  end
+
+  defp restore_from_token(nil), do: {:ok, nil}
+
+  defp restore_from_token(token) do
+    salt = Application.get_env(:plaza, PlazaWeb.Endpoint)[:live_view][:signing_salt]
+    # Max age is 1 day. 86,400 seconds
+    case Phoenix.Token.decrypt(PlazaWeb.Endpoint, salt, token, max_age: 86_400) do
+      {:ok, data} ->
+        {:ok, data}
+
+      {:error, reason} ->
+        # handles `:invalid`, `:expired` and possibly other things?
+        {:error, "Failed to restore previous state. Reason: #{inspect(reason)}."}
+    end
+  end
+
+  # Push a websocket event down to the browser's JS hook.
+  # Clear any settings for the current my_storage_key.
+  defp clear_browser_storage(socket) do
+    push_event(socket, "clear", %{key: @local_storage_key})
+  end
+
   def handle_event("step", %{"step" => "noop"}, socket) do
     {:noreply, socket}
   end
@@ -135,7 +198,7 @@ defmodule PlazaWeb.UploadLive do
   def handle_event("step", %{"step" => "3"}, socket) do
     socket =
       socket
-      |> assign(:step, 3)
+      |> assign(:step, 4)
 
     {:noreply, socket}
   end
@@ -511,6 +574,29 @@ defmodule PlazaWeb.UploadLive do
     """
   end
 
+  def render(%{step: -2, product_buffer: product} = assigns) do
+    ~H"""
+    <div class="has-font-3 is-size-4" style="margin-top: 125px; margin-bottom: 125px;">
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column; align-items: center; width: 500px;">
+          <div>
+            <PlazaWeb.ProductComponent.product product={product} meta={false} disabled={true} />
+          </div>
+          <div style="text-align: center;">
+            you've already uploaded your first product but haven't created a seller profile yet.
+            <.link
+              navigate="/my-store"
+              style="margin-left: 5px; margin-right: 5px; text-decoration: underline;"
+            >
+              go do that
+            </.link>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
   def render(%{step: -1} = assigns) do
     ~H"""
     <div class="has-font-3 is-size-4" style="margin-top: 125px; margin-bottom: 125px;">
@@ -598,40 +684,6 @@ defmodule PlazaWeb.UploadLive do
           Ok
         </div>
       </button>
-    </div>
-    """
-  end
-
-  def render(%{step: 3} = assigns) do
-    ~H"""
-    <div style="margin-top: 100px;">
-      <div style="opacity: 50%; margin-bottom: 100px;">
-        <PlazaWeb.UploadLive.header
-          step={@step}
-          disabled={true}
-          front_local_upload={@front_local_upload}
-          back_local_upload={@back_local_upload}
-          product_form={@product_form}
-        />
-      </div>
-      <div class="has-font-3 is-size-5 mx-large">
-        <div>
-          before your campaign goes live you'll need to register (login) and make a store (name, logo, etc)
-          <div>
-            you can register now or upload first and register later. which do you prefer?
-          </div>
-        </div>
-        <div>
-          <.link class="has-font-3" navigate="/users/register">
-            register / login
-          </.link>
-        </div>
-        <div>
-          <button phx-click="step" phx-value-step="4">
-            upload first
-          </button>
-        </div>
-      </div>
     </div>
     """
   end

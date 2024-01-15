@@ -114,7 +114,7 @@ defmodule PlazaWeb.Header do
           <div class="level-item pr-xmedium">
             <.checkout_href />
           </div>
-          <div class="level-item">
+          <div class="level-item pr-xmedium">
             <.no_store_yet_href />
           </div>
         </:right>
