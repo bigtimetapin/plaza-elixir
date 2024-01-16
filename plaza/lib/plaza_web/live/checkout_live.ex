@@ -17,9 +17,11 @@ defmodule PlazaWeb.CheckoutLive do
   @local_storage_key "plaza-checkout-cart"
 
   @sku_map %{
-    "white-s" => "010101110108",
+    "white-p" => "010101110108",
     "white-m" => "010101110109",
-    "white-l" => "010101110110"
+    "white-g" => "010101110110",
+    "white-gg" => "010101110111",
+    "white-xgg" => "010101110112"
   }
 
   @impl Phoenix.LiveView
@@ -190,6 +192,7 @@ defmodule PlazaWeb.CheckoutLive do
           Enum.each(cart, fn item ->
             Task.async(fn ->
               sku = Map.get(@sku_map, "white-#{item.size}")
+              IO.inspect(sku)
               {:ok, value} = Dimona.Requests.Availability.get(sku)
               {:availability, item.product.id, value}
             end)
@@ -856,15 +859,15 @@ defmodule PlazaWeb.CheckoutLive do
               <div style="font-size: 28px; color: grey;">
                 <button
                   phx-click="change-size"
-                  phx-value-size="s"
+                  phx-value-size="p"
                   phx-value-product-id={item.product.id}
                   style={
-                    if item.size == "s",
+                    if item.size == "p",
                       do: "font-size: 38px; margin-left: 5px",
                       else: "margin-left: 5px"
                   }
                 >
-                  S
+                  P
                 </button>
                 <button
                   phx-click="change-size"
@@ -880,11 +883,27 @@ defmodule PlazaWeb.CheckoutLive do
                 </button>
                 <button
                   phx-click="change-size"
-                  phx-value-size="l"
+                  phx-value-size="g"
                   phx-value-product-id={item.product.id}
-                  style={if item.size == "l", do: "font-size: 38px;"}
+                  style={if item.size == "g", do: "font-size: 38px;"}
                 >
-                  L
+                  G
+                </button>
+                <button
+                  phx-click="change-size"
+                  phx-value-size="gg"
+                  phx-value-product-id={item.product.id}
+                  style={if item.size == "gg", do: "font-size: 38px;"}
+                >
+                  GG
+                </button>
+                <button
+                  phx-click="change-size"
+                  phx-value-size="xgg"
+                  phx-value-product-id={item.product.id}
+                  style={if item.size == "xgg", do: "font-size: 38px;"}
+                >
+                  XGG
                 </button>
               </div>
             </div>
