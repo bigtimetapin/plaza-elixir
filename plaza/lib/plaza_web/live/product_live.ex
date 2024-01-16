@@ -73,8 +73,14 @@ defmodule PlazaWeb.ProductLive do
               |> assign(step: -1)
 
             _ ->
+              product_display =
+                case product.designs.display do
+                  0 -> "front"
+                  1 -> "back"
+                end
+
               socket
-              |> assign(step: 1)
+              |> assign(product_display: product_display)
           end
 
         socket
@@ -161,6 +167,20 @@ defmodule PlazaWeb.ProductLive do
     {:noreply, socket}
   end
 
+  def handle_event("change-product-display", _, socket) do
+    side =
+      case socket.assigns.product_display do
+        "front" -> "back"
+        "back" -> "front"
+      end
+
+    socket =
+      socket
+      |> assign(product_display: side)
+
+    {:noreply, socket}
+  end
+
   def handle_event("change-size", %{"size" => size}, socket) do
     socket =
       socket
@@ -242,14 +262,6 @@ defmodule PlazaWeb.ProductLive do
     push_event(socket, "clear", %{key: @local_storage_key})
   end
 
-  def handle_event("step", %{"step" => "2"}, socket) do
-    socket =
-      socket
-      |> assign(step: 2)
-
-    {:noreply, socket}
-  end
-
   @impl Phoenix.LiveView
   def render(%{waiting: true} = assigns) do
     ~H"""
@@ -299,26 +311,66 @@ defmodule PlazaWeb.ProductLive do
     """
   end
 
-  def render(%{product: product, step: 1} = assigns) do
+  def render(%{product: product, seller: seller} = assigns) do
     ~H"""
-    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
-      <div style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column;">
-          <ProductComponent.product product={product} meta={true} />
-          <div style="align-self: center;">
-            <button phx-click="step" phx-value-step="2">
-              <img src="svg/yellow-ellipse.svg" />
-              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                Purchase
-              </div>
-            </button>
+    <div
+      class="has-font-3"
+      style="display: flex; margin-left: 100px; margin-top: 100px; margin-bottom: 250px;"
+    >
+      <div style="display: flex; flex-direction: column;">
+        <div style="font-size: 34px;">
+          <%= @product.name %>
+        </div>
+        <div style="font-size: 26px; color: grey; text-decoration: underline; margin-bottom: 25px;">
+          <%= @product.user_name %>
+        </div>
+        <div style="font-size: 34px;">
+          <%= @product.description %>
+        </div>
+        <div style="margin-top: auto; font-size: 32px;">
+          <div>
+            Camiseta de algodão
           </div>
-          <div :if={!@already_in_cart} style="align-self: center; display: flex;">
+          <div>
+            Cor: Branco
+          </div>
+          <div>
+            100% Algodão
+          </div>
+          <div>
+            Feito no Brasil
+          </div>
+          <div>
+            SKU: 222270M213012
+          </div>
+        </div>
+      </div>
+      <div style="margin-left: 100px; display: flex; flex-direction: column;">
+        <div style="width: 600px;">
+          <button phx-click="change-product-display">
+            <img src={
+              if @product_display == "front", do: @product.mocks.front, else: @product.mocks.back
+            } />
+          </button>
+        </div>
+      </div>
+      <div style="margin-left: 10px; display: flex; flex-direction: column;">
+        <div style="width: 100px; margin-top: auto;">
+          <button phx-click="change-product-display">
+            <img src={
+              if @product_display == "front", do: @product.mocks.back, else: @product.mocks.front
+            } />
+          </button>
+        </div>
+      </div>
+      <div style="margin-left: 100px; display: flex; flex-direction: column;">
+        <div style="margin-top: auto;">
+          <div :if={!@already_in_cart} style="display: flex;">
             <div>
               <button phx-click="add-to-cart">
                 <img src="svg/yellow-ellipse.svg" />
                 <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                  Add to cart
+                  comprar
                 </div>
               </button>
             </div>
@@ -373,12 +425,18 @@ defmodule PlazaWeb.ProductLive do
               </div>
             </div>
           </div>
-          <div :if={@already_in_cart} style="align-self: center;">
+          <div :if={@already_in_cart}>
+            <div style="text-decoration: underline;">
+              <.link navigate="/checkout">carrinho</.link>
+            </div>
+            <div style="text-decoration: underline;">
+              <.link navigate="/">loja</.link>
+            </div>
             <div>
               <button phx-click="remove-from-cart">
                 <img src="svg/yellow-ellipse.svg" />
                 <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                  Remove from cart
+                  remover
                 </div>
               </button>
             </div>
@@ -386,6 +444,12 @@ defmodule PlazaWeb.ProductLive do
         </div>
       </div>
     </div>
+    """
+  end
+
+  def product_view(assigns) do
+    ~H"""
+
     """
   end
 end
