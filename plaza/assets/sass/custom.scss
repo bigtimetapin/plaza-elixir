@@ -390,6 +390,18 @@ $spacing-values: (
   }
 }
 
+.is-product-page-desktop {
+  @include until($tablet) {
+    display: none;
+  }
+}
+
+.is-product-page-mobile {
+  @include from($tablet) {
+    display: none;
+  }
+}
+
 .is-product-1 {
   @include from($tablet) {
     max-width: 370px;
