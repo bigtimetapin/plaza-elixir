@@ -124,6 +124,12 @@ defmodule PlazaWeb.ProductLive do
     {:noreply, socket}
   end
 
+  def handle_event("product-href", %{"product-id" => product_id}, socket) do
+    params = %{"product-id" => product_id}
+    url = URI.encode_query(params)
+    {:noreply, push_navigate(socket, to: "/product?#{url}")}
+  end
+
   def handle_event("checkout-href", _, socket) do
     socket =
       socket
@@ -396,7 +402,7 @@ defmodule PlazaWeb.ProductLive do
         <div style="margin-left: auto; display: flex; flex-direction: column;">
           <div style="margin-top: auto;">
             <div :if={!@already_in_cart}>
-              <div style="font-size: 28px; position: relative; top: 35px;">
+              <div style="font-size: 28px;">
                 <div style="display: flex;">
                   <div>
                     <button phx-click="change-quantity" phx-value-op="add">
@@ -413,7 +419,7 @@ defmodule PlazaWeb.ProductLive do
                   <div style="text-decoration: underline; margin-left: 5px;">
                     <%= "Qtd. #{@cart_product_quantity}" %>
                   </div>
-                  <div style="margin-left: auto; margin-right: 25px;">
+                  <div style="margin-left: auto; margin-right: 15px;">
                     <%= "R$ #{@product.price |> Float.to_string() |> String.replace(".", ",")}" %>
                   </div>
                 </div>
@@ -477,89 +483,125 @@ defmodule PlazaWeb.ProductLive do
         </div>
       </div>
     </div>
-    <div class="is-product-page-mobile has-font-3" style="margin-left: 25px; margin-right: 25px;">
-      <div style="display: flex; justify-content: center; font-size: 32px;">
+    <div class="is-product-page-mobile has-font-3">
+      <div style="margin-left: 25px; margin-right: 25px;">
+        <div style="display: flex; justify-content: center; font-size: 32px;">
+          <div>
+            <%= @product.name %>
+          </div>
+          <div style="margin-left: auto;">
+            <%= "R$ #{@product.price |> Float.to_string() |> String.replace(".", ",")}" %>
+          </div>
+        </div>
+        <div style="color: grey; text-decoration: underline; font-size: 28px; position: relative; bottom: 15px;">
+          <%= @product.user_name %>
+        </div>
         <div>
-          <%= @product.name %>
+          <button phx-click="change-product-display">
+            <img src={
+              if @product_display == "front", do: @product.mocks.front, else: @product.mocks.back
+            } />
+          </button>
         </div>
-        <div style="margin-left: auto;">
-          <%= "R$ #{@product.price |> Float.to_string() |> String.replace(".", ",")}" %>
+        <div style="width: 150px;">
+          <button phx-click="change-product-display">
+            <img src={
+              if @product_display == "front", do: @product.mocks.back, else: @product.mocks.front
+            } />
+          </button>
         </div>
-      </div>
-      <div style="color: grey; text-decoration: underline; font-size: 28px; position: relative; bottom: 15px;">
-        <%= @product.user_name %>
-      </div>
-      <div>
-        <button phx-click="change-product-display">
-          <img src={
-            if @product_display == "front", do: @product.mocks.front, else: @product.mocks.back
-          } />
-        </button>
-      </div>
-      <div style="width: 150px;">
-        <button phx-click="change-product-display">
-          <img src={
-            if @product_display == "front", do: @product.mocks.back, else: @product.mocks.front
-          } />
-        </button>
-      </div>
-      <div :if={!@already_in_cart}>
-        <div style="font-size: 32px; position: relative; top: 29px;">
+        <div :if={!@already_in_cart}>
+          <div style="font-size: 32px; margin-top: 25px;">
+            <div style="display: flex;">
+              <div>
+                <button phx-click="change-quantity" phx-value-op="add">
+                  +
+                </button>
+                <button
+                  :if={@cart_product_quantity > 1}
+                  phx-click="change-quantity"
+                  phx-value-op="subtract"
+                >
+                  -
+                </button>
+              </div>
+              <div style="text-decoration: underline; margin-left: 5px;">
+                <%= "Qtd. #{@cart_product_quantity}" %>
+              </div>
+              <div style="margin-left: auto; margin-right: 47px;">
+                <%= "R$ #{@product.price |> Float.to_string() |> String.replace(".", ",")}" %>
+              </div>
+            </div>
+          </div>
           <div style="display: flex;">
-            <div>
-              <button phx-click="change-quantity" phx-value-op="add">
-                +
-              </button>
-              <button
-                :if={@cart_product_quantity > 1}
-                phx-click="change-quantity"
-                phx-value-op="subtract"
-              >
-                -
-              </button>
+            <div style="font-size: 28px;">
+              <.size_form cart_product_size={@cart_product_size} />
             </div>
-            <div style="text-decoration: underline; margin-left: 5px;">
-              <%= "Qtd. #{@cart_product_quantity}" %>
-            </div>
-            <div style="margin-left: auto; margin-right: 39px;">
-              <%= "R$ #{@product.price |> Float.to_string() |> String.replace(".", ",")}" %>
+            <div style="margin-left: auto;">
+              <button phx-click="add-to-cart" style="width: 155px;">
+                <img src="svg/yellow-ellipse.svg" />
+                <div class="has-font-3" style="position: relative; bottom: 67px; font-size: 36px;">
+                  Comprar
+                </div>
+              </button>
             </div>
           </div>
         </div>
-        <div style="display: flex;">
-          <div style="font-size: 28px;">
-            <.size_form cart_product_size={@cart_product_size} />
+        <div :if={@already_in_cart}>
+          <div style="text-decoration: underline; font-size: 24px; display: flex; justify-content: right;">
+            <.link navigate="/">Loja</.link>
           </div>
-          <div style="margin-left: auto; position: relative; top: 29px;">
-            <button phx-click="add-to-cart" style="width: 155px;">
+          <div style="display: flex; justify-content: right;">
+            <button
+              phx-click="remove-from-cart"
+              class="has-font-3"
+              style="text-decoration: underline; font-size: 24px;"
+            >
+              Remover
+            </button>
+          </div>
+          <div style="position: relative; top: 10px; display: flex; justify-content: right;">
+            <button phx-click="checkout-href">
               <img src="svg/yellow-ellipse.svg" />
-              <div class="has-font-3" style="position: relative; bottom: 67px; font-size: 36px;">
-                Comprar
+              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                Carrinho
               </div>
             </button>
           </div>
         </div>
+        <div style="color: grey; text-align: center; margin-top: 10px; margin-bottom: 20px;">
+          <%= "Este produto está disponível por mais #{@product_days_remaining} dias" %>
+        </div>
+        <div style="font-size: 28px; margin-bottom: 50px;">
+          <%= @product.description %>
+        </div>
+        <div style="font-size: 22px; line-height: 24px; margin-bottom: 50px;">
+          <div>
+            Camiseta de algodão
+          </div>
+          <div>
+            Cor: Branco
+          </div>
+          <div>
+            100% Algodão
+          </div>
+          <div>
+            Feito no Brasil
+          </div>
+          <div>
+            SKU: 222270M213012
+          </div>
+        </div>
       </div>
-      <div :if={@already_in_cart}>
-        <div style="text-decoration: underline; font-size: 24px; display: flex; justify-content: right;">
-          <.link navigate="/">Loja</.link>
+      <div :if={!Enum.empty?(@top_3_other_products)}>
+        <div style="font-size: 28px; position: relative; top: 10px; left: 15px;">
+          Outros produtos parecidos
         </div>
-        <div style="display: flex; justify-content: right;">
-          <button
-            phx-click="remove-from-cart"
-            class="has-font-3"
-            style="text-decoration: underline; font-size: 24px;"
-          >
-            Remover
-          </button>
-        </div>
-        <div style="position: relative; top: 10px; display: flex; justify-content: right;">
-          <button phx-click="checkout-href">
-            <img src="svg/yellow-ellipse.svg" />
-            <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-              Carrinho
-            </div>
-          </button>
+        <div
+          :for={{product, index} <- Enum.with_index(@top_3_other_products)}
+          style={"position: relative; bottom: #{index*30}px;"}
+        >
+          <ProductComponent.product product={product} meta={true} disabled={false} />
         </div>
       </div>
     </div>
@@ -570,55 +612,65 @@ defmodule PlazaWeb.ProductLive do
     ~H"""
     <div style="display: inline-block;">
       <button class="has-font-3" phx-click="change-size" phx-value-size="p">
-        <img
-          :if={@cart_product_size == "p"}
-          src="svg/yellow-circle.svg"
-          style="position: relative; top: 43px;"
-        />
+        <div style="position: absolute;">
+          <img
+            :if={@cart_product_size == "p"}
+            src="svg/yellow-circle.svg"
+            style="position: relative; right: 15px;"
+          />
+        </div>
         <div style="position: relative;">
           P
         </div>
       </button>
       /
       <button class="has-font-3" phx-click="change-size" phx-value-size="m">
-        <img
-          :if={@cart_product_size == "m"}
-          src="svg/yellow-circle.svg"
-          style="position: relative; top: 43px;"
-        />
+        <div style="position: absolute;">
+          <img
+            :if={@cart_product_size == "m"}
+            src="svg/yellow-circle.svg"
+            style="position: relative; right: 13px;"
+          />
+        </div>
         <div style="position: relative;">
           M
         </div>
       </button>
       /
       <button class="has-font-3" phx-click="change-size" phx-value-size="g">
-        <img
-          :if={@cart_product_size == "g"}
-          src="svg/yellow-circle.svg"
-          style="position: relative; top: 43px;"
-        />
+        <div style="position: absolute;">
+          <img
+            :if={@cart_product_size == "g"}
+            src="svg/yellow-circle.svg"
+            style="position: relative; right: 13px;"
+          />
+        </div>
         <div style="position: relative;">
           G
         </div>
       </button>
       /
       <button class="has-font-3" phx-click="change-size" phx-value-size="gg">
-        <img
-          :if={@cart_product_size == "gg"}
-          src="svg/yellow-circle.svg"
-          style="position: relative; top: 43px;"
-        />
+        <div style="position: absolute;">
+          <img
+            :if={@cart_product_size == "gg"}
+            src="svg/yellow-circle.svg"
+            style="position: relative; right: 5px;"
+          />
+        </div>
         <div style="position: relative;">
           GG
         </div>
       </button>
       /
       <button class="has-font-3" phx-click="change-size" phx-value-size="xgg">
-        <img
-          :if={@cart_product_size == "xgg"}
-          src="svg/yellow-circle.svg"
-          style="position: relative; top: 43px;"
-        />
+        <div style="position: absolute;">
+          <img
+            :if={@cart_product_size == "xgg"}
+            src="svg/yellow-circle.svg"
+            style="position: relative; right: 4px;"
+          />
+        </div>
         <div style="position: relative;">
           XGG
         </div>
