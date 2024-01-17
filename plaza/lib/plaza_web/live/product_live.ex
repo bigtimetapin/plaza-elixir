@@ -463,14 +463,14 @@ defmodule PlazaWeb.ProductLive do
             </div>
           </div>
           <div :if={@already_in_cart}>
-            <div style="text-decoration: underline; font-size: 22px;">
+            <div style="text-decoration: underline; font-size: 24px;">
               <.link navigate="/">Loja</.link>
             </div>
             <div>
               <button
                 phx-click="remove-from-cart"
                 class="has-font-3"
-                style="text-decoration: underline; font-size: 22px;"
+                style="text-decoration: underline; font-size: 24px;"
               >
                 Remover
               </button>
