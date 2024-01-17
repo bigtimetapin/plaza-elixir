@@ -323,7 +323,7 @@ defmodule PlazaWeb.ProductLive do
     ~H"""
     <div
       class="has-font-3"
-      style="display: flex; margin-left: 100px; margin-top: 100px; margin-bottom: 250px;"
+      style="display: flex; margin-left: 100px; margin-top: 50px; margin-bottom: 250px; max-width: 1400px;"
     >
       <div style="display: flex; flex-direction: column;">
         <div style="font-size: 34px;">
@@ -332,10 +332,13 @@ defmodule PlazaWeb.ProductLive do
         <div style="font-size: 26px; color: grey; text-decoration: underline; margin-bottom: 25px;">
           <%= @product.user_name %>
         </div>
-        <div style="font-size: 34px;">
+        <div
+          :if={@product.description}
+          style="font-size: 22px; overflow-y: auto; text-wrap: wrap; width: 210px; height: 210px;"
+        >
           <%= @product.description %>
         </div>
-        <div style="margin-top: auto; font-size: 32px;">
+        <div style="margin-top: auto; font-size: 22px; line-height: 24px;">
           <div>
             Camiseta de algodão
           </div>
@@ -353,8 +356,8 @@ defmodule PlazaWeb.ProductLive do
           </div>
         </div>
       </div>
-      <div style="margin-left: 100px; display: flex; flex-direction: column;">
-        <div style="width: 600px;">
+      <div style="margin-left: auto; display: flex; flex-direction: column;">
+        <div style="width: 450px;">
           <button phx-click="change-product-display">
             <img src={
               if @product_display == "front", do: @product.mocks.front, else: @product.mocks.back
@@ -371,10 +374,10 @@ defmodule PlazaWeb.ProductLive do
           </button>
         </div>
       </div>
-      <div style="margin-left: 100px; display: flex; flex-direction: column;">
+      <div style="margin-left: auto; display: flex; flex-direction: column;">
         <div style="margin-top: auto;">
           <div :if={!@already_in_cart}>
-            <div style="display: flex; font-size: 34px; position: relative; top: 35px;">
+            <div style="display: flex; font-size: 28px; position: relative; top: 35px;">
               <div>
                 <button phx-click="change-quantity" phx-value-op="add">
                   +
@@ -394,12 +397,12 @@ defmodule PlazaWeb.ProductLive do
                 <%= "R$ #{@product.price |> Float.to_string() |> String.replace(".", ",")}" %>
               </div>
             </div>
-            <div style="display: inline-block; font-size: 34px;">
+            <div style="display: inline-block; font-size: 28px;">
               <button class="has-font-3" phx-click="change-size" phx-value-size="p">
                 <img
                   :if={@cart_product_size == "p"}
                   src="svg/yellow-circle.svg"
-                  style="position: relative; top: 49px;"
+                  style="position: relative; top: 44px;"
                 />
                 <div style="position: relative;">
                   P
@@ -410,7 +413,7 @@ defmodule PlazaWeb.ProductLive do
                 <img
                   :if={@cart_product_size == "m"}
                   src="svg/yellow-circle.svg"
-                  style="position: relative; top: 49px;"
+                  style="position: relative; top: 44px;"
                 />
                 <div style="position: relative;">
                   M
@@ -421,7 +424,7 @@ defmodule PlazaWeb.ProductLive do
                 <img
                   :if={@cart_product_size == "g"}
                   src="svg/yellow-circle.svg"
-                  style="position: relative; top: 49px;"
+                  style="position: relative; top: 44px;"
                 />
                 <div style="position: relative;">
                   G
@@ -432,7 +435,7 @@ defmodule PlazaWeb.ProductLive do
                 <img
                   :if={@cart_product_size == "gg"}
                   src="svg/yellow-circle.svg"
-                  style="position: relative; top: 49px;"
+                  style="position: relative; top: 44px;"
                 />
                 <div style="position: relative;">
                   GG
@@ -443,7 +446,7 @@ defmodule PlazaWeb.ProductLive do
                 <img
                   :if={@cart_product_size == "xgg"}
                   src="svg/yellow-circle.svg"
-                  style="position: relative; top: 49px;"
+                  style="position: relative; top: 44px;"
                 />
                 <div style="position: relative;">
                   XGG
@@ -484,12 +487,6 @@ defmodule PlazaWeb.ProductLive do
         </div>
       </div>
     </div>
-    """
-  end
-
-  def product_view(assigns) do
-    ~H"""
-
     """
   end
 end
