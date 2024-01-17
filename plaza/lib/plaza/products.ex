@@ -17,6 +17,16 @@ defmodule Plaza.Products do
     )
   end
 
+  def top_3_other_products(%{id: id, user_id: user_id} = _product) do
+    Repo.all(
+      from p in Product,
+        where: [active: true, user_id: ^user_id],
+        where: p.id != ^id,
+        order_by: [desc: :updated_at],
+        limit: 3
+    )
+  end
+
   def top_4_paginated(cursors) do
     %{entries: entries, metadata: metadata} =
       Repo.paginate(

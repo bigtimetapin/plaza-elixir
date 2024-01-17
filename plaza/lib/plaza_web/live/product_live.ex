@@ -79,8 +79,21 @@ defmodule PlazaWeb.ProductLive do
                   1 -> "back"
                 end
 
+              now = NaiveDateTime.utc_now()
+
+              days_remaining =
+                NaiveDateTime.diff(
+                  product.campaign_duration_timestamp,
+                  now,
+                  :day
+                )
+
+              top_3_other_products = Products.top_3_other_products(product)
+
               socket
               |> assign(product_display: product_display)
+              |> assign(product_days_remaining: days_remaining)
+              |> assign(top_3_other_products: top_3_other_products)
           end
 
         socket
@@ -323,7 +336,7 @@ defmodule PlazaWeb.ProductLive do
     ~H"""
     <div
       class="has-font-3"
-      style="display: flex; margin-left: 100px; margin-top: 50px; margin-bottom: 250px; max-width: 1400px;"
+      style="display: flex; margin-left: 100px; margin-top: 50px; margin-bottom: 150px; max-width: 1400px;"
     >
       <div style="display: flex; flex-direction: column;">
         <div style="font-size: 34px;">
@@ -363,6 +376,11 @@ defmodule PlazaWeb.ProductLive do
               if @product_display == "front", do: @product.mocks.front, else: @product.mocks.back
             } />
           </button>
+          <div style="position: absolute;">
+            <div style="color: grey; width: 450px; text-align: center; margin-top: 10px;">
+              <%= "Este produto está disponível por mais #{@product_days_remaining} dias" %>
+            </div>
+          </div>
         </div>
       </div>
       <div style="margin-left: 10px; display: flex; flex-direction: column;">
@@ -484,6 +502,27 @@ defmodule PlazaWeb.ProductLive do
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <div
+      :if={!Enum.empty?(@top_3_other_products)}
+      class="has-font-3"
+      style="border-top: 1px solid grey;"
+    >
+      <div style="margin-left: 100px;">
+        <div style="font-size: 28px; margin-top: 25px; margin-bottom: 10px;">
+          Outros produtos parecidos
+        </div>
+        <div style="display: flex; justify-content: center; margin-bottom: 100px;">
+          <div :for={product <- @top_3_other_products} style="margin-right: 100px;">
+            <ProductComponent.product product={product} meta={true} disabled={false} />
+          </div>
+        </div>
+        <div style="display: flex; justify-content: center; margin-bottom: 100px;">
+          <.link navigate="/" style="font-size: 28px; text-decoration: underline;">
+            Voltar para loja principal
+          </.link>
         </div>
       </div>
     </div>
