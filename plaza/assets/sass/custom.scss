@@ -221,11 +221,8 @@ input[type="radio"] {
 }
 
 .is-product-1 {
-  height: 428px;
   position: relative;
-  top: 10px;
-  left: 10px;
-  background-color: #FFFFFF;
+  height: 500px;
 }
 
 .is-button-1,
@@ -406,10 +403,6 @@ $spacing-values: (
   @include from($tablet) {
     max-width: 370px;
     min-width: 225px;
-  }
-
-  @include until($tablet) {
-    width: 350px;
   }
 }
 

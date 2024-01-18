@@ -471,7 +471,7 @@ defmodule PlazaWeb.ProductLive do
             Outros produtos parecidos
           </div>
           <div style="display: flex; justify-content: center; margin-bottom: 100px;">
-            <div :for={product <- @top_3_other_products} style="margin-right: 100px;">
+            <div :for={product <- @top_3_other_products} style="width: 100%;">
               <ProductComponent.product product={product} meta={true} disabled={false} />
             </div>
           </div>
