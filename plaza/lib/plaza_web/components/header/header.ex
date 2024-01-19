@@ -30,9 +30,6 @@ defmodule PlazaWeb.Header do
         <:checkout>
           <.checkout_href_mobile />
         </:checkout>
-        <:my_store>
-          <.no_store_yet_href_mobile />
-        </:my_store>
       </.mobile>
     </div>
     """
@@ -59,9 +56,6 @@ defmodule PlazaWeb.Header do
         <:checkout>
           <.checkout_href_mobile />
         </:checkout>
-        <:my_store>
-          <.no_store_yet_href_mobile />
-        </:my_store>
       </.mobile>
     </div>
     """
@@ -88,9 +82,6 @@ defmodule PlazaWeb.Header do
         <:checkout>
           <.checkout_href_mobile />
         </:checkout>
-        <:my_store>
-          <.my_store_href_mobile />
-        </:my_store>
       </.mobile>
     </div>
     """
@@ -129,9 +120,6 @@ defmodule PlazaWeb.Header do
         <:checkout>
           <.checkout_href_mobile />
         </:checkout>
-        <:my_store>
-          <.no_store_yet_href_mobile />
-        </:my_store>
       </.mobile>
     </div>
     """
@@ -158,9 +146,6 @@ defmodule PlazaWeb.Header do
         <:checkout>
           <.checkout_href_mobile />
         </:checkout>
-        <:my_store>
-          <.no_store_yet_href_selected_mobile />
-        </:my_store>
       </.mobile>
     </div>
     """
@@ -187,9 +172,6 @@ defmodule PlazaWeb.Header do
         <:checkout>
           <.checkout_href_mobile />
         </:checkout>
-        <:my_store>
-          <.no_store_yet_href_selected_mobile />
-        </:my_store>
       </.mobile>
     </div>
     """
@@ -223,9 +205,6 @@ defmodule PlazaWeb.Header do
         <:checkout>
           <.checkout_href_mobile />
         </:checkout>
-        <:my_store>
-          <.my_store_href_selected_mobile />
-        </:my_store>
       </.mobile>
     </div>
     """
@@ -249,9 +228,6 @@ defmodule PlazaWeb.Header do
         <:checkout>
           <.checkout_href_mobile />
         </:checkout>
-        <:my_store>
-          <.no_store_yet_href_mobile />
-        </:my_store>
       </.mobile>
     </div>
     """
@@ -275,9 +251,6 @@ defmodule PlazaWeb.Header do
         <:checkout>
           <.checkout_href_mobile />
         </:checkout>
-        <:my_store>
-          <.my_store_href_mobile />
-        </:my_store>
       </.mobile>
     </div>
     """
@@ -304,9 +277,6 @@ defmodule PlazaWeb.Header do
         <:checkout>
           <.checkout_href_selected_mobile />
         </:checkout>
-        <:my_store>
-          <.no_store_yet_href_mobile />
-        </:my_store>
       </.mobile>
     </div>
     """
@@ -333,9 +303,6 @@ defmodule PlazaWeb.Header do
         <:checkout>
           <.checkout_href_selected_mobile />
         </:checkout>
-        <:my_store>
-          <.no_store_yet_href_mobile />
-        </:my_store>
       </.mobile>
     </div>
     """
@@ -362,9 +329,6 @@ defmodule PlazaWeb.Header do
         <:checkout>
           <.checkout_href_selected_mobile />
         </:checkout>
-        <:my_store>
-          <.my_store_href_mobile />
-        </:my_store>
       </.mobile>
     </div>
     """
@@ -513,11 +477,17 @@ defmodule PlazaWeb.Header do
   defp mobile(assigns) do
     ~H"""
     <div>
-      <nav :if={!@open} class="is-navbar-mobile-closed" style="display: flex;">
-        <div style="margin-left: auto; margin-right: 50px; display: flex; flex-direction: column; justify-content: center; height: 100px;">
-          <button class="has-font-3" style="font-size: 32px;" phx-click="open-mobile-header">
-            open header
-          </button>
+      <nav :if={!@open} class="is-navbar-mobile-closed">
+        <div style="display: flex; justify-content: center;">
+          <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="has-font-3" style="font-size: 60px; margin-bottom: 29px;">plazaaaaa</div>
+            <button class="has-font-3" style="width: 110px;" phx-click="open-mobile-header">
+              <img src="/svg/yellow-ellipse.svg" />
+              <div class="has-font-3" style="position: relative; bottom: 53px; font-size: 30px;">
+                menu
+              </div>
+            </button>
+          </div>
         </div>
       </nav>
       <nav :if={@open} class="is-navbar-mobile-open">
@@ -528,13 +498,10 @@ defmodule PlazaWeb.Header do
               <%= render_slot(@landing) %>
             </div>
             <div style="margin-top: 100px;">
-              <%= render_slot(@my_account) %>
-            </div>
-            <div style="margin-top: 100px;">
               <%= render_slot(@checkout) %>
             </div>
             <div style="margin-top: 100px;">
-              <%= render_slot(@my_store) %>
+              <%= render_slot(@my_account) %>
             </div>
           </div>
         </div>
@@ -712,31 +679,6 @@ defmodule PlazaWeb.Header do
       <div style="display: flex; align-items: center;">
         <div class="has-font-3" style="font-size: 32px;">
           conta
-        </div>
-        <div style="margin-left: 10px;">
-          <img src="/svg/yellow-circle.svg" />
-        </div>
-      </div>
-    </.link>
-    """
-  end
-
-  defp my_store_href_mobile(assigns) do
-    ~H"""
-    <.link phx-click="close-mobile-header" navigate="/my-store">
-      <div class="has-font-3" style="font-size: 32px;">
-        minha loja
-      </div>
-    </.link>
-    """
-  end
-
-  defp my_store_href_selected_mobile(assigns) do
-    ~H"""
-    <.link phx-click="close-mobile-header" navigate="/my-store">
-      <div style="display: flex; align-items: center;">
-        <div class="has-font-3" style="font-size: 32px;">
-          minha loja
         </div>
         <div style="margin-left: 10px;">
           <img src="/svg/yellow-circle.svg" />

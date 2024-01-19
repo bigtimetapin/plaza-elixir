@@ -340,7 +340,7 @@ defmodule PlazaWeb.ProductLive do
 
   def render(%{product: product, seller: seller} = assigns) do
     ~H"""
-    <div class="is-product-page-desktop">
+    <div class="is-product-page-desktop" style="margin-top: 150px;">
       <div
         class="has-font-3"
         style="display: flex; margin-left: 100px; margin-top: 50px; margin-bottom: 150px; max-width: 1400px;"
@@ -483,7 +483,7 @@ defmodule PlazaWeb.ProductLive do
         </div>
       </div>
     </div>
-    <div class="is-product-page-mobile has-font-3">
+    <div class="is-product-page-mobile has-font-3" style="margin-top: 150px;">
       <div style="margin-left: 25px; margin-right: 25px;">
         <div style="display: flex; justify-content: center; font-size: 32px;">
           <div>
@@ -593,17 +593,18 @@ defmodule PlazaWeb.ProductLive do
           </div>
         </div>
       </div>
-      <div :if={!Enum.empty?(@top_3_other_products)}>
-        <div style="font-size: 28px; position: relative; top: 10px; left: 15px;">
+      <div :if={!Enum.empty?(@top_3_other_products)} style="margin-bottom: 450px;">
+        <div style="font-size: 28px; margin-bottom: 10px; margin-left: 20px;">
           Outros produtos parecidos
         </div>
         <div
           :for={{product, index} <- Enum.with_index(@top_3_other_products)}
-          style={"position: relative; bottom: #{index*30}px;"}
+          style="margin-bottom: 100px;"
         >
           <ProductComponent.product product={product} meta={true} disabled={false} />
         </div>
       </div>
+      <div :if={Enum.empty?(@top_3_other_products)} style="margin-bottom: 200px;"></div>
     </div>
     """
   end
