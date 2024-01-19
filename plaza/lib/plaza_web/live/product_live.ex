@@ -169,31 +169,6 @@ defmodule PlazaWeb.ProductLive do
     {:noreply, socket}
   end
 
-  def handle_event("remove-from-cart", _, socket) do
-    cart = socket.assigns.cart
-    product = socket.assigns.product
-
-    {_, index} =
-      Enum.with_index(cart)
-      |> Enum.find(fn {item, _} -> item.product.id == product.id end)
-
-    cart = List.delete_at(cart, index)
-
-    socket =
-      socket
-      |> push_event(
-        "write",
-        %{
-          key: @local_storage_key,
-          data: serialize_to_token(cart)
-        }
-      )
-      |> assign(cart: cart)
-      |> assign(already_in_cart: false)
-
-    {:noreply, socket}
-  end
-
   def handle_event("change-product-display", _, socket) do
     side =
       case socket.assigns.product_display do
@@ -440,15 +415,6 @@ defmodule PlazaWeb.ProductLive do
               <div style="text-decoration: underline; font-size: 24px;">
                 <.link navigate="/">Loja</.link>
               </div>
-              <div>
-                <button
-                  phx-click="remove-from-cart"
-                  class="has-font-3"
-                  style="text-decoration: underline; font-size: 24px;"
-                >
-                  Remover
-                </button>
-              </div>
               <div style="position: relative; top: 10px;">
                 <button phx-click="checkout-href">
                   <img src="svg/yellow-ellipse.svg" />
@@ -550,15 +516,6 @@ defmodule PlazaWeb.ProductLive do
         <div :if={@already_in_cart}>
           <div style="text-decoration: underline; font-size: 24px; display: flex; justify-content: right;">
             <.link navigate="/">Loja</.link>
-          </div>
-          <div style="display: flex; justify-content: right;">
-            <button
-              phx-click="remove-from-cart"
-              class="has-font-3"
-              style="text-decoration: underline; font-size: 24px;"
-            >
-              Remover
-            </button>
           </div>
           <div style="position: relative; top: 10px; display: flex; justify-content: right;">
             <button phx-click="checkout-href">
