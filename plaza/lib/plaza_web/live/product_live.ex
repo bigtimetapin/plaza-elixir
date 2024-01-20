@@ -620,13 +620,13 @@ defmodule PlazaWeb.ProductLive do
                   class="has-font-3"
                   phx-click="change-size"
                   phx-value-size="g"
-                  style={if @cart_product_size == "g", do: "margin-right: 8px; margin-left: 8px;"}
+                  style={if @cart_product_size == "g", do: "margin-right: 7px; margin-left: 8px;"}
                 >
                   <div style="position: absolute;">
                     <img
                       :if={@cart_product_size == "g"}
                       src="svg/yellow-circle.svg"
-                      style="position: relative; width: 35px; right: 10px;"
+                      style="position: relative; width: 35px; right: 11px;"
                     />
                   </div>
                   <div style="position: relative;">
