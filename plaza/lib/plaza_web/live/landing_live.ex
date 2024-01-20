@@ -199,13 +199,17 @@ defmodule PlazaWeb.LandingLive do
             <div :for={product <- @curated_products} style="margin-bottom: 150px;">
               <ProductComponent.product product={product} meta={true} disabled={false} />
             </div>
-            <div style="display: flex; margin-left: auto; margin-right: 20px; margin-top: 500px; font-size: 22px;">
-              em alta esta semana
+            <div style="display: flex; justify-content: right; margin-top: 500px;">
+              <div>
+                <div style="font-size: 22px;">
+                  em alta esta semana
+                </div>
+                <div style="margin-left: 10px;">
+                  <img src="/svg/right-arrow.svg" />
+                </div>
+              </div>
             </div>
-            <div style="display: flex; margin-left: auto; margin-right: 20px; font-size: 22px;">
-              <img src="/svg/right-arrow.svg" />
-            </div>
-            <div style="display: flex; overflow-x: scroll; margin-bottom: 200px;">
+            <div style="display: flex; overflow-x: scroll; margin-bottom: 200px; padding-top: 15px;">
               <div
                 :for={product <- @first_4_uncurated_products ++ @second_4_uncurated_products}
                 style="margin-right: 15px;"

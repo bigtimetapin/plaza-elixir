@@ -105,12 +105,15 @@ defmodule PlazaWeb.ProductComponent do
           </div>
         </button>
       </div>
-      <div style="position: absolute;">
-        <div :if={@expiring} style="z-index: 99; width: 150px; transform: rotate(-16deg);">
-          <img src="svg/yellow-ellipse.svg" />
+      <div
+        :if={@expiring}
+        style="position: absolute; z-index: 99; width: 150px; transform: rotate(-16deg);"
+      >
+        <div style="position: relative; right: 22px; bottom: 10px;">
+          <img src="svg/yellow-ellipse.svg" style="position: absolute;" />
           <div
             class="has-font-3"
-            style="position: relative; bottom: 59px; left: 11px; font-size: 30px;"
+            style="position: absolute; font-size: 30px; margin-top: 15px; margin-left: 11px;"
           >
             Últimos dias
           </div>
