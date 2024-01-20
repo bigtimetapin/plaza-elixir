@@ -400,7 +400,85 @@ defmodule PlazaWeb.ProductLive do
                 </div>
               </div>
               <div style="font-size: 28px;">
-                <.size_form cart_product_size={@cart_product_size} />
+                <div style="display: inline-block;">
+                  <button
+                    class="has-font-3"
+                    phx-click="change-size"
+                    phx-value-size="p"
+                    style="width: 43px;"
+                  >
+                    <div style="position: absolute;">
+                      <img :if={@cart_product_size == "p"} src="svg/yellow-circle.svg" />
+                    </div>
+                    <div style="position: relative;">
+                      P
+                    </div>
+                  </button>
+                  /
+                  <button
+                    class="has-font-3"
+                    phx-click="change-size"
+                    phx-value-size="m"
+                    style="width: 43px;"
+                  >
+                    <div style="position: absolute;">
+                      <img :if={@cart_product_size == "m"} src="svg/yellow-circle.svg" />
+                    </div>
+                    <div style="position: relative;">
+                      M
+                    </div>
+                  </button>
+                  /
+                  <button
+                    class="has-font-3"
+                    phx-click="change-size"
+                    phx-value-size="g"
+                    style="width: 43px;"
+                  >
+                    <div style="position: absolute;">
+                      <img :if={@cart_product_size == "g"} src="svg/yellow-circle.svg" />
+                    </div>
+                    <div style="position: relative;">
+                      G
+                    </div>
+                  </button>
+                  /
+                  <button
+                    class="has-font-3"
+                    phx-click="change-size"
+                    phx-value-size="gg"
+                    style="width: 43px;"
+                  >
+                    <div style="position: absolute;">
+                      <img :if={@cart_product_size == "gg"} src="svg/yellow-circle.svg" />
+                    </div>
+                    <div style="position: relative;">
+                      GG
+                    </div>
+                  </button>
+                  /
+                  <button
+                    class="has-font-3"
+                    phx-click="change-size"
+                    phx-value-size="xgg"
+                    style={
+                      if @cart_product_size == "xgg",
+                        do: "font-size: 22px; width: 43px;",
+                        else: "width: 43px;"
+                    }
+                  >
+                    <div style="position: absolute;">
+                      <img
+                        :if={@cart_product_size == "xgg"}
+                        src="svg/yellow-circle.svg"
+                        style="position: relative; bottom: 5px;"
+                      />
+                    </div>
+                    <div style="position: relative;">
+                      XGG
+                    </div>
+                  </button>
+                </div>
               </div>
               <div style="display: flex; justify-content: center; position: relative; top: 25px;">
                 <button phx-click="add-to-cart">
@@ -500,8 +578,98 @@ defmodule PlazaWeb.ProductLive do
             </div>
           </div>
           <div style="display: flex;">
-            <div style="font-size: 28px;">
-              <.size_form cart_product_size={@cart_product_size} />
+            <div style="font-size: 18px; margin-top: 25px;">
+              <div style="display: inline-block;">
+                <button
+                  class="has-font-3"
+                  phx-click="change-size"
+                  phx-value-size="p"
+                  style={if @cart_product_size == "p", do: "margin-right: 9px;"}
+                >
+                  <div style="position: absolute;">
+                    <img
+                      :if={@cart_product_size == "p"}
+                      src="svg/yellow-circle.svg"
+                      style="position: relative; width: 30px; right: 11px;"
+                    />
+                  </div>
+                  <div style="position: relative;">
+                    P
+                  </div>
+                </button>
+                /
+                <button
+                  class="has-font-3"
+                  phx-click="change-size"
+                  phx-value-size="m"
+                  style={if @cart_product_size == "m", do: "margin-right: 7px; margin-left: 7px;"}
+                >
+                  <div style="position: absolute;">
+                    <img
+                      :if={@cart_product_size == "m"}
+                      src="svg/yellow-circle.svg"
+                      style="position: relative; width: 30px; right: 9px;"
+                    />
+                  </div>
+                  <div style="position: relative;">
+                    M
+                  </div>
+                </button>
+                /
+                <button
+                  class="has-font-3"
+                  phx-click="change-size"
+                  phx-value-size="g"
+                  style={if @cart_product_size == "g", do: "margin-right: 8px; margin-left: 8px;"}
+                >
+                  <div style="position: absolute;">
+                    <img
+                      :if={@cart_product_size == "g"}
+                      src="svg/yellow-circle.svg"
+                      style="position: relative; width: 30px; right: 10px;"
+                    />
+                  </div>
+                  <div style="position: relative;">
+                    G
+                  </div>
+                </button>
+                /
+                <button
+                  class="has-font-3"
+                  phx-click="change-size"
+                  phx-value-size="gg"
+                  style={if @cart_product_size == "gg", do: "margin-right: 3px; margin-left: 3px;"}
+                >
+                  <div style="position: absolute;">
+                    <img
+                      :if={@cart_product_size == "gg"}
+                      src="svg/yellow-circle.svg"
+                      style="position: relative; width: 30px; right: 4px;"
+                    />
+                  </div>
+                  <div style="position: relative;">
+                    GG
+                  </div>
+                </button>
+                /
+                <button
+                  class="has-font-3"
+                  phx-click="change-size"
+                  phx-value-size="xgg"
+                  style={if @cart_product_size == "xgg", do: "font-size: 14px; margin-left: 3px;"}
+                >
+                  <div style="position: absolute;">
+                    <img
+                      :if={@cart_product_size == "xgg"}
+                      src="svg/yellow-circle.svg"
+                      style="position: relative; width: 30px; right: 3px; bottom: 4px;"
+                    />
+                  </div>
+                  <div style="position: relative;">
+                    XGG
+                  </div>
+                </button>
+              </div>
             </div>
             <div style="margin-left: auto;">
               <button phx-click="add-to-cart" style="width: 155px;">
@@ -562,77 +730,6 @@ defmodule PlazaWeb.ProductLive do
         </div>
       </div>
       <div :if={Enum.empty?(@top_3_other_products)} style="margin-bottom: 200px;"></div>
-    </div>
-    """
-  end
-
-  defp size_form(assigns) do
-    ~H"""
-    <div style="display: inline-block;">
-      <button class="has-font-3" phx-click="change-size" phx-value-size="p">
-        <div style="position: absolute;">
-          <img
-            :if={@cart_product_size == "p"}
-            src="svg/yellow-circle.svg"
-            style="position: relative; right: 15px;"
-          />
-        </div>
-        <div style="position: relative;">
-          P
-        </div>
-      </button>
-      /
-      <button class="has-font-3" phx-click="change-size" phx-value-size="m">
-        <div style="position: absolute;">
-          <img
-            :if={@cart_product_size == "m"}
-            src="svg/yellow-circle.svg"
-            style="position: relative; right: 13px;"
-          />
-        </div>
-        <div style="position: relative;">
-          M
-        </div>
-      </button>
-      /
-      <button class="has-font-3" phx-click="change-size" phx-value-size="g">
-        <div style="position: absolute;">
-          <img
-            :if={@cart_product_size == "g"}
-            src="svg/yellow-circle.svg"
-            style="position: relative; right: 13px;"
-          />
-        </div>
-        <div style="position: relative;">
-          G
-        </div>
-      </button>
-      /
-      <button class="has-font-3" phx-click="change-size" phx-value-size="gg">
-        <div style="position: absolute;">
-          <img
-            :if={@cart_product_size == "gg"}
-            src="svg/yellow-circle.svg"
-            style="position: relative; right: 5px;"
-          />
-        </div>
-        <div style="position: relative;">
-          GG
-        </div>
-      </button>
-      /
-      <button class="has-font-3" phx-click="change-size" phx-value-size="xgg">
-        <div style="position: absolute;">
-          <img
-            :if={@cart_product_size == "xgg"}
-            src="svg/yellow-circle.svg"
-            style="position: relative; right: 4px;"
-          />
-        </div>
-        <div style="position: relative;">
-          XGG
-        </div>
-      </button>
     </div>
     """
   end
