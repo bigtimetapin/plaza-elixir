@@ -5,7 +5,12 @@ defmodule PlazaWeb.AdminLive do
   alias Plaza.Products
   alias PlazaWeb.ProductComponent
 
-  @admin_list ["bigtimetapin@gmail.com", "alexander@plazaaaaa.com"]
+  @admin_list [
+    "bigtimetapin@gmail.com",
+    "alexander@plazaaaaa.com",
+    "alexandrensmarin@gmail.com",
+    "am.cauliflower.am@gmail.com"
+  ]
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
@@ -137,7 +142,7 @@ defmodule PlazaWeb.AdminLive do
           :for={product <- @seller_products}
           style="display: flex; flex-direction: column; border: 1px dotted black; margin-bottom: 25px;"
         >
-          <ProductComponent.product product={product} meta={true} />
+          <ProductComponent.product product={product} meta={true} disabled={true} />
           <div style="text-align: center;">
             <%= "product curated; #{product.curated}" %>
           </div>
