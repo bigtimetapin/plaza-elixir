@@ -578,7 +578,7 @@ defmodule PlazaWeb.ProductLive do
             </div>
           </div>
           <div style="display: flex;">
-            <div style="font-size: 18px; margin-top: 25px;">
+            <div style="font-size: 22px; margin-top: 25px; position: relative; right: 10px;">
               <div style="display: inline-block;">
                 <button
                   class="has-font-3"
@@ -590,7 +590,7 @@ defmodule PlazaWeb.ProductLive do
                     <img
                       :if={@cart_product_size == "p"}
                       src="svg/yellow-circle.svg"
-                      style="position: relative; width: 30px; right: 11px;"
+                      style="position: relative; width: 35px; right: 13px;"
                     />
                   </div>
                   <div style="position: relative;">
@@ -608,7 +608,7 @@ defmodule PlazaWeb.ProductLive do
                     <img
                       :if={@cart_product_size == "m"}
                       src="svg/yellow-circle.svg"
-                      style="position: relative; width: 30px; right: 9px;"
+                      style="position: relative; width: 35px; right: 10px;"
                     />
                   </div>
                   <div style="position: relative;">
@@ -626,7 +626,7 @@ defmodule PlazaWeb.ProductLive do
                     <img
                       :if={@cart_product_size == "g"}
                       src="svg/yellow-circle.svg"
-                      style="position: relative; width: 30px; right: 10px;"
+                      style="position: relative; width: 35px; right: 10px;"
                     />
                   </div>
                   <div style="position: relative;">
@@ -644,7 +644,7 @@ defmodule PlazaWeb.ProductLive do
                     <img
                       :if={@cart_product_size == "gg"}
                       src="svg/yellow-circle.svg"
-                      style="position: relative; width: 30px; right: 4px;"
+                      style="position: relative; width: 35px; right: 4px;"
                     />
                   </div>
                   <div style="position: relative;">
@@ -656,13 +656,13 @@ defmodule PlazaWeb.ProductLive do
                   class="has-font-3"
                   phx-click="change-size"
                   phx-value-size="xgg"
-                  style={if @cart_product_size == "xgg", do: "font-size: 14px; margin-left: 3px;"}
+                  style={if @cart_product_size == "xgg", do: "font-size: 18px; width: 35px;"}
                 >
                   <div style="position: absolute;">
                     <img
                       :if={@cart_product_size == "xgg"}
                       src="svg/yellow-circle.svg"
-                      style="position: relative; width: 30px; right: 3px; bottom: 4px;"
+                      style="position: relative; bottom: 4px;"
                     />
                   </div>
                   <div style="position: relative;">
@@ -671,11 +671,11 @@ defmodule PlazaWeb.ProductLive do
                 </button>
               </div>
             </div>
-            <div style="margin-left: auto;">
-              <button phx-click="add-to-cart" style="width: 155px;">
+            <div style="margin-left: auto; position: relative; left: 10px; top: 10px;">
+              <button phx-click="add-to-cart" style="width: 145px;">
                 <img src="svg/yellow-ellipse.svg" />
-                <div class="has-font-3" style="position: relative; bottom: 67px; font-size: 36px;">
-                  Comprar
+                <div class="has-font-3" style="position: relative; bottom: 63px; font-size: 34px;">
+                  comprar
                 </div>
               </button>
             </div>
@@ -683,13 +683,13 @@ defmodule PlazaWeb.ProductLive do
         </div>
         <div :if={@already_in_cart}>
           <div style="text-decoration: underline; font-size: 24px; display: flex; justify-content: right;">
-            <.link navigate="/">Loja</.link>
+            <.link navigate="/">loja</.link>
           </div>
           <div style="position: relative; top: 10px; display: flex; justify-content: right;">
             <button phx-click="checkout-href">
-              <img src="svg/yellow-ellipse.svg" />
-              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                Carrinho
+              <img src="svg/yellow-ellipse.svg" style="width: 175px;" />
+              <div class="has-font-3" style="position: relative; bottom: 73px; font-size: 34px;">
+                carrinho
               </div>
             </button>
           </div>
