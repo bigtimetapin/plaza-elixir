@@ -153,15 +153,19 @@ input[type="radio"] {
   visibility: hidden;
 }
 
-.text-input-1 {
+.text-input-1,
+.text-input-2 {
   font-family: AppleGaramondLight, sans-serif;
   font-size: 34px;
-  text-align: center;
   border-top: none;
   border-left: none;
   border-right: none;
   border-radius: 0px;
   width: 400px;
+}
+
+.text-input-1 {
+  text-align: center;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

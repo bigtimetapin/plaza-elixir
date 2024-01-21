@@ -65,6 +65,12 @@ defmodule PlazaWeb.ArtistLive do
     {:noreply, socket}
   end
 
+  def handle_event("product-href", %{"product-id" => product_id}, socket) do
+    params = %{"product-id" => product_id}
+    url = URI.encode_query(params)
+    {:noreply, push_navigate(socket, to: "/product?#{url}")}
+  end
+
   @impl Phoenix.LiveView
   def render(%{waiting: true} = assigns) do
     ~H"""
@@ -156,7 +162,7 @@ defmodule PlazaWeb.ArtistLive do
           <div
             :if={@seller.description}
             class="is-size-6 mb-xsmall"
-            style="line-height: 34px; width: 267px;"
+            style="line-height: 30px; width: 267px;"
           >
             <%= @seller.description %>
           </div>
@@ -188,7 +194,7 @@ defmodule PlazaWeb.ArtistLive do
 
   defp right(assigns) do
     ~H"""
-    <div style="margin-top: 150px; width: 100%; border-left: 1px solid #707070;">
+    <div style="padding-top: 150px; width: 100%; border-left: 1px solid #707070;">
       <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 200px">
         <ProductComponent.products3 products={@products} />
       </div>

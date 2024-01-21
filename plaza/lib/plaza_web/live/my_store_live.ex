@@ -760,7 +760,7 @@ defmodule PlazaWeb.MyStoreLive do
           <div class="is-size-6 mb-small" style="text-decoration: underline;">
             <%= @seller.user_name %>
           </div>
-          <div class="is-size-6 mb-xsmall" style="line-height: 34px; width: 267px;">
+          <div class="is-size-6 mb-xsmall" style="line-height: 30px; width: 267px;">
             <%= @user_description %>
           </div>
           <div class="is-size-6 mb-small has-dark-gray-text">
@@ -769,8 +769,10 @@ defmodule PlazaWeb.MyStoreLive do
           <div :for={url <- @user_urls} class="is-size-6" style="text-decoration: underline;">
             <.url_or url={url} />
           </div>
-          <div style="margin-top: 50px; height: 30px; width: 33px; border-top: none; border-left: none; border-right: none; border-bottom: 2px solid black;">
-            <button phx-click="edit-seller" class="has-font-3" style="font-size: 24px;">edit</button>
+          <div style="margin-top: 50px; height: 30px; width: 33px; border-top: none; border-left: none; border-right: none; border-bottom: 2px solid grey; color: grey;">
+            <button phx-click="edit-seller" class="has-font-3" style="font-size: 24px;">
+              Editar
+            </button>
           </div>
         </div>
       </div>
@@ -779,9 +781,30 @@ defmodule PlazaWeb.MyStoreLive do
   end
 
   defp url_or(%{url: {:url, url}} = assigns) do
+    {url, href} =
+      case String.starts_with?(url, "https://") do
+        true ->
+          {String.replace_prefix(url, "https://", ""), url}
+
+        false ->
+          case String.starts_with?(url, "http://") do
+            true ->
+              href = String.replace_prefix(url, "http://", "https://")
+              {href |> String.replace_prefix("https://", ""), href}
+
+            false ->
+              {url, "https://#{url}"}
+          end
+      end
+
+    assigns =
+      assigns
+      |> assign(url: url)
+      |> assign(href: href)
+
     ~H"""
-    <a href={url} target="_blank">
-      <%= url %>
+    <a href={@href} target="_blank">
+      <%= @url %>
     </a>
     """
   end
@@ -794,7 +817,7 @@ defmodule PlazaWeb.MyStoreLive do
 
   defp right(assigns) do
     ~H"""
-    <div style="margin-top: 150px; width: 100%; border-left: 1px solid #707070;">
+    <div style="padding-top: 150px; width: 100%; border-left: 1px solid #707070;">
       <div style="margin-left: 100px; margin-bottom: 50px;">
         <.link navigate="/upload" style="text-decoration: underline;" class="has-font-3 is-size-6">
           upload more stuff
@@ -868,7 +891,7 @@ defmodule PlazaWeb.MyStoreLive do
         </form>
       </div>
       <div>
-        <div style="position: relative; left: 50px; bottom: 40px;">
+        <div style="margin-left: 50px;">
           <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
             <.input
               field={@seller_form[:user_name]}
@@ -910,11 +933,34 @@ defmodule PlazaWeb.MyStoreLive do
               phx-debounce="500"
             >
             </.input>
-            <div style="position: relative; top: 100px;">
+            <div style="position: relative; right: 357px; top: 50px;">
+              <div>
+                <.input
+                  field={@seller_form[:description]}
+                  type="textarea"
+                  placeholder="Breve descrição da loja/artista"
+                  phx-debounce="500"
+                  maxlength="140"
+                  style="width: 500px; height: 100px;"
+                >
+                </.input>
+              </div>
+              <div>
+                <.input
+                  field={@seller_form[:location]}
+                  type="text"
+                  placeholder="Localização"
+                  class="text-input-2"
+                  phx-debounce="500"
+                >
+                </.input>
+              </div>
+            </div>
+            <div style="margin-left: 200px;">
               <button>
                 <img src="/svg/yellow-ellipse.svg" />
                 <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                  <%= if !@seller, do: "Criar Loja", else: "Editar Loja" %>
+                  <%= if !@seller, do: "Continuar", else: "Editar" %>
                 </div>
               </button>
             </div>
