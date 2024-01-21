@@ -54,6 +54,22 @@ defmodule PlazaWeb.ArtistLive do
   end
 
   @impl Phoenix.LiveView
+  def handle_event("open-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("close-mobile-header", _, socket) do
+    socket =
+      socket
+      |> assign(mobile_header_open: false)
+
+    {:noreply, socket}
+  end
+
   def handle_event("all-products", _, socket) do
     products = Products.list_active_products_by_user_id(socket.assigns.seller.user_id)
 
@@ -92,9 +108,22 @@ defmodule PlazaWeb.ArtistLive do
 
   def render(assigns) do
     ~H"""
-    <div style="display: flex;">
-      <.left seller={@seller} />
-      <.right products={@products} all_products={@all_products} />
+    <div class="is-artist-page-desktop">
+      <div style="display: flex;">
+        <.left seller={@seller} />
+        <.right products={@products} all_products={@all_products} />
+      </div>
+    </div>
+    <div class="is-artist-page-mobile has-font-3" style="display: flex; justify-content: center;">
+      <div style="display: flex; flex-direction: column;">
+        <div style="width: 150px; height: 150px; background: lightgrey; overflow: hidden;">
+          <img
+            :if={@seller.profile_photo_url}
+            src={@seller.profile_photo_url}
+            style="min-width: 100%; min-height: 100%;"
+          />
+        </div>
+      </div>
     </div>
     """
   end
@@ -151,8 +180,11 @@ defmodule PlazaWeb.ArtistLive do
 
     ~H"""
     <div class="has-font-3" style="position: relative; top: 50px;">
-      <div style="width: 377px; overflow: hidden;">
-        <img src={if @seller.profile_photo_url, do: @seller.profile_photo_url, else: "png/pep.png"} />
+      <div style="width: 377px; height: 377px; overflow: hidden;">
+        <img
+          src={if @seller.profile_photo_url, do: @seller.profile_photo_url, else: "png/pep.png"}
+          style="min-width: 100%; min-height: 100%;"
+        />
       </div>
       <div style="display: flex; flex-direction: column;">
         <div style="margin-left: auto; padding-top: 10px; width: 316px; height: 600px;">

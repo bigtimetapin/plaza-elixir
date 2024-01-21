@@ -388,6 +388,18 @@ $spacing-values: (
   }
 }
 
+.is-artist-page-desktop {
+  @include until($tablet) {
+    display: none;
+  }
+}
+
+.is-artist-page-mobile {
+  @include from($tablet) {
+    display: none;
+  }
+}
+
 .is-product-page-desktop {
   @include until($tablet) {
     display: none;

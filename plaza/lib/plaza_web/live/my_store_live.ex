@@ -752,8 +752,20 @@ defmodule PlazaWeb.MyStoreLive do
 
     ~H"""
     <div class="has-font-3" style="position: relative; top: 50px;">
-      <div style="width: 377px; overflow: hidden;">
-        <img src={if @seller.profile_photo_url, do: @seller.profile_photo_url, else: "png/pep.png"} />
+      <div style="width: 377px; height: 377px; overflow: hidden;">
+        <div :if={!@seller.profile_photo_url} style="justify-content: center;">
+          <div>
+            Upload
+          </div>
+          <div>
+            Logo/Foto de Perfil
+          </div>
+        </div>
+        <img
+          :if={@seller.profile_photo_url}
+          src={@seller.profile_photo_url}
+          style="min-width: 100%; min-height: 100%;"
+        />
       </div>
       <div style="display: flex; flex-direction: column;">
         <div style="margin-left: auto; padding-top: 10px; width: 316px; height: 600px;">
