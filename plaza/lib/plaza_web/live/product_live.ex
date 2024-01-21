@@ -89,11 +89,14 @@ defmodule PlazaWeb.ProductLive do
                 )
 
               top_3_other_products = Products.top_3_other_products(product)
+              artist_href = URI.encode_query(%{"user_name" => product.user_name})
+              artist_href = "/artist?#{artist_href}"
 
               socket
               |> assign(product_display: product_display)
               |> assign(product_days_remaining: days_remaining)
               |> assign(top_3_other_products: top_3_other_products)
+              |> assign(artist_href: artist_href)
           end
 
         socket
@@ -326,7 +329,11 @@ defmodule PlazaWeb.ProductLive do
               <%= @product.name %>
             </div>
             <div style="font-size: 26px; color: grey; text-decoration: underline; margin-bottom: 25px;">
-              <%= @product.user_name %>
+              <p>
+                <.link navigate={@artist_href}>
+                  <%= @product.user_name %>
+                </.link>
+              </p>
             </div>
             <div
               :if={@product.description}
@@ -558,7 +565,11 @@ defmodule PlazaWeb.ProductLive do
           </div>
         </div>
         <div style="color: grey; text-decoration: underline; font-size: 28px; position: relative; bottom: 15px;">
-          <%= @product.user_name %>
+          <p>
+            <.link navigate={@artist_href}>
+              <%= @product.user_name %>
+            </.link>
+          </p>
         </div>
         <div>
           <button phx-click="change-product-display">

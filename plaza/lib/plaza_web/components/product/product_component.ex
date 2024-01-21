@@ -63,8 +63,12 @@ defmodule PlazaWeb.ProductComponent do
           {"expired", false}
       end
 
+    artist_href = URI.encode_query(%{"user_name" => product.user_name})
+    artist_href = "/artist?#{artist_href}"
+
     assigns =
       assigns
+      |> assign(artist_href: artist_href)
       |> assign(days_remaining: days_remaining)
       |> assign(expiring: expiring)
 
@@ -94,7 +98,11 @@ defmodule PlazaWeb.ProductComponent do
               class="has-dark-gray-text is-size-7"
               style="position: absolute; bottom: 0px; left: 10px;"
             >
-              <%= @product.user_name %>
+              <p>
+                <.link navigate={@artist_href}>
+                  <%= @product.user_name %>
+                </.link>
+              </p>
             </div>
             <div
               class="has-dark-gray-text is-size-7"
