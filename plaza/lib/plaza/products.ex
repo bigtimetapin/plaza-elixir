@@ -120,13 +120,34 @@ defmodule Plaza.Products do
   end
 
   def list_products_by_user_id(id) do
-    Repo.all(from p in Product, where: [user_id: ^id])
+    Repo.all(
+      from Product,
+        where: [user_id: ^id],
+        order_by: [desc: :updated_at]
+    )
   end
 
   def list_products_by_user_id(id, n) do
     Repo.all(
       from Product,
         where: [user_id: ^id],
+        order_by: [desc: :updated_at],
+        limit: ^n
+    )
+  end
+
+  def list_active_products_by_user_id(id) do
+    Repo.all(
+      from Product,
+        where: [user_id: ^id, active: true],
+        order_by: [desc: :updated_at]
+    )
+  end
+
+  def list_active_products_by_user_id(id, n) do
+    Repo.all(
+      from Product,
+        where: [user_id: ^id, active: true],
         order_by: [desc: :updated_at],
         limit: ^n
     )
