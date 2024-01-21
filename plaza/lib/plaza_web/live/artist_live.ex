@@ -114,16 +114,97 @@ defmodule PlazaWeb.ArtistLive do
         <.right products={@products} all_products={@all_products} />
       </div>
     </div>
-    <div class="is-artist-page-mobile has-font-3" style="display: flex; justify-content: center;">
-      <div style="display: flex; flex-direction: column;">
-        <div style="width: 150px; height: 150px; background: lightgrey; overflow: hidden;">
-          <img
-            :if={@seller.profile_photo_url}
-            src={@seller.profile_photo_url}
-            style="min-width: 100%; min-height: 100%;"
-          />
+    <div class="is-artist-page-mobile has-font-3" style="margin-top: 150px;">
+      <div style="display: flex; margin-left: 5px; margin-right: 5px;">
+        <div style="display: flex; flex-direction: column; width: 100%;">
+          <div style="width: 150px; height: 150px; background: lightgrey; overflow: hidden; margin-bottom: 25px; align-self: center;">
+            <img
+              :if={@seller.profile_photo_url}
+              src={@seller.profile_photo_url}
+              style="min-width: 100%; min-height: 100%;"
+            />
+          </div>
+          <div style="font-size: 32px; text-align: center; margin-bottom: 10px;">
+            <%= @seller.user_name %>
+          </div>
+          <div style="align-self: center; margin-bottom: 100px; width: 400px;">
+            <div style="font-size: 24px; text-align: center; margin-bottom: 20px;">
+              <%= @seller.description %>
+            </div>
+            <div style="font-size: 20px; text-decoration: underline;">
+              <.urls_mobile seller={@seller} />
+            </div>
+          </div>
+          <div :for={product <- @products} style="margin-bottom: 150px;">
+            <ProductComponent.product product={product} meta={true} disabled={false} />
+          </div>
+          <div
+            :if={!@all_products && @products != []}
+            style="text-align: center; font-size: 24px; margin-bottom: 100px; margin-top: 100px;"
+          >
+            <button class="has-font-3" phx-click="all-products" style="text-decoration: underline;">
+              Ver todos os produtos
+            </button>
+          </div>
         </div>
       </div>
+    </div>
+    """
+  end
+
+  defp urls_mobile(assigns) do
+    seller = assigns.seller
+
+    website =
+      case seller.website do
+        nil ->
+          nil
+
+        nn ->
+          {:url, nn}
+      end
+
+    instagram =
+      case seller.socials.instagram do
+        nil ->
+          nil
+
+        nn ->
+          {:url, nn}
+      end
+
+    twitter =
+      case seller.socials.twitter do
+        nil ->
+          nil
+
+        nn ->
+          {:url, nn}
+      end
+
+    soundcloud =
+      case seller.socials.soundcloud do
+        nil ->
+          nil
+
+        nn ->
+          {:url, nn}
+      end
+
+    urls = [
+      website,
+      instagram,
+      twitter,
+      soundcloud
+    ]
+
+    assigns =
+      assigns
+      |> assign(urls: urls)
+
+    ~H"""
+    <div :for={url <- @urls}>
+      <.url_or url={url} />
     </div>
     """
   end
