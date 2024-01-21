@@ -74,6 +74,7 @@ defmodule PlazaWeb.MyStoreLive do
             |> assign(header: :my_store)
             |> assign(seller: seller)
             |> assign(products: products)
+            |> assign(all_products: false)
             |> assign(logo_upload: logo_upload)
             |> assign(seller_form: seller_form)
             |> assign(uuid: UUID.uuid1())
@@ -100,6 +101,17 @@ defmodule PlazaWeb.MyStoreLive do
     socket =
       socket
       |> assign(mobile_header_open: false)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("all-products", _, socket) do
+    products = Products.list_products_by_user_id(socket.assigns.current_user.id)
+
+    socket =
+      socket
+      |> assign(products: products)
+      |> assign(all_products: true)
 
     {:noreply, socket}
   end
@@ -553,7 +565,7 @@ defmodule PlazaWeb.MyStoreLive do
         <div>
           you've uploaded your first product
           <div>
-            <ProductComponent.product product={product} meta={false} />
+            <ProductComponent.product product={product} meta={false} disabled={true} />
           </div>
         </div>
       </div>
@@ -643,7 +655,7 @@ defmodule PlazaWeb.MyStoreLive do
             <div style="margin-bottom: 50px;">
               and you've uploaded your first product
               <div>
-                <ProductComponent.product product={product} meta={false} />
+                <ProductComponent.product product={product} meta={false} disabled={true} />
               </div>
             </div>
           </div>
@@ -661,9 +673,9 @@ defmodule PlazaWeb.MyStoreLive do
 
   def render(assigns) do
     ~H"""
-    <div style="display: flex; margin-bottom: 50px;">
+    <div style="display: flex;">
       <.left seller={@seller} />
-      <.right products={@products} />
+      <.right products={@products} all_products={@all_products} />
     </div>
     """
   end
@@ -743,21 +755,23 @@ defmodule PlazaWeb.MyStoreLive do
       <div style="width: 377px; overflow: hidden;">
         <img src={if @seller.profile_photo_url, do: @seller.profile_photo_url, else: "png/pep.png"} />
       </div>
-      <div style="position: relative; left: 61px; width: 316px; height: 600px; border-right: 1px solid #707070;">
-        <div class="is-size-6 mb-small" style="text-decoration: underline;">
-          <%= @seller.user_name %>
-        </div>
-        <div class="is-size-6 mb-xsmall" style="line-height: 34px; width: 267px;">
-          <%= @user_description %>
-        </div>
-        <div class="is-size-6 mb-small has-dark-gray-text">
-          <%= @user_location %>
-        </div>
-        <div :for={url <- @user_urls} class="is-size-6" style="text-decoration: underline;">
-          <.url_or url={url} />
-        </div>
-        <div style="margin-top: 50px; height: 30px; width: 33px; border-top: none; border-left: none; border-right: none; border-bottom: 2px solid black;">
-          <button phx-click="edit-seller" class="has-font-3" style="font-size: 24px;">edit</button>
+      <div style="display: flex; flex-direction: column;">
+        <div style="margin-left: auto; padding-top: 10px; width: 316px; height: 600px;">
+          <div class="is-size-6 mb-small" style="text-decoration: underline;">
+            <%= @seller.user_name %>
+          </div>
+          <div class="is-size-6 mb-xsmall" style="line-height: 34px; width: 267px;">
+            <%= @user_description %>
+          </div>
+          <div class="is-size-6 mb-small has-dark-gray-text">
+            <%= @user_location %>
+          </div>
+          <div :for={url <- @user_urls} class="is-size-6" style="text-decoration: underline;">
+            <.url_or url={url} />
+          </div>
+          <div style="margin-top: 50px; height: 30px; width: 33px; border-top: none; border-left: none; border-right: none; border-bottom: 2px solid black;">
+            <button phx-click="edit-seller" class="has-font-3" style="font-size: 24px;">edit</button>
+          </div>
         </div>
       </div>
     </div>
@@ -780,29 +794,23 @@ defmodule PlazaWeb.MyStoreLive do
 
   defp right(assigns) do
     ~H"""
-    <div style="margin-top: 150px;">
-      <div style="position: relative; left: 100px; margin-bottom: 50px;">
+    <div style="margin-top: 150px; width: 100%; border-left: 1px solid #707070;">
+      <div style="margin-left: 100px; margin-bottom: 50px;">
         <.link navigate="/upload" style="text-decoration: underline;" class="has-font-3 is-size-6">
           upload more stuff
         </.link>
       </div>
-      <div style="position: relative; left: 75px;">
+      <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 200px">
         <ProductComponent.products3 products={@products} />
       </div>
-      <div
-        class="has-font-3"
-        style="display: flex; justify-content: flex-end; position: relative; top: 50px;"
-      >
-        <div style="display: inline-block; position: relative; right: 200px;">
-          <div class="is-size-6" style="text-decoration: underline;">
-            Ver todos as produtos
-          </div>
-        </div>
-        <div style="display: inline-block; position: relative; left: 50px;">
-          <div class="is-size-6 has-dark-gray-text" style="text-decoration: underline;">
-            Acessar Painel de Vendedor
-          </div>
-        </div>
+      <div :if={!@all_products} style="display: flex; justify-content: center; margin-bottom: 100px;">
+        <button
+          class="has-font-3"
+          style="text-decoration: underline; font-size: 28px;"
+          phx-click="all-products"
+        >
+          Ver todos os produtos
+        </button>
       </div>
     </div>
     """
@@ -846,7 +854,7 @@ defmodule PlazaWeb.MyStoreLive do
             style="position: relative; left: 5px;"
           >
             <div style="width: 312px; height: 300px; overflow: hidden; border: 1px solid black;">
-              <img id="plaza-logo-display" />
+              <img id="plaza-logo-display" style="min-width: 100%; min-height: 100%;" />
             </div>
             <div style="display: inline-block; width: 270px; font-size: 24px; color: gray;">
               <%= @logo_upload.name %>

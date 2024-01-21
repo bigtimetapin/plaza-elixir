@@ -288,7 +288,7 @@ defmodule PlazaWeb.ProductLive do
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <div>
-          <ProductComponent.product product={product} meta={true} />
+          <ProductComponent.product product={product} meta={true} disabled={true} />
         </div>
         <div>
           this seller has not finished registration yet
@@ -303,7 +303,7 @@ defmodule PlazaWeb.ProductLive do
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <div>
-          <ProductComponent.product product={product} meta={true} />
+          <ProductComponent.product product={product} meta={true} disabled={true} />
         </div>
         <div>
           this product is no longer available

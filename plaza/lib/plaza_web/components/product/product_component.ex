@@ -5,9 +5,9 @@ defmodule PlazaWeb.ProductComponent do
 
   def products3(assigns) do
     ~H"""
-    <div class="columns is-multiline is-size-6 has-three-products">
+    <div class="columns is-multiline" style="max-width: 1500px;">
       <%= for product <- @products do %>
-        <div class="column is-one-third">
+        <div class="column is-one-third" style="margin-bottom: 100px;">
           <.product product={product} meta={true} disabled={false} />
         </div>
       <% end %>
@@ -19,7 +19,7 @@ defmodule PlazaWeb.ProductComponent do
 
   def products4(assigns) do
     ~H"""
-    <div class="columns is-multiline is-size-6 has-four-products">
+    <div class="columns is-multiline" style="max-width: 1600px;">
       <%= for product <- @products do %>
         <div class="column is-one-quarter-widescreen is-one-third-desktop is-half-tablet">
           <.product product={product} meta={true} disabled={false} />

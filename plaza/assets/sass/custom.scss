@@ -212,14 +212,6 @@ input[type="radio"] {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // buttons /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-.has-three-products {
-  max-width: 1200px;
-}
-
-.has-four-products {
-  max-width: 1600px;
-}
-
 .is-product-1 {
   position: relative;
   height: 500px;
@@ -401,7 +393,7 @@ $spacing-values: (
 
 .is-product-1 {
   @include from($tablet) {
-    max-width: 370px;
+    max-width: 400px;
     min-width: 225px;
   }
 }
