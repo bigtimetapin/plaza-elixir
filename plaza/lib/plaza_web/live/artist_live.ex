@@ -139,7 +139,7 @@ defmodule PlazaWeb.ArtistLive do
             <ProductComponent.product product={product} meta={true} disabled={false} />
           </div>
           <div
-            :if={!@all_products && @products != []}
+            :if={!@all_products && Enum.count(@products) == 3}
             style="text-align: center; font-size: 24px; margin-bottom: 100px; margin-top: 100px;"
           >
             <button class="has-font-3" phx-click="all-products" style="text-decoration: underline;">
@@ -261,7 +261,7 @@ defmodule PlazaWeb.ArtistLive do
 
     ~H"""
     <div class="has-font-3" style="position: relative; top: 50px;">
-      <div style="width: 377px; height: 377px; overflow: hidden;">
+      <div style="width: 377px; height: 377px; overflow: hidden; border: 1px solid grey;">
         <img
           src={if @seller.profile_photo_url, do: @seller.profile_photo_url, else: "png/pep.png"}
           style="min-width: 100%; min-height: 100%;"
@@ -292,9 +292,30 @@ defmodule PlazaWeb.ArtistLive do
   end
 
   defp url_or(%{url: {:url, url}} = assigns) do
+    {url, href} =
+      case String.starts_with?(url, "https://") do
+        true ->
+          {String.replace_prefix(url, "https://", ""), url}
+
+        false ->
+          case String.starts_with?(url, "http://") do
+            true ->
+              href = String.replace_prefix(url, "http://", "https://")
+              {href |> String.replace_prefix("https://", ""), href}
+
+            false ->
+              {url, "https://#{url}"}
+          end
+      end
+
+    assigns =
+      assigns
+      |> assign(url: url)
+      |> assign(href: href)
+
     ~H"""
-    <a href={url} target="_blank">
-      <%= url %>
+    <a href={@href} target="_blank">
+      <%= @url %>
     </a>
     """
   end
@@ -311,7 +332,10 @@ defmodule PlazaWeb.ArtistLive do
       <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 200px">
         <ProductComponent.products3 products={@products} />
       </div>
-      <div :if={!@all_products} style="display: flex; justify-content: center; margin-bottom: 100px;">
+      <div
+        :if={!@all_products && Enum.count(@products) == 3}
+        style="display: flex; justify-content: center; margin-bottom: 100px;"
+      >
         <button
           class="has-font-3"
           style="text-decoration: underline; font-size: 28px;"

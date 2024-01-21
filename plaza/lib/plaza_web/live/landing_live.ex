@@ -34,7 +34,6 @@ defmodule PlazaWeb.LandingLive do
       |> assign(second_4_uncurated_products: second_4_uncurated_products)
       |> assign(uncurated_cursor_before: nil)
       |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
-      |> assign(page_title: "Hello Plaza")
       |> assign(header: :landing)
       |> assign(seller: seller)
 
