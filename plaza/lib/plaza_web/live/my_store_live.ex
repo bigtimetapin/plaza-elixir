@@ -654,8 +654,13 @@ defmodule PlazaWeb.MyStoreLive do
             </div>
             <div style="margin-bottom: 50px;">
               and you've uploaded your first product
-              <div>
-                <ProductComponent.product product={product} meta={false} disabled={true} />
+              <div style="display: flex; justify-content: center; margin-top: 50px;">
+                <ProductComponent.product
+                  product={product}
+                  meta={false}
+                  disabled={true}
+                  style="width: 500px;"
+                />
               </div>
             </div>
           </div>
@@ -752,13 +757,18 @@ defmodule PlazaWeb.MyStoreLive do
 
     ~H"""
     <div class="has-font-3" style="position: relative; top: 50px;">
-      <div style="width: 377px; height: 377px; overflow: hidden;">
-        <div :if={!@seller.profile_photo_url} style="justify-content: center;">
-          <div>
-            Upload
-          </div>
-          <div>
-            Logo/Foto de Perfil
+      <div style="width: 377px; height: 377px; overflow: hidden; border: 1px solid grey;">
+        <div
+          :if={!@seller.profile_photo_url}
+          style="display: flex; justify-content: center; height: 100%; text-decoration: underline; text-align: center; font-size: 22px;"
+        >
+          <div style="display: flex; flex-direction: column; justify-content: center;">
+            <div>
+              Upload
+            </div>
+            <div>
+              Logo/Foto de Perfil
+            </div>
           </div>
         </div>
         <img

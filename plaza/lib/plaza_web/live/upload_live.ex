@@ -36,7 +36,7 @@ defmodule PlazaWeb.UploadLive do
               %{id: id} ->
                 case Accounts.get_seller_by_id(id) do
                   nil ->
-                    {nil, id, @default_user_name, false, 4}
+                    {nil, id, @default_user_name, false, 1}
 
                   %{stripe_id: nil} = seller ->
                     case Products.count(id) > 0 do
