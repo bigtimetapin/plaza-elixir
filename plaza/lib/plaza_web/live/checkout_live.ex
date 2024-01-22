@@ -11,8 +11,7 @@ defmodule PlazaWeb.CheckoutLive do
   alias Plaza.Products.Product
   alias Plaza.Purchases
 
-  ## @site "http://localhost:4000"
-  @site "https://plazaaaaa-solitary-snowflake-7144-summer-wave-9195.fly.dev"
+  @site System.get_env("PHX_HOST") || "http://localhost:4000"
 
   @local_storage_key "plaza-checkout-cart"
 
@@ -128,9 +127,12 @@ defmodule PlazaWeb.CheckoutLive do
   def handle_params(%{"purchase-id" => purchase_id, "success" => "true"} = params, _uri, socket) do
     case connected?(socket) do
       true ->
-        purchase = Purchases.get!(purchase_id)
+        ## give time for stripe to post new status
+        ## sleep outside task below to leave the page in waiting true
+        Process.sleep(5000)
 
         Task.async(fn ->
+          purchase = Purchases.get!(purchase_id)
           {:ok, stripe_session} = Stripe.Session.retrieve(purchase.stripe_session_id)
 
           {:ok, payment_intent} =
