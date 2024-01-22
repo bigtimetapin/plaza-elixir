@@ -577,9 +577,14 @@ defmodule PlazaWeb.UploadLive do
     ~H"""
     <div class="has-font-3 is-size-4" style="margin-top: 125px; margin-bottom: 125px;">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column; align-items: center; width: 500px;">
-          <div>
-            <PlazaWeb.ProductComponent.product product={product} meta={false} disabled={true} />
+        <div style="display: flex; flex-direction: column; width: 500px;">
+          <div style="display: flex; justify-content: center;">
+            <PlazaWeb.ProductComponent.product
+              product={product}
+              meta={false}
+              disabled={true}
+              style="width: 500px;"
+            />
           </div>
           <div style="text-align: center;">
             you've already uploaded your first product but haven't created a seller profile yet.
