@@ -20,6 +20,16 @@ if System.get_env("PHX_SERVER") do
   config :plaza, PlazaWeb.Endpoint, server: true
 end
 
+# Configure AWS client
+config :ex_aws,
+  access_key_id: [{:system, "AWS_ACCESS_KEY_ID_PLAZA"}],
+  secret_access_key: [{:system, "AWS_SECRET_ACCESS_KEY_PLAZA"}]
+
+# Configure Stripe 
+config :stripity_stripe,
+  api_key: System.fetch_env!("STRIPE_API_KEY"),
+  signing_secret: System.fetch_env!("STRIPE_WEBHOOK_SIGNING_SECRET")
+
 # ## Configuring the mailer
 # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 config :plaza, Plaza.Mailer,
@@ -101,5 +111,5 @@ if config_env() == :prod do
   #     config :plaza, PlazaWeb.Endpoint,
   #       force_ssl: [hsts: true]
   #
-  # Check `Plug.SSL` for all available options in `force_ssl`.
+  # Check `Plug.SSL` for all available options in `force_ssl`. 
 end

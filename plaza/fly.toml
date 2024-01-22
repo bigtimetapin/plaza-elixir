@@ -1,12 +1,11 @@
-# fly.toml app configuration file generated for plazaaaaa-solitary-snowflake-7144-summer-wave-9195 on 2023-12-23T19:30:05-08:00
+# fly.toml app configuration file generated for plazaaaaa on 2024-01-21T18:44:01-08:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "plazaaaaa-solitary-snowflake-7144-summer-wave-9195"
+app = "plazaaaaa"
 primary_region = "gru"
 kill_signal = "SIGTERM"
-swap_size_mb = 512
 
 [build]
 
@@ -14,7 +13,7 @@ swap_size_mb = 512
   release_command = "/app/bin/migrate"
 
 [env]
-  PHX_HOST = "plazaaaaa-solitary-snowflake-7144-summer-wave-9195.fly.dev"
+  PHX_HOST = "plazaaaaa.fly.dev"
   PORT = "8080"
 
 [http_service]
@@ -30,6 +29,6 @@ swap_size_mb = 512
     soft_limit = 1000
 
 [[vm]]
-  cpu_kind = "shared"
-  cpus = 1
-  memory_mb = 2048
+  cpu_kind = "performance"
+  cpus = 2
+  memory_mb = 8192

@@ -56,16 +56,6 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-# Configure AWS client
-config :ex_aws,
-  access_key_id: [{:system, "AWS_ACCESS_KEY_ID_PLAZA"}],
-  secret_access_key: [{:system, "AWS_SECRET_ACCESS_KEY_PLAZA"}]
-
-# Configure Stripe 
-config :stripity_stripe,
-  api_key: System.fetch_env!("STRIPE_API_KEY"),
-  signing_secret: System.fetch_env!("STRIPE_WEBHOOK_SIGNING_SECRET")
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

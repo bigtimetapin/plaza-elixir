@@ -46,12 +46,7 @@ RUN mkdir config
 # to ensure any relevant config change will trigger the dependencies
 # to be re-compiled.
 COPY config/config.exs config/${MIX_ENV}.exs config/
-# Note: You can mount multiple secrets
-RUN --mount=type=secret,id=STRIPE_API_KEY \
-    --mount=type=secret,id=STRIPE_WEBHOOK_SIGNING_SECRET \
-    STRIPE_API_KEY="$(cat /run/secrets/STRIPE_API_KEY)" \
-    STRIPE_WEBHOOK_SIGNING_SECRET="$(cat /run/secrets/STRIPE_WEBHOOK_SIGNING_SECRET)" \
-    mix deps.compile
+RUN mix deps.compile
 
 COPY priv priv
 
@@ -63,28 +58,16 @@ COPY assets assets
 RUN npm install --prefix ./assets 
 
 # compile assets
-RUN --mount=type=secret,id=STRIPE_API_KEY \
-    --mount=type=secret,id=STRIPE_WEBHOOK_SIGNING_SECRET \
-    STRIPE_API_KEY="$(cat /run/secrets/STRIPE_API_KEY)" \
-    STRIPE_WEBHOOK_SIGNING_SECRET="$(cat /run/secrets/STRIPE_WEBHOOK_SIGNING_SECRET)" \
-    mix assets.deploy
+RUN mix assets.deploy
 
 # Compile the release
-RUN --mount=type=secret,id=STRIPE_API_KEY \
-    --mount=type=secret,id=STRIPE_WEBHOOK_SIGNING_SECRET \
-    STRIPE_API_KEY="$(cat /run/secrets/STRIPE_API_KEY)" \
-    STRIPE_WEBHOOK_SIGNING_SECRET="$(cat /run/secrets/STRIPE_WEBHOOK_SIGNING_SECRET)" \
-    mix compile
+RUN mix compile
 
 # Changes to config/runtime.exs don't require recompiling the code
 COPY config/runtime.exs config/
 
 COPY rel rel
-RUN --mount=type=secret,id=STRIPE_API_KEY \
-    --mount=type=secret,id=STRIPE_WEBHOOK_SIGNING_SECRET \
-    STRIPE_API_KEY="$(cat /run/secrets/STRIPE_API_KEY)" \
-    STRIPE_WEBHOOK_SIGNING_SECRET="$(cat /run/secrets/STRIPE_WEBHOOK_SIGNING_SECRET)" \
-    mix release
+RUN mix release
 
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
