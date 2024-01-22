@@ -757,7 +757,7 @@ defmodule PlazaWeb.MyStoreLive do
 
     ~H"""
     <div class="has-font-3" style="position: relative; top: 50px;">
-      <div style="width: 377px; height: 377px; overflow: hidden; border: 1px solid grey;">
+      <div style="width: 377px; height: 377px; overflow: hidden; border-bottom: 1px solid grey;">
         <div
           :if={!@seller.profile_photo_url}
           style="display: flex; justify-content: center; height: 100%; text-decoration: underline; text-align: center; font-size: 22px;"

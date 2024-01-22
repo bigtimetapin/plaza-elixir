@@ -261,7 +261,7 @@ defmodule PlazaWeb.ArtistLive do
 
     ~H"""
     <div class="has-font-3" style="position: relative; top: 50px;">
-      <div style="width: 377px; height: 377px; overflow: hidden; border: 1px solid grey;">
+      <div style="width: 377px; height: 377px; overflow: hidden; border-bottom: 1px solid grey;">
         <img
           src={if @seller.profile_photo_url, do: @seller.profile_photo_url, else: "png/pep.png"}
           style="min-width: 100%; min-height: 100%;"
