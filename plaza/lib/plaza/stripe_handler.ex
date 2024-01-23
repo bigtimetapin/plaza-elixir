@@ -32,13 +32,11 @@ defmodule Plaza.StripeHandler do
         fn %{
              "user_id" => user_id,
              "total_price" => total_price,
-             "total_quantity" => total_quantity
+             "total_platform_fee" => total_platform_fee
            } = params ->
-          # 50 * 100 cents
-          platform_fee = 5000
-
           amount =
-            Product.price_unit_amount(%{price: total_price}) - platform_fee * total_quantity
+            Product.price_unit_amount(%{price: total_price}) -
+              Product.price_unit_amount(%{price: total_platform_fee})
 
           seller = Accounts.get_seller_by_id(user_id)
 

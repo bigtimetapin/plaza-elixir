@@ -70,6 +70,7 @@ defmodule PlazaWeb.UploadLive do
                     user_id: user_id,
                     user_name: user_name,
                     price: 75.0,
+                    internal_expense: 46.9,
                     designs: %Designs{
                       display: 0
                     },
@@ -326,10 +327,13 @@ defmodule PlazaWeb.UploadLive do
           end
       end
 
+    data = socket.assigns.product_form.data
+
     changes =
       Product.changeset_price(
-        socket.assigns.product_form.data,
-        price_attr
+        data,
+        price_attr,
+        data.internal_expense
       )
       |> Changeset.apply_action(:update)
 
@@ -405,6 +409,35 @@ defmodule PlazaWeb.UploadLive do
   end
 
   def handle_event("front-upload-change", file_name, socket) do
+    back = socket.assigns.back_local_upload
+
+    socket =
+      case back do
+        nil ->
+          socket
+
+        _ ->
+          data = socket.assigns.product_form.data
+
+          {:ok, product} =
+            Product.changeset_internal_expense(
+              data,
+              %{"internal_expense" => 64.9}
+            )
+            |> Changeset.apply_action(:update)
+
+          form =
+            Product.changeset(
+              product,
+              %{}
+            )
+            |> Map.put(:action, :validate)
+            |> to_form
+
+          socket
+          |> assign(product_form: form)
+      end
+
     socket =
       socket
       |> assign(front_local_upload: file_name)
@@ -413,6 +446,35 @@ defmodule PlazaWeb.UploadLive do
   end
 
   def handle_event("back-upload-change", file_name, socket) do
+    front = socket.assigns.front_local_upload
+
+    socket =
+      case front do
+        nil ->
+          socket
+
+        _ ->
+          data = socket.assigns.product_form.data
+
+          {:ok, product} =
+            Product.changeset_internal_expense(
+              data,
+              %{"internal_expense" => 64.9}
+            )
+            |> Changeset.apply_action(:update)
+
+          form =
+            Product.changeset(
+              product,
+              %{}
+            )
+            |> Map.put(:action, :validate)
+            |> to_form
+
+          socket
+          |> assign(product_form: form)
+      end
+
     socket =
       socket
       |> assign(back_local_upload: file_name)
@@ -421,8 +483,26 @@ defmodule PlazaWeb.UploadLive do
   end
 
   def handle_event("front-upload-cancel", _, socket) do
+    data = socket.assigns.product_form.data
+
+    {:ok, product} =
+      Product.changeset_internal_expense(
+        data,
+        %{"internal_expense" => 46.9}
+      )
+      |> Changeset.apply_action(:update)
+
+    form =
+      Product.changeset(
+        product,
+        %{}
+      )
+      |> Map.put(:action, :validate)
+      |> to_form
+
     socket =
       socket
+      |> assign(product_form: form)
       |> assign(front_local_upload: nil)
       |> assign(:uuid, UUID.uuid1())
       |> push_event("front-upload-cancel", %{})
@@ -431,8 +511,26 @@ defmodule PlazaWeb.UploadLive do
   end
 
   def handle_event("back-upload-cancel", _, socket) do
+    data = socket.assigns.product_form.data
+
+    {:ok, product} =
+      Product.changeset_internal_expense(
+        data,
+        %{"internal_expense" => 46.9}
+      )
+      |> Changeset.apply_action(:update)
+
+    form =
+      Product.changeset(
+        product,
+        %{}
+      )
+      |> Map.put(:action, :validate)
+      |> to_form
+
     socket =
       socket
+      |> assign(product_form: form)
       |> assign(back_local_upload: nil)
       |> assign(:uuid, UUID.uuid1())
       |> push_event("back-upload-cancel", %{})
@@ -846,36 +944,41 @@ defmodule PlazaWeb.UploadLive do
                   field={@product_form[:description]}
                   type="textarea"
                   placeholder="*Descrição"
-                  style="color: #707070; font-size: 28px; text-decoration-line: underline; border: none; width: 500px; height: 250px;"
+                  style="color: #707070; font-size: 28px; text-decoration-line: underline; border: none; width: 500px; height: 250px; max-height: 250px;"
                   class="has-font-3"
                   phx-debounce="500"
                 >
                 </.input>
               </div>
             </div>
-            <div style="display: inline-block; position: absolute;">
-              <div style="position: relative; left: 10px; width: 750px;">
-                <div>
-                  Defina o preço final de venda:
-                </div>
-                <div style="position: relative; bottom: 98px; left: 370px;">
-                  <div style="position: absolute;">
-                    <div style="position: relative; top: 26px; left: 17px; background-color: #F8FC5F; width: 20px; z-index: 99;">
-                      R$
-                    </div>
+            <div style="display: inline-block; position: absolute; width: 500px; height: 675px;">
+              <div style="display: flex; flex-direction: column; height: 100%; position: relative; right: 165px;">
+                <div style="margin-top: auto;">
+                  <div>
+                    Defina o preço final de venda:
                   </div>
-                  <.input
-                    field={@product_form[:price]}
-                    value={@product_form.data.price}
-                    type="number"
-                    phx-change="change-product-price"
-                    class="has-font-3"
-                    style="font-size: 34px; border: 1px solid gray; background-color: #F8FC5F; width: 150px; height: 100px; border-radius: 50px; padding-left: 50px;"
-                  >
-                  </.input>
-                </div>
-                <div style="position: relative; bottom: 50px;">
-                  Se vender 30 unidades seu lucro será: R$<%= (@product_form.data.price - 50) * 30 %>
+                  <div style="position: relative; bottom: 98px; left: 370px;">
+                    <div style="position: absolute;">
+                      <div style="position: relative; top: 26px; left: 17px; background-color: #F8FC5F; width: 20px; z-index: 99;">
+                        R$
+                      </div>
+                    </div>
+                    <.input
+                      field={@product_form[:price]}
+                      value={@product_form.data.price}
+                      type="number"
+                      phx-change="change-product-price"
+                      class="has-font-3"
+                      style="font-size: 34px; border: 1px solid gray; background-color: #F8FC5F; width: 150px; height: 100px; border-radius: 50px; padding-left: 50px;"
+                    >
+                    </.input>
+                  </div>
+                  <div style="position: relative; bottom: 50px;">
+                    Se vender 30 unidades seu lucro será: R$<%= ((@product_form.data.price -
+                                                                    @product_form.data.internal_expense) *
+                                                                   30)
+                    |> Float.round(2) %>
+                  </div>
                 </div>
               </div>
             </div>

@@ -10,6 +10,7 @@ defmodule Plaza.Products.Product do
     field :user_name, :string
     field :name, :string
     field :price, :float
+    field :internal_expense, :float
     field :description, :string
     field :designs, EctoDesigns
     field :mocks, EctoMocks
@@ -32,6 +33,7 @@ defmodule Plaza.Products.Product do
       :user_name,
       :name,
       :price,
+      :internal_expense,
       :description,
       :designs,
       :mocks,
@@ -45,6 +47,7 @@ defmodule Plaza.Products.Product do
       :user_name,
       :name,
       :price,
+      :internal_expense,
       :description,
       :designs,
       :mocks,
@@ -61,7 +64,17 @@ defmodule Plaza.Products.Product do
     |> validate_number(:price, greater_than_or_equal_to: 50)
   end
 
-  def changeset_price(product, attrs) do
+  def changeset_internal_expense(product, attrs) do
+    product
+    |> cast(attrs, [
+      :internal_expense
+    ])
+    |> validate_required([
+      :internal_expense
+    ])
+  end
+
+  def changeset_price(product, attrs, internal_expense) do
     product
     |> cast(attrs, [
       :price
@@ -69,7 +82,7 @@ defmodule Plaza.Products.Product do
     |> validate_required([
       :price
     ])
-    |> validate_number(:price, greater_than_or_equal_to: 50)
+    |> validate_number(:price, greater_than_or_equal_to: internal_expense)
   end
 
   def changeset_name_and_description(product, attrs) do

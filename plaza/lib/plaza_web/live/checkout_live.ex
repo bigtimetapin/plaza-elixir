@@ -476,7 +476,8 @@ defmodule PlazaWeb.CheckoutLive do
               user_id: item.product.user_id,
               size: item.size,
               quantity: item.quantity,
-              price: item.product.price
+              price: item.product.price,
+              internal_expense: item.produce.internal_expense
             }
           end
         )
@@ -489,6 +490,7 @@ defmodule PlazaWeb.CheckoutLive do
                 user_id: item.user_id,
                 total_price: item.price * item.quantity,
                 total_quantity: item.quantity,
+                total_platform_fee: item.internal_expense * item.quantity,
                 paid: false
               }
 
@@ -498,7 +500,9 @@ defmodule PlazaWeb.CheckoutLive do
               new = %{
                 found
                 | total_price: found.total_price + item.price * item.quantity,
-                  total_quantity: found.total_quantity + item.quantity
+                  total_quantity: found.total_quantity + item.quantity,
+                  total_platform_fee:
+                    found.total_platform_fee + item.internal_expense * item.quantity
               }
 
               acc = List.replace_at(acc, index, new)

@@ -7,6 +7,7 @@ defmodule Plaza.Repo.Migrations.AddProductsTable do
       add :user_name, :string, null: false
       add :name, :string, null: false
       add :price, :float, null: false
+      add :internal_expense, :float, null: false
       add :description, :string, size: 140, null: false
       add :designs, :map, null: false
       add :mocks, :map, null: false
