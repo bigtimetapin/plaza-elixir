@@ -478,22 +478,29 @@ defmodule PlazaWeb.Header do
     ~H"""
     <div>
       <nav :if={!@open} class="is-navbar-mobile-closed">
-        <div style="display: flex; justify-content: center;">
-          <div style="display: flex; flex-direction: column; align-items: center;">
-            <div class="has-font-3" style="font-size: 60px; margin-bottom: 29px;">plazaaaaa</div>
-            <button class="has-font-3" style="width: 110px;" phx-click="open-mobile-header">
-              <img src="/svg/yellow-ellipse.svg" />
-              <div class="has-font-3" style="position: relative; bottom: 53px; font-size: 30px;">
-                menu
-              </div>
-            </button>
+        <div style="display: flex;">
+          <div class="has-font-3" style="font-size: 60px; margin-right: auto; margin-left: 25px;">
+            plazaaaaa
+          </div>
+          <div style="margin-left: auto; margin-right: 25px;">
+            <div style="margin-top: 25px;">
+              <button class="has-font-3" style="width: 110px;" phx-click="open-mobile-header">
+                <img src="/svg/yellow-ellipse.svg" />
+                <div class="has-font-3" style="position: relative; bottom: 53px; font-size: 30px;">
+                  menu
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </nav>
-      <nav :if={@open} class="is-navbar-mobile-open">
+      <nav
+        :if={@open}
+        class="is-navbar-mobile-open"
+        style="background: #F8FC5F; position: fixed; top: 0; left: 0; bottom: 0; right: 0;"
+      >
         <div style="display: flex; justify-content: center; padding-top: 100px; padding-bottom: 250px;">
           <div style="display: flex; flex-direction: column; align-items: center;">
-            <div class="has-font-3" style="font-size: 60px;">plazaaaaa</div>
             <div style="margin-top: 100px;">
               <%= render_slot(@landing) %>
             </div>
@@ -566,13 +573,8 @@ defmodule PlazaWeb.Header do
   defp landing_href_selected_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/">
-      <div style="display: flex; align-items: center;">
-        <div class="has-font-3" style="font-size: 32px;">
-          loja
-        </div>
-        <div style="margin-left: 10px;">
-          <img src="/svg/yellow-circle.svg" />
-        </div>
+      <div class="has-font-3" style="font-size: 32px; text-decoration: underline;">
+        plazaaaaa
       </div>
     </.link>
     """
@@ -581,8 +583,8 @@ defmodule PlazaWeb.Header do
   defp landing_href_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/">
-      <div class="has-font-3" style="font-size: 32px;">
-        loja
+      <div class="has-font-3" style="font-size: 32px; text-decoration: underline;">
+        plazaaaaa
       </div>
     </.link>
     """
@@ -591,7 +593,7 @@ defmodule PlazaWeb.Header do
   defp login_href_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/users/log_in">
-      <div class="has-font-3" style="font-size: 32px;">
+      <div class="has-font-3" style="font-size: 32px; text-decoration: underline;">
         log in
       </div>
     </.link>
@@ -601,13 +603,8 @@ defmodule PlazaWeb.Header do
   defp login_href_selected_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/users/log_in">
-      <div style="display: flex; align-items: center;">
-        <div class="has-font-3" style="font-size: 32px;">
-          log in
-        </div>
-        <div style="margin-left: 10px;">
-          <img src="/svg/yellow-circle.svg" />
-        </div>
+      <div class="has-font-3" style="font-size: 32px; text-decoration: underline;">
+        log in
       </div>
     </.link>
     """
@@ -616,7 +613,7 @@ defmodule PlazaWeb.Header do
   defp checkout_href_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/checkout">
-      <div class="has-font-3" style="font-size: 32px;">
+      <div class="has-font-3" style="font-size: 32px; text-decoration: underline;">
         carrinho
       </div>
     </.link>
@@ -626,13 +623,8 @@ defmodule PlazaWeb.Header do
   defp checkout_href_selected_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/checkout">
-      <div style="display: flex; align-items: center;">
-        <div class="has-font-3" style="font-size: 32px;">
-          carrinho
-        </div>
-        <div style="margin-left: 10px;">
-          <img src="/svg/yellow-circle.svg" />
-        </div>
+      <div class="has-font-3" style="font-size: 32px; text-decoration: underline;">
+        carrinho
       </div>
     </.link>
     """
@@ -641,7 +633,7 @@ defmodule PlazaWeb.Header do
   defp no_store_yet_href_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/upload">
-      <div class="has-font-3" style="font-size: 32px;">
+      <div class="has-font-3" style="font-size: 32px; text-decoration: underline;">
         quero vender
       </div>
     </.link>
@@ -651,13 +643,8 @@ defmodule PlazaWeb.Header do
   defp no_store_yet_href_selected_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/upload">
-      <div style="display: flex; align-items: center;">
-        <div class="has-font-3" style="font-size: 32px;">
-          quero vender
-        </div>
-        <div style="margin-left: 10px;">
-          <img src="/svg/yellow-circle.svg" />
-        </div>
+      <div class="has-font-3" style="font-size: 32px; text-decoration: underline;">
+        quero vender
       </div>
     </.link>
     """
@@ -666,8 +653,8 @@ defmodule PlazaWeb.Header do
   defp my_account_href_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/my-account">
-      <div class="has-font-3" style="font-size: 32px;">
-        conta
+      <div class="has-font-3" style="font-size: 32px; text-decoration: underline;">
+        minha conta
       </div>
     </.link>
     """
@@ -676,13 +663,8 @@ defmodule PlazaWeb.Header do
   defp my_account_href_selected_mobile(assigns) do
     ~H"""
     <.link phx-click="close-mobile-header" navigate="/my-account">
-      <div style="display: flex; align-items: center;">
-        <div class="has-font-3" style="font-size: 32px;">
-          conta
-        </div>
-        <div style="margin-left: 10px;">
-          <img src="/svg/yellow-circle.svg" />
-        </div>
+      <div class="has-font-3" style="font-size: 32px; text-decoration: underline;">
+        minha conta
       </div>
     </.link>
     """
