@@ -14,7 +14,6 @@ defmodule PlazaWeb.ProductLive do
   alias Plaza.Purchases
   alias PlazaWeb.ProductComponent
 
-  @site System.get_env("PHX_HOST") || "http://localhost:4000"
   @local_storage_key "plaza-checkout-cart"
 
   @impl Phoenix.LiveView

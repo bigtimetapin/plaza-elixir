@@ -40,3 +40,6 @@ npm-debug.log
 
 # css build
 /assets/css/custom.css
+
+# .env vars
+.env.prod

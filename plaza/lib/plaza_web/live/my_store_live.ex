@@ -14,7 +14,6 @@ defmodule PlazaWeb.MyStoreLive do
 
   alias ExAws.S3
 
-  @site System.get_env("PHX_HOST") || "http://localhost:4000"
   @local_storage_key "plaza-product-form"
 
   @aws_s3_region "us-west-2"
@@ -321,8 +320,10 @@ defmodule PlazaWeb.MyStoreLive do
       {:ok, %Stripe.AccountLink{url: stripe_account_link_url}} =
         Stripe.AccountLink.create(%{
           account: stripe_id,
-          refresh_url: "#{@site}/my-store?stripe-setup-refresh=#{stripe_id}",
-          return_url: "#{@site}/my-store?stripe-setup-return=#{stripe_id}",
+          refresh_url:
+            "#{Application.get_env(:plaza, :app_url)}/my-store?stripe-setup-refresh=#{stripe_id}",
+          return_url:
+            "#{Application.get_env(:plaza, :app_url)}/my-store?stripe-setup-return=#{stripe_id}",
           type: :account_onboarding
         })
 
@@ -344,8 +345,10 @@ defmodule PlazaWeb.MyStoreLive do
           {:ok, %Stripe.AccountLink{url: stripe_account_link_url}} =
             Stripe.AccountLink.create(%{
               account: stripe_id,
-              refresh_url: "#{@site}/my-store?stripe-setup-refresh=#{stripe_id}",
-              return_url: "#{@site}/my-store?stripe-setup-return=#{stripe_id}",
+              refresh_url:
+                "#{Application.get_env(:plaza, :app_url)}/my-store?stripe-setup-refresh=#{stripe_id}",
+              return_url:
+                "#{Application.get_env(:plaza, :app_url)}/my-store?stripe-setup-return=#{stripe_id}",
               type: :account_onboarding
             })
 

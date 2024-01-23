@@ -11,10 +11,7 @@ defmodule PlazaWeb.CheckoutLive do
   alias Plaza.Products.Product
   alias Plaza.Purchases
 
-  @site System.get_env("PHX_HOST") || "http://localhost:4000"
-
   @local_storage_key "plaza-checkout-cart"
-
   @sku_map %{
     "white-p" => "010101110108",
     "white-m" => "010101110109",
@@ -568,7 +565,7 @@ defmodule PlazaWeb.CheckoutLive do
             Stripe.Product.create(%{
               images: [mock_url],
               name: product.name,
-              url: "#{@site}/product?product_id=#{product.id}",
+              url: "#{Application.get_env(:plaza, :app_url)}/product?product_id=#{product.id}",
               default_price_data: %{
                 unit_amount: Product.price_unit_amount(product),
                 currency: "brl"
@@ -621,8 +618,9 @@ defmodule PlazaWeb.CheckoutLive do
             }
           ],
           customer_email: email,
-          success_url: "#{@site}/checkout?#{success_query_params}",
-          cancel_url: "#{@site}/checkout?#{cancel_query_params}"
+          success_url:
+            "#{Application.get_env(:plaza, :app_url)}/checkout?#{success_query_params}",
+          cancel_url: "#{Application.get_env(:plaza, :app_url)}/checkout?#{cancel_query_params}"
         })
 
       IO.inspect(stripe_session)

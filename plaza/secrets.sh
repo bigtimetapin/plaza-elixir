@@ -1,7 +1,10 @@
 #!/bin/sh
 
+## source env
+. ./.env.prod
+## deploy env
 fly secrets set \
-	PHX_HOST="plazaaaaa.com" \
+	PHX_HOST="$PHX_HOST" \
 	DIMONA_API_KEY="$DIMONA_API_KEY" \
 	AWS_ACCESS_KEY_ID_PLAZA="$AWS_ACCESS_KEY_ID_PLAZA" \
 	AWS_SECRET_ACCESS_KEY_PLAZA="$AWS_SECRET_ACCESS_KEY_PLAZA" \

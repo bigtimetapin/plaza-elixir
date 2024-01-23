@@ -112,4 +112,5 @@ if config_env() == :prod do
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`. 
+  config :plaza, app_url: "https://plazaaaaa.com"
 end
