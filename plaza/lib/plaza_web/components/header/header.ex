@@ -339,7 +339,7 @@ defmodule PlazaWeb.Header do
 
   defp landing_desktop(assigns) do
     ~H"""
-    <.left_desktop selected={true}>
+    <.left_desktop>
       <:right>
         <div class="level-item pr-xmedium">
           <%= render_slot(@login) %>
@@ -360,7 +360,7 @@ defmodule PlazaWeb.Header do
 
   defp checkout_desktop(assigns) do
     ~H"""
-    <.left_desktop selected={false}>
+    <.left_desktop>
       <:right>
         <div class="level-item pr-xmedium">
           <%= render_slot(@login) %>
@@ -431,7 +431,6 @@ defmodule PlazaWeb.Header do
     """
   end
 
-  attr :selected, :boolean, default: false
   attr :header, :atom, required: true
   slot :right, required: true
 
@@ -441,27 +440,11 @@ defmodule PlazaWeb.Header do
       <div class="is-navbar is-navbar-desktop">
         <nav class="level" style="position: relative; top: 20px; margin-left: 50px">
           <div class="level-left">
-            <div class="level-item pr-large">
-              <div class="is-size-1-desktop is-size-2-touch">plazaaaaa</div>
-            </div>
-            <div class="level-item pr-xmedium">
-              <div class="is-size-5" style="position: relative; top: 11px;">
-                <.link :if={@selected} navigate="/">
-                  loja
-                  <div style="position: absolute;">
-                    <div style="position: relative; left: 2px;">
-                      <img src="/svg/yellow-circle.svg" />
-                    </div>
-                  </div>
-                </.link>
-                <.link :if={!@selected} navigate="/">
-                  loja
-                </.link>
-              </div>
-            </div>
             <div class="level-item">
-              <div class="is-size-5" style="position: relative; top: 11px;">
-                <div class="has-dark-gray-text">buscar</div>
+              <div style="font-size: 72px;">
+                <.link navigate="/">
+                  plazaaaaa
+                </.link>
               </div>
             </div>
           </div>
