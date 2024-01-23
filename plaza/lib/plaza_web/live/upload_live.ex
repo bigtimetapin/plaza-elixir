@@ -69,6 +69,7 @@ defmodule PlazaWeb.UploadLive do
                   %Product{
                     user_id: user_id,
                     user_name: user_name,
+                    product_type: "camiseta-classic-branco",
                     price: 75.0,
                     internal_expense: 46.9,
                     designs: %Designs{

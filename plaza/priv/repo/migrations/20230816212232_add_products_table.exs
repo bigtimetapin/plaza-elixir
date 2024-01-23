@@ -5,6 +5,7 @@ defmodule Plaza.Repo.Migrations.AddProductsTable do
     create table(:products) do
       add :user_id, references(:users, on_delete: :delete_all), null: false
       add :user_name, :string, null: false
+      add :product_type, :string, null: false
       add :name, :string, null: false
       add :price, :float, null: false
       add :internal_expense, :float, null: false
