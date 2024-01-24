@@ -397,15 +397,41 @@ defmodule PlazaWeb.CheckoutLive do
     {:noreply, socket}
   end
 
-  def handle_event("change-name-form", %{"name-form" => %{"name" => name}}, socket) do
+  def handle_event("change-name-form", %{"name-form" => %{"name" => name} = attrs}, socket) do
+    data = socket.assigns.name_form.data
+    IO.inspect(data)
+
+    changes =
+      {data, %{name: :string}}
+      |> Changeset.cast(%{name: name}, [:name])
+      |> Changeset.validate_required([:name])
+      |> Changeset.apply_action(:update)
+
+    form =
+      case changes do
+        {:error, changeset} ->
+          changeset |> to_form(as: "name-form")
+
+        {:ok, _} ->
+          {%{name: name}, %{name: :string}}
+          |> Changeset.cast(%{}, [])
+          |> Map.put(:action, :validation)
+          |> to_form(as: "name-form")
+      end
+
     socket =
       socket
       |> assign(name: name)
+      |> assign(name_form: form)
 
     {:noreply, socket}
   end
 
-  def handle_event("change-address-form", %{"address" => %{"postal_code" => postal_code}}, socket) do
+  def handle_event(
+        "change-postal-code",
+        %{"address" => %{"postal_code" => postal_code} = attrs},
+        socket
+      ) do
     IO.inspect(postal_code)
     attrs = %{"postal_code" => postal_code}
     address = socket.assigns.address_form.data
@@ -421,7 +447,7 @@ defmodule PlazaWeb.CheckoutLive do
       case changes do
         {:error, changeset} ->
           socket
-          |> assign(address_form: changeset |> to_form)
+          |> assign(address_form: changeset |> to_form())
           |> assign(delivery_methods_error: false)
           |> assign(delivery_methods: nil)
           |> assign(delivery_method: nil)
@@ -438,7 +464,7 @@ defmodule PlazaWeb.CheckoutLive do
           end)
 
           address_form =
-            Address.changeset(
+            Address.changeset_postal_code(
               address,
               %{}
             )
@@ -453,8 +479,36 @@ defmodule PlazaWeb.CheckoutLive do
     {:noreply, socket}
   end
 
-  def handle_event("change-address-form", params, socket) do
-    IO.inspect(params)
+  def handle_event("change-address-form", %{"address" => attrs}, socket) do
+    address = socket.assigns.address_form.data
+    IO.inspect(address)
+    IO.inspect(attrs)
+
+    changes =
+      Address.changeset_no_postal_code(
+        address,
+        attrs
+      )
+      |> Changeset.apply_action(:update)
+
+    form =
+      case changes do
+        {:error, changeset} ->
+          changeset |> to_form()
+
+        {:ok, address} ->
+          Address.changeset(
+            address,
+            %{}
+          )
+          |> Map.put(:action, :validation)
+          |> to_form()
+      end
+
+    socket =
+      socket
+      |> assign(address_form: form)
+
     {:noreply, socket}
   end
 
@@ -1146,6 +1200,7 @@ defmodule PlazaWeb.CheckoutLive do
               >
               </.input>
               <.input
+                phx-change="change-postal-code"
                 field={@address_form[:postal_code]}
                 type="text"
                 placeholder="cep"

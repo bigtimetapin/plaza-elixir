@@ -32,6 +32,22 @@ defmodule Plaza.Accounts.Address do
     |> validate_length(:country, min: 2, max: 2)
   end
 
+  def changeset_no_postal_code(address, attrs) do
+    address
+    |> cast(attrs, [
+      :user_id,
+      :line1,
+      :line2,
+      :city,
+      :state,
+      :country
+    ])
+    |> validate_required([
+      :line1
+    ])
+    |> validate_length(:country, min: 2, max: 2)
+  end
+
   def changeset_postal_code(address, attrs) do
     address
     |> cast(attrs, [
