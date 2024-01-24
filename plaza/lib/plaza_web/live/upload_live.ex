@@ -285,6 +285,10 @@ defmodule PlazaWeb.UploadLive do
     {:noreply, socket}
   end
 
+  def handle_event("submit-product-form", _, socket) do
+    {:noreply, socket}
+  end
+
   def handle_event("change-product-form", %{"product" => product}, socket) do
     changes =
       Product.changeset_name_and_description(
@@ -911,22 +915,6 @@ defmodule PlazaWeb.UploadLive do
       </div>
       <div style="display: inline-block; position: absolute;">
         <div style="position: relative; left: 50px; top: 50px;">
-          <div style="position: absolute;">
-            <div
-              :if={
-                @product_form.data.name && @product_form.data.description &&
-                  @product_form.data.price
-              }
-              style="position: relative; top: 450px; left: 550px;"
-            >
-              <button phx-click="step" phx-value-step="8">
-                <img src="svg/yellow-ellipse.svg" />
-                <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
-                  Próximo
-                </div>
-              </button>
-            </div>
-          </div>
           <.form for={@product_form} phx-change="change-product-form" phx-submit="submit-product-form">
             <div style="display: inline-block;">
               <div>
@@ -952,7 +940,7 @@ defmodule PlazaWeb.UploadLive do
                 </.input>
               </div>
             </div>
-            <div style="display: inline-block; position: absolute; width: 500px; height: 675px;">
+            <div style="display: inline-block; position: absolute; width: 500px; height: 800px;">
               <div style="display: flex; flex-direction: column; height: 100%; position: relative; right: 165px;">
                 <div style="margin-top: auto;">
                   <div>
@@ -979,6 +967,19 @@ defmodule PlazaWeb.UploadLive do
                                                                     @product_form.data.internal_expense) *
                                                                    30)
                     |> Float.round(2) %>
+                  </div>
+                  <div style="width: 300px; height: 150px;" }>
+                    <div :if={
+                      @product_form.data.name && @product_form.data.description &&
+                        @product_form.data.price
+                    }>
+                      <button phx-click="step" phx-value-step="8">
+                        <img src="svg/yellow-ellipse.svg" />
+                        <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
+                          Próximo
+                        </div>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
