@@ -550,7 +550,7 @@ defmodule PlazaWeb.CheckoutLive do
         socket
       ) do
     {price, _} = Float.parse(price)
-    price = (price * 100) |> Kernel.round()
+    price = price |> Kernel.round()
 
     socket =
       socket
@@ -810,12 +810,7 @@ defmodule PlazaWeb.CheckoutLive do
               all =
                 many
                 |> Enum.map(fn opt ->
-                  %{
-                    opt
-                    | delivery_method_id:
-                        opt.delivery_method_id
-                        |> Integer.to_string()
-                  }
+                  normalize_delivery_method(opt)
                 end)
 
               {:ok, head, all}
@@ -1160,10 +1155,6 @@ defmodule PlazaWeb.CheckoutLive do
   end
 
   def render(%{step: 2} = assigns) do
-    IO.inspect(assigns.name_form_valid)
-    IO.inspect(assigns.address_form.source.valid?)
-    IO.inspect(assigns.name_form_valid && assigns.address_form.source.valid?)
-
     ~H"""
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 400px;">
       <div style="display: flex; justify-content: center;">
@@ -1242,28 +1233,6 @@ defmodule PlazaWeb.CheckoutLive do
               error={@delivery_methods_error}
               waiting={@delivery_methods_waiting}
             />
-          </div>
-        </div>
-      </div>
-    </div>
-    """
-  end
-
-  def render(%{step: 4} = assigns) do
-    ~H"""
-    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
-      <div style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column; position: relative; top: 150px;">
-          <div>
-            <%= "#{@delivery_method.name}: R$ #{@delivery_method.price / 100.0}" %>
-          </div>
-          <div>
-            <button phx-click="checkout">
-              <img src="svg/yellow-ellipse.svg" />
-              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                Checkout
-              </div>
-            </button>
           </div>
         </div>
       </div>
@@ -1354,21 +1323,21 @@ defmodule PlazaWeb.CheckoutLive do
             :for={option <- options}
             style="display: flex;"
             phx-click="select-delivery-method"
-            phx-value-id={option.delivery_method_id}
-            phx-value-price={option.value}
+            phx-value-id={option.id}
+            phx-value-price={option.price}
             phx-value-name={option.name}
-            phx-value-days={option.business_days}
+            phx-value-days={option.days}
           >
             <img
               src={
-                if option.delivery_method_id == selected.id,
+                if option.id == selected.id,
                   do: "/svg/yellow-circle.svg",
                   else: "/svg/white-circle.svg"
               }
               style="width: 30px;"
             />
             <div style="font-size: 24px; margin-left: 5px; margin-bottom: 10px;">
-              <%= "#{option.name} #{option.business_days} #{option.value}" %>
+              <%= "#{option.name} #{option.days} Dias Úteis R$#{(option.price / 100) |> Float.to_string() |> String.replace(".", ",")}" %>
             </div>
           </button>
         </div>
