@@ -89,6 +89,7 @@ defmodule PlazaWeb.CheckoutLive do
               )
           )
           |> assign(delivery_methods_error: false)
+          |> assign(delivery_methods_waiting: false)
           |> assign(delivery_methods: nil)
           |> assign(delivery_method: nil)
           |> assign(
@@ -446,6 +447,7 @@ defmodule PlazaWeb.CheckoutLive do
 
           socket
           |> assign(address_form: address_form)
+          |> assign(delivery_methods_waiting: true)
       end
 
     {:noreply, socket}
@@ -772,6 +774,10 @@ defmodule PlazaWeb.CheckoutLive do
           |> assign(delivery_method: head)
           |> assign(delivery_methods_error: false)
       end
+
+    socket =
+      socket
+      |> assign(delivery_methods_waiting: false)
 
     {:noreply, socket}
   end
@@ -1102,7 +1108,7 @@ defmodule PlazaWeb.CheckoutLive do
           <div style="align-self: center; font-size: 22px;">
             coloque o endereço para entrega do seu pedido
           </div>
-          <div style="margin-bottom: 50px;">
+          <div style="margin-bottom: 50px; align-self: center;">
             <.form for={@name_form} phx-change="change-name-form">
               <.input
                 field={@name_form[:name]}
@@ -1115,7 +1121,7 @@ defmodule PlazaWeb.CheckoutLive do
               </.input>
             </.form>
           </div>
-          <div>
+          <div style="align-self: center;">
             <.form
               for={@address_form}
               phx-change="change-address-form"
@@ -1159,11 +1165,12 @@ defmodule PlazaWeb.CheckoutLive do
               </div>
             </.form>
           </div>
-          <div>
+          <div style="align-self: center;">
             <.delivery_method_form
               options={@delivery_methods}
               selected={@delivery_method}
               error={@delivery_methods_error}
+              waiting={@delivery_methods_waiting}
             />
           </div>
         </div>
@@ -1218,6 +1225,19 @@ defmodule PlazaWeb.CheckoutLive do
         <div style="font-size: 30px; margin-top: 10px;">
           Ficou alguma dúvida? clique aqui
         </div>
+      </div>
+    </div>
+    """
+  end
+
+  defp delivery_method_form(%{waiting: true} = assigns) do
+    ~H"""
+    <div style="text-align: center;">
+      <div style="font-size: 28px;">
+        Opções de frete:
+      </div>
+      <div style="width: 500px;">
+        <img src="gif/loading.gif" />
       </div>
     </div>
     """
