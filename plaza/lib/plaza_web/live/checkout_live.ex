@@ -88,6 +88,9 @@ defmodule PlazaWeb.CheckoutLive do
                 )
               )
           )
+          |> assign(delivery_methods_error: false)
+          |> assign(delivery_methods: nil)
+          |> assign(delivery_method: nil)
           |> assign(
             name_form:
               to_form(
@@ -401,7 +404,55 @@ defmodule PlazaWeb.CheckoutLive do
     {:noreply, socket}
   end
 
+  def handle_event("change-address-form", %{"address" => %{"postal_code" => postal_code}}, socket) do
+    IO.inspect(postal_code)
+    attrs = %{"postal_code" => postal_code}
+    address = socket.assigns.address_form.data
+
+    changes =
+      Address.changeset_postal_code(
+        address,
+        attrs
+      )
+      |> Changeset.apply_action(:update)
+
+    socket =
+      case changes do
+        {:error, changeset} ->
+          socket
+          |> assign(address_form: changeset |> to_form)
+          |> assign(delivery_methods_error: false)
+          |> assign(delivery_methods: nil)
+          |> assign(delivery_method: nil)
+
+        {:ok, address} ->
+          Task.async(fn ->
+            {
+              :shipping_quote,
+              Dimona.Requests.Shipping.post(%{
+                "zipcode" => address.postal_code,
+                "quantity" => 1
+              })
+            }
+          end)
+
+          address_form =
+            Address.changeset(
+              address,
+              %{}
+            )
+            |> Map.put(:action, :validate)
+            |> to_form()
+
+          socket
+          |> assign(address_form: address_form)
+      end
+
+    {:noreply, socket}
+  end
+
   def handle_event("change-address-form", params, socket) do
+    IO.inspect(params)
     {:noreply, socket}
   end
 
@@ -418,21 +469,12 @@ defmodule PlazaWeb.CheckoutLive do
         {:error, changeset} ->
           socket
           |> assign(address_form: changeset |> to_form)
+          |> assign(delivery_methods: nil)
+          |> assign(error: nil)
 
         {:ok, address} ->
-          Task.async(fn ->
-            {
-              :shipping_quote,
-              Dimona.Requests.Shipping.post(%{
-                "zipcode" => address.postal_code,
-                "quantity" => 1
-              })
-            }
-          end)
-
           socket
           |> assign(shipping_address: address)
-          |> assign(waiting: true)
       end
 
     {:noreply, socket}
@@ -456,7 +498,6 @@ defmodule PlazaWeb.CheckoutLive do
           days: days
         }
       )
-      |> assign(step: 4)
 
     {:noreply, socket}
   end
@@ -653,14 +694,6 @@ defmodule PlazaWeb.CheckoutLive do
     {:noreply, socket}
   end
 
-  def handle_event("step", %{"step" => "3"}, socket) do
-    socket =
-      socket
-      |> assign(step: 3)
-
-    {:noreply, socket}
-  end
-
   @impl Phoenix.LiveView
   def handle_info({ref, {:availability, product_id, value}}, socket) do
     Process.demonitor(ref, [:flush])
@@ -707,8 +740,21 @@ defmodule PlazaWeb.CheckoutLive do
             [] ->
               :error
 
-            nel ->
-              {:ok, nel}
+            [head | _] ->
+              head = normalize_delivery_method(head)
+
+              all =
+                many
+                |> Enum.map(fn opt ->
+                  %{
+                    opt
+                    | delivery_method_id:
+                        opt.delivery_method_id
+                        |> Integer.to_string()
+                  }
+                end)
+
+              {:ok, head, all}
           end
       end
 
@@ -716,21 +762,16 @@ defmodule PlazaWeb.CheckoutLive do
       case result do
         :error ->
           socket
-          |> assign(error: "unable to resolve cep, try again")
+          |> assign(delivery_methods_error: true)
           |> assign(delivery_methods: nil)
+          |> assign(delivery_method: nil)
 
-        {:ok, nel} ->
-          IO.inspect(nel)
-
+        {:ok, head, all} ->
           socket
-          |> assign(delivery_methods: nel)
-          |> assign(error: nil)
+          |> assign(delivery_methods: all)
+          |> assign(delivery_method: head)
+          |> assign(delivery_methods_error: false)
       end
-
-    socket =
-      socket
-      |> assign(step: 3)
-      |> assign(waiting: false)
 
     {:noreply, socket}
   end
@@ -1105,6 +1146,7 @@ defmodule PlazaWeb.CheckoutLive do
                 class="text-input-1"
                 autocomplete="shipping postal-code"
                 phx-debounce="500"
+                onKeypress="window.hyphen();"
               >
               </.input>
               <div style="display: flex; justify-content: center; margin-top: 50px;">
@@ -1117,50 +1159,13 @@ defmodule PlazaWeb.CheckoutLive do
               </div>
             </.form>
           </div>
-        </div>
-      </div>
-    </div>
-    """
-  end
-
-  def render(%{delivery_methods: nil, error: error} = assigns) do
-    ~H"""
-    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
-      <div style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column;">
           <div>
-            could not resolve your shipping address
+            <.delivery_method_form
+              options={@delivery_methods}
+              selected={@delivery_method}
+              error={@delivery_methods_error}
+            />
           </div>
-          <div>
-            <button phx-click="step" phx-value-step="2">
-              <img src="svg/yellow-ellipse.svg" />
-              <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                Try Again
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    """
-  end
-
-  def render(%{step: 3, delivery_methods: delivery_methods} = assigns) do
-    ~H"""
-    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
-      <div style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column; position: relative; top: 100px; left: 50px;">
-          <button
-            :for={opt <- delivery_methods}
-            phx-click="select-delivery-method"
-            phx-value-id={opt.delivery_method_id}
-            phx-value-price={opt.value}
-            phx-value-name={opt.name}
-            phx-value-days={opt.business_days}
-            style="margin-top: 15px;"
-          >
-            <%= "#{opt.name}: R$ #{opt.value} at #{opt.business_days} days" %>
-          </button>
         </div>
       </div>
     </div>
@@ -1216,5 +1221,81 @@ defmodule PlazaWeb.CheckoutLive do
       </div>
     </div>
     """
+  end
+
+  defp delivery_method_form(%{options: nil, error: false} = assigns) do
+    ~H"""
+    <div style="text-align: center;">
+      <div style="font-size: 28px;">
+        Opções de frete:
+      </div>
+      <div style="font-size: 22px; color: grey;">
+        Aguardando CEP
+      </div>
+    </div>
+    """
+  end
+
+  defp delivery_method_form(%{options: nil, error: true} = assigns) do
+    ~H"""
+    <div style="text-align: center;">
+      <div style="font-size: 28px;">
+        Opções de frete:
+      </div>
+      <div style="font-size: 22px; color: grey; text-decoration: underline;">
+        CEP INCORRETO
+      </div>
+      <div style="font-size: 22px; color: grey;">
+        Por favor revise os dados
+      </div>
+    </div>
+    """
+  end
+
+  defp delivery_method_form(%{options: options, error: false, selected: selected} = assigns) do
+    ~H"""
+    <div style="text-align: center;">
+      <div style="font-size: 32px; margin-bottom: 10px;">
+        Opções de frete:
+      </div>
+      <div style="display: flex; justify-content: center;">
+        <div>
+          <button
+            :for={option <- options}
+            style="display: flex;"
+            phx-click="select-delivery-method"
+            phx-value-id={option.delivery_method_id}
+            phx-value-price={option.value}
+            phx-value-name={option.name}
+            phx-value-days={option.business_days}
+          >
+            <img
+              src={
+                if option.delivery_method_id == selected.id,
+                  do: "/svg/yellow-circle.svg",
+                  else: "/svg/white-circle.svg"
+              }
+              style="width: 30px;"
+            />
+            <div style="font-size: 24px; margin-left: 5px; margin-bottom: 10px;">
+              <%= "#{option.name} #{option.business_days} #{option.value}" %>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  defp normalize_delivery_method(raw) do
+    {price, _} = Float.parse(raw.value)
+    price = (price * 100) |> Kernel.round()
+
+    %{
+      id: raw.delivery_method_id |> Integer.to_string(),
+      price: price,
+      name: raw.name,
+      days: raw.business_days
+    }
   end
 end

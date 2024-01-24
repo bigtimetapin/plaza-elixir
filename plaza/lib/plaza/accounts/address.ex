@@ -28,8 +28,19 @@ defmodule Plaza.Accounts.Address do
       :line1,
       :postal_code
     ])
-    |> validate_length(:postal_code, min: 5)
+    |> validate_length(:postal_code, is: 9)
     |> validate_length(:country, min: 2, max: 2)
+  end
+
+  def changeset_postal_code(address, attrs) do
+    address
+    |> cast(attrs, [
+      :postal_code
+    ])
+    |> validate_required([
+      :postal_code
+    ])
+    |> validate_length(:postal_code, is: 9)
   end
 
   def to_dimona_form(address) do
