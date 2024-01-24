@@ -19,7 +19,9 @@ defmodule Plaza.Application do
       # Start the Endpoint (http/https)
       PlazaWeb.Endpoint,
       # Start the Cron Scheduler 
-      Plaza.Scheduler
+      Plaza.Scheduler,
+      # Dynamic Task Supervisor 
+      {Task.Supervisor, name: Plaza.TaskSupervisor}
       # Start a worker by calling: Plaza.Worker.start_link(arg)
       # {Plaza.Worker, arg}
     ]
