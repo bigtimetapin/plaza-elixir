@@ -101,6 +101,7 @@ defmodule PlazaWeb.CheckoutLive do
                 as: "name-form"
               )
           )
+          |> assign(name_form_valid: false)
           |> assign(name: nil)
           |> assign(waiting: false)
           |> push_event(
@@ -399,7 +400,6 @@ defmodule PlazaWeb.CheckoutLive do
 
   def handle_event("change-name-form", %{"name-form" => %{"name" => name} = attrs}, socket) do
     data = socket.assigns.name_form.data
-    IO.inspect(data)
 
     changes =
       {data, %{name: :string}}
@@ -407,22 +407,30 @@ defmodule PlazaWeb.CheckoutLive do
       |> Changeset.validate_required([:name])
       |> Changeset.apply_action(:update)
 
-    form =
+    socket =
       case changes do
         {:error, changeset} ->
-          changeset |> to_form(as: "name-form")
+          form = changeset |> to_form(as: "name-form")
+
+          socket
+          |> assign(name_form: form)
+          |> assign(name_form_valid: false)
 
         {:ok, _} ->
-          {%{name: name}, %{name: :string}}
-          |> Changeset.cast(%{}, [])
-          |> Map.put(:action, :validation)
-          |> to_form(as: "name-form")
+          form =
+            {%{name: name}, %{name: :string}}
+            |> Changeset.cast(%{}, [])
+            |> Map.put(:action, :validation)
+            |> to_form(as: "name-form")
+
+          socket
+          |> assign(name_form: form)
+          |> assign(name_form_valid: true)
       end
 
     socket =
       socket
       |> assign(name: name)
-      |> assign(name_form: form)
 
     {:noreply, socket}
   end
@@ -1152,8 +1160,12 @@ defmodule PlazaWeb.CheckoutLive do
   end
 
   def render(%{step: 2} = assigns) do
+    IO.inspect(assigns.name_form_valid)
+    IO.inspect(assigns.address_form.source.valid?)
+    IO.inspect(assigns.name_form_valid && assigns.address_form.source.valid?)
+
     ~H"""
-    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 400px;">
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; flex-direction: column;">
           <div style="align-self: center; font-size: 40px;">
@@ -1210,17 +1222,20 @@ defmodule PlazaWeb.CheckoutLive do
                 onKeypress="window.hyphen();"
               >
               </.input>
-              <div style="display: flex; justify-content: center; margin-top: 50px;">
-                <button>
+              <div style="display: flex; justify-content: center; position: relative; top: 400px;">
+                <button
+                  disabled={!(@name_form_valid && @address_form.source.valid?)}
+                  style={if !(@name_form_valid && @address_form.source.valid?), do: "opacity: 50%"}
+                >
                   <img src="svg/yellow-ellipse.svg" />
                   <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                    Submit
+                    Continuar
                   </div>
                 </button>
               </div>
             </.form>
           </div>
-          <div style="align-self: center;">
+          <div style="align-self: center; position: relative; bottom: 100px;">
             <.delivery_method_form
               options={@delivery_methods}
               selected={@delivery_method}
