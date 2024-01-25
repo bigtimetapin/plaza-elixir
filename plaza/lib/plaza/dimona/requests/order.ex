@@ -49,6 +49,8 @@ defmodule Plaza.Dimona.Requests.Order do
               }
           end)
 
+        IO.inspect(items)
+
         body = %{
           order_id: purchase.id,
           delivery_method_id: purchase.shipping_method_id,
@@ -58,6 +60,11 @@ defmodule Plaza.Dimona.Requests.Order do
           address: %{
             name: purchase.customer_name,
             street: purchase.shipping_address_line1,
+            number: "334",
+            city: "Rio de Janeiro",
+            state: "RJ",
+            neighborhood: "Centro",
+            phone: "21 21093661",
             complement: purchase.shipping_address_line2,
             zipcode: purchase.shipping_address_postal_code,
             country: "BR"
