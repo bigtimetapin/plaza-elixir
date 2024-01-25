@@ -508,7 +508,10 @@ defmodule PlazaWeb.ProductLive do
                     </button>
                   </div>
                 </div>
-                <div :if={@already_in_cart}>
+                <div
+                  :if={@already_in_cart}
+                  style="width: 295px; display: flex; justify-content: center;"
+                >
                   <div style="text-decoration: underline; font-size: 24px;">
                     <.link navigate="/">Loja</.link>
                   </div>
