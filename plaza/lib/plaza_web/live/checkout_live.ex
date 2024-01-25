@@ -938,155 +938,160 @@ defmodule PlazaWeb.CheckoutLive do
 
   def render(%{step: 1} = assigns) do
     ~H"""
-    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 150px; display: flex;">
-      <div style="margin-left: 50px; font-size: 44px;">
-        <div style="display: flex; border-bottom: 2px solid grey; width: 800px;">
-          <div>
-            carrinho
-          </div>
-          <div style="margin-left: 100px;">
-            item
-          </div>
-          <div style="margin-left: auto; margin-right: 10px;">
-            valor
-          </div>
-        </div>
-        <div style="margin-top: 20px;">
-          <div :for={item <- @cart} style="display: flex;">
-            <div style="width: 100px;">
-              <button phx-click="product-href" phx-value-product-id={item.product.id}>
-                <img src={
-                  if item.product.designs.display == 0,
-                    do: item.product.mocks.front,
-                    else: item.product.mocks.back
-                } />
-              </button>
+    <div
+      class="has-font-3"
+      style="margin-top: 150px; margin-bottom: 150px; display: flex; justify-content: center;"
+    >
+      <div style="display: flex; max-width: 1600px; width: 100%;">
+        <div style="font-size: 44px;">
+          <div style="display: flex; border-bottom: 2px solid grey; width: 800px;">
+            <div>
+              carrinho
             </div>
-            <div style="margin-left: 127px;">
-              <div style="font-size: 32px;">
-                <%= item.product.name %>
-              </div>
-              <div style="font-size: 28px; color: grey;">
-                <button
-                  phx-click="change-size"
-                  phx-value-size="p"
-                  phx-value-product-id={item.product.id}
-                  style={
-                    if item.size == "p",
-                      do: "font-size: 38px; margin-left: 5px",
-                      else: "margin-left: 5px"
-                  }
-                >
-                  P
-                </button>
-                <button
-                  phx-click="change-size"
-                  phx-value-size="m"
-                  phx-value-product-id={item.product.id}
-                  style={
-                    if item.size == "m",
-                      do: "font-size: 38px; margin-left: 5px",
-                      else: "margin-left: 5px"
-                  }
-                >
-                  M
-                </button>
-                <button
-                  phx-click="change-size"
-                  phx-value-size="g"
-                  phx-value-product-id={item.product.id}
-                  style={if item.size == "g", do: "font-size: 38px;"}
-                >
-                  G
-                </button>
-                <button
-                  phx-click="change-size"
-                  phx-value-size="gg"
-                  phx-value-product-id={item.product.id}
-                  style={if item.size == "gg", do: "font-size: 38px;"}
-                >
-                  GG
-                </button>
-                <button
-                  phx-click="change-size"
-                  phx-value-size="xgg"
-                  phx-value-product-id={item.product.id}
-                  style={if item.size == "xgg", do: "font-size: 38px;"}
-                >
-                  XGG
-                </button>
-              </div>
+            <div style="margin-left: 100px;">
+              item
             </div>
             <div style="margin-left: auto; margin-right: 10px;">
-              <div style="font-size: 28px;">
-                <%= "R$ #{String.replace(Float.to_string(item.product.price), ".", ",")}" %>
+              valor
+            </div>
+          </div>
+          <div style="margin-top: 20px;">
+            <div :for={item <- @cart} style="display: flex;">
+              <div style="width: 100px;">
+                <button phx-click="product-href" phx-value-product-id={item.product.id}>
+                  <img src={
+                    if item.product.designs.display == 0,
+                      do: item.product.mocks.front,
+                      else: item.product.mocks.back
+                  } />
+                </button>
               </div>
-              <div :if={item.available} style="display: flex; font-size: 22px; margin-top: 5px;">
+              <div style="margin-left: 127px;">
+                <div style="font-size: 32px;">
+                  <%= item.product.name %>
+                </div>
+                <div style="font-size: 28px; color: grey;">
+                  <button
+                    phx-click="change-size"
+                    phx-value-size="p"
+                    phx-value-product-id={item.product.id}
+                    style={
+                      if item.size == "p",
+                        do: "font-size: 38px; margin-left: 5px",
+                        else: "margin-left: 5px"
+                    }
+                  >
+                    P
+                  </button>
+                  <button
+                    phx-click="change-size"
+                    phx-value-size="m"
+                    phx-value-product-id={item.product.id}
+                    style={
+                      if item.size == "m",
+                        do: "font-size: 38px; margin-left: 5px",
+                        else: "margin-left: 5px"
+                    }
+                  >
+                    M
+                  </button>
+                  <button
+                    phx-click="change-size"
+                    phx-value-size="g"
+                    phx-value-product-id={item.product.id}
+                    style={if item.size == "g", do: "font-size: 38px;"}
+                  >
+                    G
+                  </button>
+                  <button
+                    phx-click="change-size"
+                    phx-value-size="gg"
+                    phx-value-product-id={item.product.id}
+                    style={if item.size == "gg", do: "font-size: 38px;"}
+                  >
+                    GG
+                  </button>
+                  <button
+                    phx-click="change-size"
+                    phx-value-size="xgg"
+                    phx-value-product-id={item.product.id}
+                    style={if item.size == "xgg", do: "font-size: 38px;"}
+                  >
+                    XGG
+                  </button>
+                </div>
+              </div>
+              <div style="margin-left: auto; margin-right: 10px;">
+                <div style="font-size: 28px;">
+                  <%= "R$ #{String.replace(Float.to_string(item.product.price), ".", ",")}" %>
+                </div>
+                <div :if={item.available} style="display: flex; font-size: 22px; margin-top: 5px;">
+                  <div>
+                    <button
+                      phx-click="change-quantity"
+                      phx-value-op="add"
+                      phx-value-product-id={item.product.id}
+                    >
+                      +
+                    </button>
+                    <button
+                      :if={item.quantity > 1}
+                      phx-click="change-quantity"
+                      phx-value-op="subtract"
+                      phx-value-product-id={item.product.id}
+                    >
+                      -
+                    </button>
+                  </div>
+                  <div style="border: 1px solid grey; width: 40px; text-align: center; margin-left: 5px;">
+                    <%= item.quantity %>
+                  </div>
+                </div>
+                <div :if={!item.available} style="font-size: 22px; margin-top: 5px;">
+                  out of stock
+                </div>
                 <div>
                   <button
-                    phx-click="change-quantity"
-                    phx-value-op="add"
+                    style="font-size: 18px; color: grey; position: relative; bottom: 25px;"
+                    phx-click="remove-from-cart"
                     phx-value-product-id={item.product.id}
                   >
-                    +
-                  </button>
-                  <button
-                    :if={item.quantity > 1}
-                    phx-click="change-quantity"
-                    phx-value-op="subtract"
-                    phx-value-product-id={item.product.id}
-                  >
-                    -
+                    remover
                   </button>
                 </div>
-                <div style="border: 1px solid grey; width: 40px; text-align: center; margin-left: 5px;">
-                  <%= item.quantity %>
-                </div>
               </div>
-              <div :if={!item.available} style="font-size: 22px; margin-top: 5px;">
-                out of stock
-              </div>
+            </div>
+          </div>
+          <div :if={!@cart_empty}>
+            <div style="display: flex; border-bottom: 2px solid grey; width: 800px;"></div>
+            <div style="display: flex; font-size: 28px;">
               <div>
-                <button
-                  style="font-size: 18px; color: grey; position: relative; bottom: 25px;"
-                  phx-click="remove-from-cart"
-                  phx-value-product-id={item.product.id}
-                >
-                  remover
-                </button>
+                valor dos prodotus
+              </div>
+              <div style="margin-left: auto; margin-right: 10px;">
+                <%= "R$ #{Float.to_string(@cart_total_amount) |> String.replace(".", ",")}" %>
+              </div>
+            </div>
+            <div style="display: flex; font-size: 28px;">
+              <div>
+                valor do frete
+              </div>
+              <div style="margin-left: auto; margin-right: 10px;">
+                calculado no checkout
               </div>
             </div>
           </div>
         </div>
-        <div :if={!@cart_empty}>
-          <div style="display: flex; border-bottom: 2px solid grey; width: 800px;"></div>
-          <div style="display: flex; font-size: 28px;">
-            <div>
-              valor dos prodotus
-            </div>
-            <div style="margin-left: auto; margin-right: 10px;">
-              <%= "R$ #{Float.to_string(@cart_total_amount) |> String.replace(".", ",")}" %>
-            </div>
-          </div>
-          <div style="display: flex; font-size: 28px;">
-            <div>
-              valor do frete
-            </div>
-            <div style="margin-left: auto; margin-right: 10px;">
-              calculado no checkout
-            </div>
-          </div>
+        <div style="font-size: 44px; margin-left: auto;">
+          <.sign_in_or_continue_as_guest
+            current_user={@current_user}
+            cart_empty={@cart_empty}
+            cart_out_of_stock={@cart_out_of_stock}
+            login_form={assigns[:login_form]}
+            email_form={assigns[:email_form]}
+            email_form_is_empty={assigns[:email_form_is_empty]}
+          />
         </div>
-      </div>
-      <div style="margin-left: 50px; font-size: 44px;">
-        <.sign_in_or_continue_as_guest
-          current_user={@current_user}
-          cart_empty={@cart_empty}
-          cart_out_of_stock={@cart_out_of_stock}
-          login_form={assigns[:login_form]}
-          email_form={assigns[:email_form]}
-          email_form_is_empty={assigns[:email_form_is_empty]}
-        />
       </div>
     </div>
     """
@@ -1100,14 +1105,17 @@ defmodule PlazaWeb.CheckoutLive do
           checkout
         </div>
         <div style="font-size: 22px;">
-          coloque seu email para fazer login
+          coloque seu email para fazer login ou continue como convidado
         </div>
-        <div>
+        <div style="width: 500px;">
           <PlazaWeb.Auth.Login.login_quick form={@login_form} redirect_url="/checkout" />
         </div>
         <div>
+          <div style="font-size: 36px;">
+            checkout como convidado
+          </div>
           <div style="font-size: 22px;">
-            ou continue como convidado
+            coloque apenas seu email
           </div>
           <div>
             <.form for={@email_form} phx-change="change-email-form" phx-submit="submit-email-form">

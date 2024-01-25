@@ -50,7 +50,7 @@ defmodule PlazaWeb.Auth.Login do
         type="email"
         label="Email"
         required
-        style="border-bottom: 2px solid grey; font-size: 28px; border-left: none; border-right: none; border-top: none; width: 400px;"
+        style="border-bottom: 2px solid grey; font-size: 28px; border-left: none; border-right: none; border-top: none; width: 100%;"
         class="has-font-3"
         placeholder="seu email"
       />
@@ -59,7 +59,7 @@ defmodule PlazaWeb.Auth.Login do
         type="password"
         label="Password"
         required
-        style="border-bottom: 2px solid grey; font-size: 28px; border-left: none; border-right: none; border-top: none; width: 400px;"
+        style="border-bottom: 2px solid grey; font-size: 28px; border-left: none; border-right: none; border-top: none; width: 100%;"
         class="has-font-3"
         placeholder="senha"
       />
