@@ -59,10 +59,11 @@ defmodule Plaza.Dimona.Requests.Order do
           address: %{
             name: purchase.customer_name,
             street: purchase.shipping_address_line1,
+            number: "123",
             city: "Rio de Janeiro",
             state: "RJ",
             neighborhood: "Centro",
-            phone: "21 21093661",
+            # phone: "21 21093661",
             complement: purchase.shipping_address_line2,
             zipcode: purchase.shipping_address_postal_code,
             country: "BR"

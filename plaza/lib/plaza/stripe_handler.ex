@@ -70,21 +70,26 @@ defmodule Plaza.StripeHandler do
       IO.inspect(sellers)
       ## build and fire off order create to dimona 
       dimona_order = purchase |> Order.build()
+      IO.inspect("here 01")
 
       dimona_result =
         case dimona_order do
           {:ok, body} ->
+            IO.inspect("here 02")
             body |> Order.post()
 
           :error ->
+            IO.inspect("here 03")
             :error
         end
 
       case dimona_result do
         {:ok, body} ->
+          IO.inspect("here 04")
           IO.inspect(body)
 
         error ->
+          IO.inspect("here 05")
           IO.inspect(error)
       end
 

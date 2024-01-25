@@ -196,7 +196,6 @@ defmodule PlazaWeb.CheckoutLive do
           Enum.each(cart, fn item ->
             Task.async(fn ->
               sku = Map.get(@sku_map, "white-#{item.size}")
-              IO.inspect(sku)
               {:ok, value} = Dimona.Requests.Availability.get(sku)
               {:availability, item.product.id, value}
             end)
