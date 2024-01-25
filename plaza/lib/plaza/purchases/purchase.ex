@@ -8,7 +8,9 @@ defmodule Plaza.Purchases.Purchase do
     field :sellers, {:array, :map}
     field :sellers_paid, :boolean
     field :email, :string
+    field :customer_name, :string
     field :stripe_session_id, :string
+    field :dimona_order_id, :string
     field :shipping_method_id, :string
     field :shipping_method_price, :integer
     field :shipping_address_line1, :string
@@ -28,7 +30,9 @@ defmodule Plaza.Purchases.Purchase do
       :sellers,
       :sellers_paid,
       :email,
+      :customer_name,
       :stripe_session_id,
+      :dimona_order_id,
       :shipping_method_id,
       :shipping_method_price,
       :shipping_address_line1,
@@ -43,6 +47,7 @@ defmodule Plaza.Purchases.Purchase do
       :sellers,
       :sellers_paid,
       :email,
+      :customer_name,
       :stripe_session_id,
       :shipping_method_id,
       :shipping_method_price,

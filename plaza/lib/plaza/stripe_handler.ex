@@ -4,20 +4,23 @@ defmodule Plaza.StripeHandler do
   alias Plaza.Accounts
   alias Plaza.Products.Product
   alias Plaza.Purchases
+  alias Plaza.Dimona.Requests.Order
 
   ## TODO: send email to buyer 
   @impl true
   def handle_event(%Stripe.Event{type: "payment_intent.succeeded", data: data}) do
     Task.Supervisor.start_child(Plaza.TaskSupervisor, fn ->
       %{object: %{metadata: %{"purchase_id" => purchase_id}}} = data
-      IO.inspect(purchase_id)
 
+      ## send message to src liveview 
+      ## in off chance that their url reload beat stripe
       Phoenix.PubSub.broadcast(
         Plaza.PubSub,
         "payment-status-#{purchase_id}",
         {:payment_status, "succeeded"}
       )
 
+      ## fetch stripe transaction info
       purchase = Purchases.get!(purchase_id)
       {:ok, stripe_session} = Stripe.Session.retrieve(purchase.stripe_session_id)
 
@@ -25,6 +28,7 @@ defmodule Plaza.StripeHandler do
 
       charge = List.first(payment_intent.charges.data)
 
+      ## build transfer payment to sellers
       transfer_tasks =
         Task.async_stream(
           purchase.sellers,
@@ -58,11 +62,33 @@ defmodule Plaza.StripeHandler do
           end
         )
 
+      ## fire off transfer payments
       transfers = Enum.to_list(transfer_tasks)
+      ## payment analytics
       sellers_paid = Enum.all?(transfers, fn el -> validate_paid(el) end)
       sellers = Enum.map(transfers, fn {_, seller} -> seller end)
       IO.inspect(sellers)
+      ## build and fire off order create to dimona 
+      dimona_order = purchase |> Order.build()
 
+      dimona_result =
+        case dimona_order do
+          {:ok, body} ->
+            body |> Order.post()
+
+          :error ->
+            :error
+        end
+
+      case dimona_result do
+        {:ok, body} ->
+          IO.inspect(body)
+
+        error ->
+          IO.inspect(error)
+      end
+
+      ## persist analytics 
       Purchases.update(
         purchase,
         %{"sellers" => sellers, "sellers_paid" => sellers_paid}

@@ -8,7 +8,9 @@ defmodule Plaza.Repo.Migrations.AddPurchasesTable do
       add :sellers, {:array, :map}, null: false
       add :sellers_paid, :boolean, null: false
       add :email, :string, null: false
+      add :customer_name, :string, null: false
       add :stripe_session_id, :string, null: false
+      add :dimona_order_id, :string, null: true
       add :shipping_method_id, :string, null: false
       add :shipping_method_price, :integer, null: false
       add :shipping_address_line1, :string, null: false

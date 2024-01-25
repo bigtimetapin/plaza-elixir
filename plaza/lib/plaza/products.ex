@@ -61,6 +61,13 @@ defmodule Plaza.Products do
     %{entries: entries, metadata: metadata}
   end
 
+  def all_in_list(product_ids) do
+    Repo.all(
+      from p in Product,
+        where: p.id in ^product_ids
+    )
+  end
+
   def count(id) do
     Repo.aggregate(
       from(Product, where: [user_id: ^id]),

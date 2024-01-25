@@ -790,6 +790,7 @@ defmodule PlazaWeb.CheckoutLive do
           sellers: sellers,
           sellers_paid: false,
           email: email,
+          customer_name: name,
           stripe_session_id: "pending",
           shipping_method_id: delivery_method.id,
           shipping_method_price: delivery_method.price,
