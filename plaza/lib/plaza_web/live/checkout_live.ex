@@ -537,6 +537,8 @@ defmodule PlazaWeb.CheckoutLive do
           |> assign(error: nil)
 
         {:ok, address} ->
+          send(self(), :checkout)
+
           socket
           |> assign(shipping_address: address)
       end
@@ -566,7 +568,162 @@ defmodule PlazaWeb.CheckoutLive do
     {:noreply, socket}
   end
 
-  def handle_event("checkout", _, socket) do
+  def handle_event("step", %{"step" => "2"}, socket) do
+    socket =
+      socket
+      |> assign(step: 2)
+
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({ref, {:availability, product_id, value}}, socket) do
+    Process.demonitor(ref, [:flush])
+    cart = socket.assigns.cart
+
+    ## race condition where read-cart/availability-check is fired off at mount-callback 
+    ## but the handle-params callback on-purchase-success clears the cart 
+    ## and this handler ends up with an empty cart
+    socket =
+      case cart do
+        [] ->
+          socket
+
+        _ ->
+          {item, index} =
+            Enum.with_index(cart)
+            |> Enum.find(fn {item, _} -> item.product.id == product_id end)
+
+          supply = Map.values(value) |> List.first()
+
+          available = item.quantity + 5 <= supply
+          item = %{item | available: available}
+          cart = List.replace_at(cart, index, item)
+          cart_out_of_stock = Enum.any?(cart, fn i -> !i.available end)
+
+          socket
+          |> assign(cart: cart)
+          |> assign(cart_out_of_stock: cart_out_of_stock)
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_info({ref, {:shipping_quote, result}}, socket) do
+    Process.demonitor(ref, [:flush])
+
+    result =
+      case result do
+        {:error, payload} ->
+          :error
+
+        {:ok, many} ->
+          case many do
+            [] ->
+              :error
+
+            [head | _] ->
+              head = normalize_delivery_method(head)
+
+              all =
+                many
+                |> Enum.map(fn opt ->
+                  normalize_delivery_method(opt)
+                end)
+
+              {:ok, head, all}
+          end
+      end
+
+    socket =
+      case result do
+        :error ->
+          socket
+          |> assign(delivery_methods_error: true)
+          |> assign(delivery_methods: nil)
+          |> assign(delivery_method: nil)
+
+        {:ok, head, all} ->
+          socket
+          |> assign(delivery_methods: all)
+          |> assign(delivery_method: head)
+          |> assign(delivery_methods_error: false)
+      end
+
+    socket =
+      socket
+      |> assign(delivery_methods_waiting: false)
+
+    {:noreply, socket}
+  end
+
+  def handle_info({ref, {:stripe_redirect, url}}, socket) do
+    Process.demonitor(
+      ref,
+      [:flush]
+    )
+
+    socket =
+      socket
+      |> redirect(external: url)
+
+    {:noreply, socket}
+  end
+
+  ## from task
+  def handle_info({ref, {:payment_status, payment_status}}, socket) do
+    Process.demonitor(
+      ref,
+      [:flush]
+    )
+
+    socket =
+      case payment_status do
+        "succeeded" ->
+          socket
+          |> assign(cart: [])
+          |> assign(cart_empty: true)
+          |> assign(cart_total_amount: 0)
+          |> assign(step: 5)
+          |> push_event(
+            "clear",
+            %{
+              key: @local_storage_key
+            }
+          )
+
+        _ ->
+          socket
+      end
+
+    {:noreply, socket}
+  end
+
+  ## from pubsub
+  def handle_info({:payment_status, payment_status}, socket) do
+    socket =
+      case payment_status do
+        "suceeded" ->
+          socket
+          |> assign(cart: [])
+          |> assign(cart_empty: true)
+          |> assign(cart_total_amount: 0)
+          |> assign(step: 5)
+          |> push_event(
+            "clear",
+            %{
+              key: @local_storage_key
+            }
+          )
+
+        _ ->
+          socket
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_info(:checkout, socket) do
     Task.async(fn ->
       cart = socket.assigns.cart
 
@@ -582,7 +739,7 @@ defmodule PlazaWeb.CheckoutLive do
               size: item.size,
               quantity: item.quantity,
               price: item.product.price,
-              internal_expense: item.produce.internal_expense
+              internal_expense: item.product.internal_expense
             }
           end
         )
@@ -746,161 +903,6 @@ defmodule PlazaWeb.CheckoutLive do
     socket =
       socket
       |> assign(waiting: true)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("step", %{"step" => "2"}, socket) do
-    socket =
-      socket
-      |> assign(step: 2)
-
-    {:noreply, socket}
-  end
-
-  @impl Phoenix.LiveView
-  def handle_info({ref, {:availability, product_id, value}}, socket) do
-    Process.demonitor(ref, [:flush])
-    cart = socket.assigns.cart
-
-    ## race condition where read-cart/availability-check is fired off at mount-callback 
-    ## but the handle-params callback on-purchase-success clears the cart 
-    ## and this handler ends up with an empty cart
-    socket =
-      case cart do
-        [] ->
-          socket
-
-        _ ->
-          {item, index} =
-            Enum.with_index(cart)
-            |> Enum.find(fn {item, _} -> item.product.id == product_id end)
-
-          supply = Map.values(value) |> List.first()
-
-          available = item.quantity + 5 <= supply
-          item = %{item | available: available}
-          cart = List.replace_at(cart, index, item)
-          cart_out_of_stock = Enum.any?(cart, fn i -> !i.available end)
-
-          socket
-          |> assign(cart: cart)
-          |> assign(cart_out_of_stock: cart_out_of_stock)
-      end
-
-    {:noreply, socket}
-  end
-
-  def handle_info({ref, {:shipping_quote, result}}, socket) do
-    Process.demonitor(ref, [:flush])
-
-    result =
-      case result do
-        {:error, payload} ->
-          :error
-
-        {:ok, many} ->
-          case many do
-            [] ->
-              :error
-
-            [head | _] ->
-              head = normalize_delivery_method(head)
-
-              all =
-                many
-                |> Enum.map(fn opt ->
-                  normalize_delivery_method(opt)
-                end)
-
-              {:ok, head, all}
-          end
-      end
-
-    socket =
-      case result do
-        :error ->
-          socket
-          |> assign(delivery_methods_error: true)
-          |> assign(delivery_methods: nil)
-          |> assign(delivery_method: nil)
-
-        {:ok, head, all} ->
-          socket
-          |> assign(delivery_methods: all)
-          |> assign(delivery_method: head)
-          |> assign(delivery_methods_error: false)
-      end
-
-    socket =
-      socket
-      |> assign(delivery_methods_waiting: false)
-
-    {:noreply, socket}
-  end
-
-  def handle_info({ref, {:stripe_redirect, url}}, socket) do
-    Process.demonitor(
-      ref,
-      [:flush]
-    )
-
-    socket =
-      socket
-      |> redirect(external: url)
-
-    {:noreply, socket}
-  end
-
-  ## from task
-  def handle_info({ref, {:payment_status, payment_status}}, socket) do
-    Process.demonitor(
-      ref,
-      [:flush]
-    )
-
-    socket =
-      case payment_status do
-        "succeeded" ->
-          socket
-          |> assign(cart: [])
-          |> assign(cart_empty: true)
-          |> assign(cart_total_amount: 0)
-          |> assign(step: 5)
-          |> push_event(
-            "clear",
-            %{
-              key: @local_storage_key
-            }
-          )
-
-        _ ->
-          socket
-      end
-
-    {:noreply, socket}
-  end
-
-  ## from pubsub
-  def handle_info({:payment_status, payment_status}, socket) do
-    socket =
-      case payment_status do
-        "suceeded" ->
-          socket
-          |> assign(cart: [])
-          |> assign(cart_empty: true)
-          |> assign(cart_total_amount: 0)
-          |> assign(step: 5)
-          |> push_event(
-            "clear",
-            %{
-              key: @local_storage_key
-            }
-          )
-
-        _ ->
-          socket
-      end
 
     {:noreply, socket}
   end
