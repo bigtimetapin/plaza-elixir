@@ -1,6 +1,5 @@
 defmodule Plaza.Dimona.Requests.Order do
   alias Plaza.Products
-  alias Plaza.Purchases
 
   @sku_map %{
     "white-p" => "010101110108",
@@ -60,7 +59,6 @@ defmodule Plaza.Dimona.Requests.Order do
           address: %{
             name: purchase.customer_name,
             street: purchase.shipping_address_line1,
-            number: "334",
             city: "Rio de Janeiro",
             state: "RJ",
             neighborhood: "Centro",
