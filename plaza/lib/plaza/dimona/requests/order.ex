@@ -62,7 +62,7 @@ defmodule Plaza.Dimona.Requests.Order do
             number: "123",
             city: "Rio de Janeiro",
             state: "RJ",
-            neighborhood: "Centro",
+            # neighborhood: "Centro",
             # phone: "21 21093661",
             complement: purchase.shipping_address_line2,
             zipcode: purchase.shipping_address_postal_code,
