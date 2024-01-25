@@ -1263,9 +1263,6 @@ defmodule PlazaWeb.CheckoutLive do
             </div>
           </div>
         </div>
-        <div style="font-size: 30px; margin-top: 10px;">
-          Ficou alguma dúvida? clique aqui
-        </div>
       </div>
     </div>
     """
