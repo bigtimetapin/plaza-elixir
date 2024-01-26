@@ -1171,6 +1171,28 @@ defmodule PlazaWeb.CheckoutLive do
                   out of stock
                 </div>
               </div>
+              <div style="font-size: 20px; color: grey;">
+                <button
+                  class="has-font-3"
+                  style="text-decoration: underline;"
+                  phx-click="remove-from-cart"
+                  phx-value-product-id={item.product.id}
+                >
+                  remover
+                </button>
+              </div>
+              <div style="display: flex; border-top: 2px solid lightgrey; margin-top: 10px;">
+                <div style="margin-left: auto;">
+                  <div style="display: flex;">
+                    <div style="font-size: 24px; line-height: 43px; margin-right: 20px;">
+                      Total:
+                    </div>
+                    <div style="font-size: 28px;">
+                      <%= "R$ #{Float.to_string(@cart_total_amount) |> String.replace(".", ",")}" %>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
