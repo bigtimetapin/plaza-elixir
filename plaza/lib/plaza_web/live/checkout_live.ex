@@ -116,7 +116,6 @@ defmodule PlazaWeb.CheckoutLive do
     socket =
       socket
       |> assign(cart: [])
-      |> assign(cart_empty: true)
       |> assign(cart_out_of_stock: false)
       |> assign(cart_total_amount: 0)
       |> assign(header: :checkout)
@@ -188,8 +187,6 @@ defmodule PlazaWeb.CheckoutLive do
           socket
 
         {:ok, cart} ->
-          cart_empty = Enum.empty?(cart)
-
           cart_total_amount =
             List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
 
@@ -205,7 +202,6 @@ defmodule PlazaWeb.CheckoutLive do
 
           socket
           |> assign(cart: cart)
-          |> assign(cart_empty: cart_empty)
           |> assign(cart_total_amount: cart_total_amount)
 
         {:error, reason} ->
@@ -260,7 +256,6 @@ defmodule PlazaWeb.CheckoutLive do
 
     item = %{item | size: size}
     cart = List.replace_at(cart, index, item)
-    cart_empty = Enum.empty?(cart)
 
     cart_total_amount =
       List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
@@ -276,7 +271,6 @@ defmodule PlazaWeb.CheckoutLive do
     socket =
       socket
       |> assign(cart: cart)
-      |> assign(cart_empty: cart_empty)
       |> assign(cart_total_amount: cart_total_amount)
       |> push_event(
         "write",
@@ -307,7 +301,6 @@ defmodule PlazaWeb.CheckoutLive do
 
     item = %{item | quantity: quantity}
     cart = List.replace_at(cart, index, item)
-    cart_empty = Enum.empty?(cart)
 
     cart_total_amount =
       List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
@@ -323,7 +316,6 @@ defmodule PlazaWeb.CheckoutLive do
     socket =
       socket
       |> assign(cart: cart)
-      |> assign(cart_empty: cart_empty)
       |> assign(cart_total_amount: cart_total_amount)
       |> push_event(
         "write",
@@ -345,7 +337,6 @@ defmodule PlazaWeb.CheckoutLive do
       |> Enum.find(fn {item, _} -> item.product.id == product_id end)
 
     cart = List.delete_at(cart, index)
-    cart_empty = Enum.empty?(cart)
     cart_out_of_stock = Enum.any?(cart, fn i -> !i.available end)
 
     cart_total_amount =
@@ -354,7 +345,6 @@ defmodule PlazaWeb.CheckoutLive do
     socket =
       socket
       |> assign(cart: cart)
-      |> assign(cart_empty: cart_empty)
       |> assign(cart_total_amount: cart_total_amount)
       |> assign(cart_out_of_stock: cart_out_of_stock)
       |> push_event(
@@ -681,7 +671,6 @@ defmodule PlazaWeb.CheckoutLive do
         "succeeded" ->
           socket
           |> assign(cart: [])
-          |> assign(cart_empty: true)
           |> assign(cart_total_amount: 0)
           |> assign(step: 5)
           |> push_event(
@@ -705,7 +694,6 @@ defmodule PlazaWeb.CheckoutLive do
         "suceeded" ->
           socket
           |> assign(cart: [])
-          |> assign(cart_empty: true)
           |> assign(cart_total_amount: 0)
           |> assign(step: 5)
           |> push_event(
@@ -1082,7 +1070,7 @@ defmodule PlazaWeb.CheckoutLive do
                 </div>
               </div>
             </div>
-            <div :if={!@cart_empty}>
+            <div>
               <div style="display: flex; border-bottom: 2px solid grey; width: 800px;"></div>
               <div style="display: flex; font-size: 28px;">
                 <div>
@@ -1105,7 +1093,6 @@ defmodule PlazaWeb.CheckoutLive do
           <div style="font-size: 44px; margin-left: auto;">
             <.sign_in_or_continue_as_guest
               current_user={@current_user}
-              cart_empty={@cart_empty}
               cart_out_of_stock={@cart_out_of_stock}
               login_form={assigns[:login_form]}
               email_form={assigns[:email_form]}
@@ -1276,7 +1263,7 @@ defmodule PlazaWeb.CheckoutLive do
 
   defp sign_in_or_continue_as_guest(%{current_user: nil} = assigns) do
     ~H"""
-    <div :if={!@cart_empty} style="display: flex; justify-content: center;">
+    <div style="display: flex; justify-content: center;">
       <div style="margin-left: 150px;">
         <div style="font-size: 40px;">
           checkout
@@ -1322,10 +1309,7 @@ defmodule PlazaWeb.CheckoutLive do
 
   defp sign_in_or_continue_as_guest(assigns) do
     ~H"""
-    <div
-      :if={!@cart_empty}
-      style="display: flex; justify-content: center; width: 500px; margin-top: 150px;"
-    >
+    <div style="display: flex; justify-content: center; width: 500px; margin-top: 150px;">
       <button
         phx-click="step"
         phx-value-step="2"
