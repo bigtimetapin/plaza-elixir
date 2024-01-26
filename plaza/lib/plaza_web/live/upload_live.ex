@@ -670,7 +670,7 @@ defmodule PlazaWeb.UploadLive do
   def render(%{waiting: true} = assigns) do
     ~H"""
     <div style="margin-top: 200px; display: flex; justify-content: center;">
-      <img src="gif/loading.gif" />
+      <img src="gif/loading.gif" class="is-loading" />
     </div>
     """
   end

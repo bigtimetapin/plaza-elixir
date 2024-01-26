@@ -360,6 +360,16 @@ $spacing-values: (
   }
 }
 
+.is-loading {
+  @include until($tablet) {
+    max-width: 400px;
+  }
+
+  @include from($tablet) {
+    max-width: 1000px;
+  }
+}
+
 .is-landing-desktop {
   @include until($tablet) {
     display: none;
