@@ -712,9 +712,7 @@ defmodule PlazaWeb.CheckoutLive do
 
   def handle_info(:checkout, socket) do
     Task.async(fn ->
-      cart =
-        socket.assigns.cart
-        |> Enum.filter(fn item -> item.available end)
+      cart = socket.assigns.cart
 
       products =
         Enum.map(
