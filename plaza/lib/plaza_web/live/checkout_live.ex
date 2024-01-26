@@ -1035,7 +1035,7 @@ defmodule PlazaWeb.CheckoutLive do
                   <div style="font-size: 28px;">
                     <%= "R$ #{String.replace(Float.to_string(item.product.price), ".", ",")}" %>
                   </div>
-                  <div :if={item.available} style="display: flex; font-size: 22px; margin-top: 5px;">
+                  <div :if={item.available} style="display: flex; font-size: 22px;">
                     <div>
                       <button
                         phx-click="change-quantity"
@@ -1057,7 +1057,7 @@ defmodule PlazaWeb.CheckoutLive do
                       <%= item.quantity %>
                     </div>
                   </div>
-                  <div :if={!item.available} style="font-size: 22px; margin-top: 5px;">
+                  <div :if={!item.available} style="font-size: 22px;">
                     out of stock
                   </div>
                   <div>
@@ -1142,7 +1142,37 @@ defmodule PlazaWeb.CheckoutLive do
                   <%= "R$ #{(item.product.price * item.quantity) |> Float.to_string() |> String.replace(".", ",")}" %>
                 </div>
               </div>
-              <div style="font-size: 26px; display: flex;"></div>
+              <div :if={item.available} style="display: flex; font-size: 22px; margin-top: 5px;">
+                <div style="margin-left: auto;">
+                  <div style="display: flex;">
+                    <div>
+                      <button
+                        phx-click="change-quantity"
+                        phx-value-op="add"
+                        phx-value-product-id={item.product.id}
+                      >
+                        +
+                      </button>
+                      <button
+                        :if={item.quantity > 1}
+                        phx-click="change-quantity"
+                        phx-value-op="subtract"
+                        phx-value-product-id={item.product.id}
+                      >
+                        -
+                      </button>
+                    </div>
+                    <div style="border: 1px solid grey; width: 40px; text-align: center; margin-left: 5px;">
+                      <%= item.quantity %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div :if={!item.available} style="display: flex; font-size: 22px; margin-top: 5px;">
+                <div style="margin-left: auto;">
+                  out of stock
+                </div>
+              </div>
             </div>
           </div>
         </div>
