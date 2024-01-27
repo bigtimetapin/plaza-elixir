@@ -7,28 +7,50 @@ defmodule Plaza.Accounts.UserNotifier do
   defp deliver(recipient, subject, body) do
     email =
       new()
-      |> from({"Plaza", "plaza@plazaaaaa.com"})
+      |> from({"Plazaaaaa", "plaza@plazaaaaa.com"})
       |> to(recipient)
       |> subject(subject)
       |> text_body(body)
 
-    {:ok, metadata} = Mailer.deliver(email)
-    {:ok, metadata}
+    Mailer.deliver(email)
+  end
+
+  def deliver_receipt_to_seller(seller_email, their_share) do
+    deliver(seller_email, "Uma venda", """
+    Você realizou uma vendaaaaa
+
+    R$ #{(their_share / 100) |> Float.round(2) |> Float.to_string() |> String.replace(".", ",")} estão sendo transferidos para sua conta Stripe.
+
+    Este é um email automatico do site plazaaaaa.com por favor não responder diretamente para este remetente.
+
+    Se não foi você por favor desconsidere esta mensagem.
+    """)
+  end
+
+  def deliver_receipt_to_buyer(receipt_email, receipt_url) do
+    deliver(receipt_email, "Uma compra", """
+    Você realizou uma compraaaaa
+
+    O URL do seu pedido: #{receipt_url}
+
+    Este é um email automatico do site plazaaaaa.com por favor não responder diretamente para este remetente.
+
+    Se não foi você por favor desconsidere esta mensagem.
+    """)
   end
 
   @doc """
   Deliver confirmation that the email was confirmed.
   """
   def deliver_confirmation_confirmation(user) do
-    deliver(user.email, "Confirmation success", """
+    deliver(user.email, "Confirmado", """
+    Agora sim!
 
-    ==============================
+    Seu email foi confirmado.  
 
-    Hi #{user.email},
+    Este é um email automatico do site plazaaaaa.com por favor não responder diretamente para este remetente.
 
-    Your Plaza account was confirmed successfully.
-
-    ==============================
+    Se não foi você por favor desconsidere esta mensagem.
     """)
   end
 
@@ -36,19 +58,16 @@ defmodule Plaza.Accounts.UserNotifier do
   Deliver instructions to confirm account.
   """
   def deliver_confirmation_instructions(user, url) do
-    deliver(user.email, "Confirmation instructions", """
+    deliver(user.email, "Bem vindo ao Plaza", """
+    Bem vindo ao Plaza,
 
-    ==============================
-
-    Hi #{user.email},
-
-    You can confirm your account by visiting the URL below:
+    Por favor confirme seu email:
 
     #{url}
 
-    If you didn't create an account with us, please ignore this.
+    Este é um email automatico do site plazaaaaa.com por favor não responder diretamente para este remetente.
 
-    ==============================
+    Se não foi você por favor desconsidere esta mensagem.
     """)
   end
 

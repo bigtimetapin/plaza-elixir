@@ -2,11 +2,11 @@ defmodule Plaza.StripeHandler do
   @behaviour Stripe.WebhookHandler
 
   alias Plaza.Accounts
+  alias Plaza.Accounts.UserNotifier
   alias Plaza.Products.Product
   alias Plaza.Purchases
   alias Plaza.Dimona.Requests.Order
 
-  ## TODO: send email to buyer 
   @impl true
   def handle_event(%Stripe.Event{type: "payment_intent.succeeded", data: data}) do
     Task.Supervisor.start_child(Plaza.TaskSupervisor, fn ->
@@ -27,6 +27,14 @@ defmodule Plaza.StripeHandler do
       {:ok, payment_intent} = Stripe.PaymentIntent.retrieve(stripe_session.payment_intent, %{})
 
       charge = List.first(payment_intent.charges.data)
+      ## email receipt to buyer
+      buyer_email_response =
+        UserNotifier.deliver_receipt_to_buyer(
+          charge.receipt_email,
+          charge.receipt_url
+        )
+
+      IO.inspect(buyer_email_response)
 
       ## build transfer payment to sellers
       transfer_tasks =
@@ -41,6 +49,7 @@ defmodule Plaza.StripeHandler do
               Product.price_unit_amount(%{price: total_price}) -
                 Product.price_unit_amount(%{price: total_platform_fee})
 
+            user = Accounts.get_user!(user_id)
             seller = Accounts.get_seller_by_id(user_id)
 
             transfer_result =
@@ -53,6 +62,13 @@ defmodule Plaza.StripeHandler do
 
             case transfer_result do
               {:ok, _} ->
+                seller_email_response =
+                  UserNotifier.deliver_receipt_to_seller(
+                    user.email,
+                    amount
+                  )
+
+                IO.inspect(seller_email_response)
                 %{params | "paid" => true}
 
               {:error, error} ->
