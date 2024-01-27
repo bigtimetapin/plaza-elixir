@@ -783,6 +783,10 @@ defmodule PlazaWeb.CheckoutLive do
           shipping_method_price: delivery_method.price,
           shipping_address_line1: shipping_address.line1,
           shipping_address_line2: shipping_address.line2,
+          shipping_address_line3: shipping_address.line3,
+          shipping_address_city: shipping_address.city,
+          shipping_address_state: shipping_address.state,
+          shipping_address_country: "br",
           shipping_address_postal_code: shipping_address.postal_code
         })
 
@@ -1231,21 +1235,34 @@ defmodule PlazaWeb.CheckoutLive do
               phx-change="change-address-form"
               phx-submit="submit-address-form"
             >
+              <div style="display: flex;">
+                <.input
+                  field={@address_form[:line1]}
+                  type="text"
+                  placeholder="endereço"
+                  class="text-input-3"
+                  style="width: 270px; margin-right: 10px;"
+                  autocomplete="shipping address-line1"
+                  phx-debounce="500"
+                >
+                </.input>
+                <.input
+                  field={@address_form[:line2]}
+                  type="text"
+                  placeholder="numero"
+                  class="text-input-3"
+                  style="width: 120px;"
+                  autocomplete="shipping address-line2"
+                  phx-debounce="500"
+                >
+                </.input>
+              </div>
               <.input
-                field={@address_form[:line1]}
-                type="text"
-                placeholder="endereço"
-                class="text-input-1"
-                autocomplete="shipping address-line1"
-                phx-debounce="500"
-              >
-              </.input>
-              <.input
-                field={@address_form[:line2]}
+                field={@address_form[:line3]}
                 type="text"
                 placeholder="complemento"
-                class="text-input-1"
-                autocomplete="shipping address-line2"
+                class="text-input-2"
+                autocomplete="shipping address-line3"
                 phx-debounce="500"
               >
               </.input>
@@ -1254,12 +1271,34 @@ defmodule PlazaWeb.CheckoutLive do
                 field={@address_form[:postal_code]}
                 type="text"
                 placeholder="cep"
-                class="text-input-1"
+                class="text-input-2"
                 autocomplete="shipping postal-code"
                 phx-debounce="500"
                 onKeypress="window.hyphen();"
               >
               </.input>
+              <div style="display: flex;">
+                <.input
+                  field={@address_form[:city]}
+                  type="text"
+                  placeholder="cidade"
+                  class="text-input-3"
+                  style="width: 195px; margin-right: 10px;"
+                  autocomplete="shipping address-level2"
+                  phx-debounce="500"
+                >
+                </.input>
+                <.input
+                  field={@address_form[:state]}
+                  type="text"
+                  placeholder="estado"
+                  class="text-input-3"
+                  style="width: 195px;"
+                  autocomplete="shipping address-level1"
+                  phx-debounce="500"
+                >
+                </.input>
+              </div>
               <div style="display: flex; justify-content: center; position: relative; top: 400px;">
                 <button
                   disabled={!(@name_form_valid && @address_form.source.valid?)}

@@ -6,6 +6,7 @@ defmodule Plaza.Accounts.Address do
     field :user_id, :id
     field :line1, :string
     field :line2, :string
+    field :line3, :string
     field :city, :string
     field :state, :string
     field :postal_code, :string
@@ -19,6 +20,7 @@ defmodule Plaza.Accounts.Address do
       :user_id,
       :line1,
       :line2,
+      :line3,
       :city,
       :state,
       :postal_code,
@@ -26,7 +28,10 @@ defmodule Plaza.Accounts.Address do
     ])
     |> validate_required([
       :line1,
-      :postal_code
+      :line2,
+      :postal_code,
+      :city,
+      :state
     ])
     |> validate_length(:postal_code, is: 9)
     |> validate_length(:country, min: 2, max: 2)
@@ -38,12 +43,10 @@ defmodule Plaza.Accounts.Address do
       :user_id,
       :line1,
       :line2,
+      :line3,
       :city,
       :state,
       :country
-    ])
-    |> validate_required([
-      :line1
     ])
     |> validate_length(:country, min: 2, max: 2)
   end
@@ -57,15 +60,5 @@ defmodule Plaza.Accounts.Address do
       :postal_code
     ])
     |> validate_length(:postal_code, is: 9)
-  end
-
-  def to_dimona_form(address) do
-    %{
-      "street" => address.line1,
-      "complement" => address.line2,
-      "city" => address.city,
-      "state" => address.state,
-      "zipcode" => address.postal_code
-    }
   end
 end

@@ -14,7 +14,8 @@ defmodule Plaza.Repo.Migrations.AddPurchasesTable do
       add :shipping_method_id, :string, null: false
       add :shipping_method_price, :integer, null: false
       add :shipping_address_line1, :string, null: false
-      add :shipping_address_line2, :string, null: true
+      add :shipping_address_line2, :string, null: false
+      add :shipping_address_line3, :string, null: true
       add :shipping_address_city, :string, null: true
       add :shipping_address_state, :string, null: true
       add :shipping_address_postal_code, :string, null: false

@@ -154,13 +154,18 @@ input[type="radio"] {
 }
 
 .text-input-1,
-.text-input-2 {
+.text-input-2,
+.text-input-3 {
   font-family: AppleGaramondLight, sans-serif;
   font-size: 34px;
   border-top: none;
   border-left: none;
   border-right: none;
   border-radius: 0px;
+}
+
+.text-input-1,
+.text-input-2 {
   width: 400px;
 }
 

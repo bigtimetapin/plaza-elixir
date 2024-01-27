@@ -15,6 +15,7 @@ defmodule Plaza.Purchases.Purchase do
     field :shipping_method_price, :integer
     field :shipping_address_line1, :string
     field :shipping_address_line2, :string
+    field :shipping_address_line3, :string
     field :shipping_address_city, :string
     field :shipping_address_state, :string
     field :shipping_address_postal_code, :string
@@ -22,6 +23,8 @@ defmodule Plaza.Purchases.Purchase do
     timestamps()
   end
 
+  ## using street number as line-2 in brasil
+  ## which is required with the cep
   def changeset(purchase, attrs) do
     purchase
     |> cast(attrs, [
@@ -37,6 +40,7 @@ defmodule Plaza.Purchases.Purchase do
       :shipping_method_price,
       :shipping_address_line1,
       :shipping_address_line2,
+      :shipping_address_line3,
       :shipping_address_city,
       :shipping_address_state,
       :shipping_address_postal_code,
@@ -52,6 +56,7 @@ defmodule Plaza.Purchases.Purchase do
       :shipping_method_id,
       :shipping_method_price,
       :shipping_address_line1,
+      :shipping_address_line2,
       :shipping_address_postal_code
     ])
   end
