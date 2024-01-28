@@ -1351,7 +1351,7 @@ defmodule PlazaWeb.CheckoutLive do
           Compra realizada com sucesso!
         </div>
         <div style="font-size: 30px; margin-top: 10px;">
-          check your email for your receipt and updates
+          verifique seu e-mail para receber seu recibo e atualizações
         </div>
         <div style="display: flex; justify-content: center; margin-top: 50px;">
           <div style="display: flex; flex-direction: column; width: 300px;">
@@ -1360,6 +1360,11 @@ defmodule PlazaWeb.CheckoutLive do
               Successo!
             </div>
           </div>
+        </div>
+        <div style="font-size: 30px; margin-top: 10px; text-decoration: underline;">
+          <.link navigate="/">
+            Voltar para plazaaaaa
+          </.link>
         </div>
       </div>
     </div>
