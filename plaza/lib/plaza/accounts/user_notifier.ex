@@ -21,6 +21,8 @@ defmodule Plaza.Accounts.UserNotifier do
 
     R$ #{(their_share / 100) |> Float.round(2) |> Float.to_string() |> String.replace(".", ",")} estão sendo transferidos para sua conta Stripe.
 
+    Visite plazaaaaa.com/my-store para mais detalhes.
+
     Este é um email automatico do site plazaaaaa.com por favor não responder diretamente para este remetente.
 
     Se não foi você por favor desconsidere esta mensagem.
@@ -31,7 +33,7 @@ defmodule Plaza.Accounts.UserNotifier do
     deliver(receipt_email, "Uma compra", """
     Você realizou uma compraaaaa
 
-    O URL do seu pedido: #{receipt_url}
+    O recibo do seu pedido: #{receipt_url}
 
     Este é um email automatico do site plazaaaaa.com por favor não responder diretamente para este remetente.
 

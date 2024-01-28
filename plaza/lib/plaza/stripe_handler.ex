@@ -3,6 +3,7 @@ defmodule Plaza.StripeHandler do
 
   alias Plaza.Accounts
   alias Plaza.Accounts.UserNotifier
+  alias Plaza.ProductAnalytics
   alias Plaza.Products.Product
   alias Plaza.Purchases
   alias Plaza.Dimona.Requests.Order
@@ -43,7 +44,8 @@ defmodule Plaza.StripeHandler do
           fn %{
                "user_id" => user_id,
                "total_price" => total_price,
-               "total_platform_fee" => total_platform_fee
+               "total_platform_fee" => total_platform_fee,
+               "product_analytics" => product_analytics
              } = params ->
             amount =
               Product.price_unit_amount(%{price: total_price}) -
@@ -62,11 +64,27 @@ defmodule Plaza.StripeHandler do
 
             case transfer_result do
               {:ok, _} ->
+                ## email receipt to seller
                 seller_email_response =
                   UserNotifier.deliver_receipt_to_seller(
                     user.email,
                     amount
                   )
+
+                ## increment product analytics 
+                increment_product_analytics_stream =
+                  Task.async_stream(
+                    product_analytics,
+                    fn %{"product_id" => product_id, "quantity" => quantity} ->
+                      ProductAnalytics.increment_total_purchased(
+                        product_id,
+                        quantity
+                      )
+                    end
+                  )
+
+                incremented_product_analytics = Enum.to_list(increment_product_analytics_stream)
+                IO.inspect(incremented_product_analytics)
 
                 IO.inspect(seller_email_response)
                 %{params | "paid" => true}
