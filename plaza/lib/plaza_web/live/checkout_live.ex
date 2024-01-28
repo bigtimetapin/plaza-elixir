@@ -103,6 +103,7 @@ defmodule PlazaWeb.CheckoutLive do
           )
           |> assign(name_form_valid: false)
           |> assign(name: nil)
+          |> assign(checkout_as_guest_mobile: false)
           |> assign(waiting: false)
           |> push_event(
             "read",
@@ -175,6 +176,16 @@ defmodule PlazaWeb.CheckoutLive do
     socket =
       socket
       |> assign(mobile_header_open: false)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("checkout-as-guest", _, socket) do
+    checkout_as_guest_mobile = !socket.assigns.checkout_as_guest_mobile
+
+    socket =
+      socket
+      |> assign(checkout_as_guest_mobile: checkout_as_guest_mobile)
 
     {:noreply, socket}
   end
@@ -1120,7 +1131,7 @@ defmodule PlazaWeb.CheckoutLive do
         </div>
       </div>
     </div>
-    <div class="is-checkout-page-mobile has-font-3" style="height: 1000px;">
+    <div class="is-checkout-page-mobile has-font-3">
       <div style="display: flex; justify-content: center; margin-left: 10px; margin-right: 10px; margin-top: 100px;">
         <div style="display: flex; flex-direction: column; width: 100%;">
           <div style="border-bottom: 2px solid grey; margin-bottom: 10px;">
@@ -1199,18 +1210,110 @@ defmodule PlazaWeb.CheckoutLive do
                   remover
                 </button>
               </div>
-              <div style="display: flex; border-top: 2px solid lightgrey; margin-top: 10px;">
-                <div style="margin-left: auto;">
-                  <div style="display: flex;">
-                    <div style="font-size: 24px; line-height: 43px; margin-right: 20px;">
-                      Total:
-                    </div>
-                    <div style="font-size: 28px;">
-                      <%= "R$ #{Float.to_string(@cart_total_amount) |> String.replace(".", ",")}" %>
-                    </div>
+            </div>
+
+            <div style="display: flex; border-top: 2px solid lightgrey; margin-top: 10px;">
+              <div style="margin-left: auto;">
+                <div style="display: flex;">
+                  <div style="font-size: 24px; line-height: 43px; margin-right: 20px;">
+                    Total:
+                  </div>
+                  <div style="font-size: 28px;">
+                    <%= "R$ #{Float.to_string(@cart_total_amount) |> String.replace(".", ",")}" %>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+          <div :if={!@checkout_as_guest_mobile && !@current_user}>
+            <div style="border-bottom: 1px solid grey; margin-bottom: 10px; margin-top: 50px;">
+              <div style="font-size: 36px; line-height: 40px; margin-left: 10px;">
+                Checkout
+              </div>
+            </div>
+            <div style="font-size: 20px; line-height: 18px; margin-left: 10px;">
+              coloque seu email para fazer login
+            </div>
+            <div style="font-size: 20px; line-height: 18px; margin-left: 10px;">
+              ou continue como
+              <button
+                class="has-font-3"
+                style="text-decoration: underline;"
+                phx-click="checkout-as-guest"
+              >
+                convidado
+              </button>
+            </div>
+            <div style="display: flex; justify-content: center;">
+              <div style="width: 300px;">
+                <PlazaWeb.Auth.Login.login_quick
+                  form={@login_form}
+                  redirect_url="/checkout"
+                  button_right={false}
+                />
+              </div>
+            </div>
+          </div>
+          <div :if={@checkout_as_guest_mobile && !@current_user}>
+            <div style="border-bottom: 1px solid grey; margin-bottom: 10px; margin-top: 50px;">
+              <div style="font-size: 36px; line-height: 40px; margin-left: 10px;">
+                Checkout como convidado
+              </div>
+            </div>
+            <div style="font-size: 20px; line-height: 18px; margin-left: 10px; margin-bottom: 10px;">
+              coloque apenas seu email
+            </div>
+            <div style="display: flex; justify-content: center;">
+              <div style="display: flex; flex-direction: column;">
+                <.form for={@email_form} phx-change="change-email-form" phx-submit="submit-email-form">
+                  <.input
+                    field={@email_form[:email]}
+                    type="email"
+                    class="text-input-3"
+                    placeholder="seu email"
+                    autocomplete="email"
+                  />
+                  <div style={if @email_form_is_empty, do: "opacity: 50%;"}>
+                    <div style="display: flex; justify-content: center; margin-top: 50px;">
+                      <button disabled={@email_form_is_empty}>
+                        <img src="svg/yellow-ellipse.svg" />
+                        <div
+                          class="has-font-3"
+                          style="position: relative; bottom: 79px; font-size: 36px;"
+                        >
+                          Continuar
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </.form>
+                <div style="margin-left: auto;">
+                  <div style="position: relative; bottom: 200px;">
+                    <button
+                      class="has-font-3"
+                      style="text-decoration: underline; font-size: 20px;"
+                      phx-click="checkout-as-guest"
+                    >
+                      voltar para login
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div :if={@current_user}>
+            <div style="display: flex; justify-content: center; margin-top: 50px; margin-bottom: 50px;">
+              <button
+                phx-click="step"
+                phx-value-step="2"
+                style={if @cart_out_of_stock, do: "opacity: 50%"}
+                disabled={@cart_out_of_stock}
+              >
+                <img src="svg/yellow-ellipse.svg" />
+                <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                  Comprar
+                </div>
+              </button>
             </div>
           </div>
         </div>
@@ -1382,7 +1485,11 @@ defmodule PlazaWeb.CheckoutLive do
           coloque seu email para fazer login ou continue como convidado
         </div>
         <div style="width: 500px;">
-          <PlazaWeb.Auth.Login.login_quick form={@login_form} redirect_url="/checkout" />
+          <PlazaWeb.Auth.Login.login_quick
+            form={@login_form}
+            redirect_url="/checkout"
+            button_right={true}
+          />
         </div>
         <div>
           <div style="font-size: 36px;">
@@ -1396,7 +1503,7 @@ defmodule PlazaWeb.CheckoutLive do
               <.input
                 field={@email_form[:email]}
                 type="email"
-                placeholder="email"
+                placeholder="seu email"
                 autocomplete="email"
               />
               <div style={if @email_form_is_empty, do: "opacity: 50%;"}>

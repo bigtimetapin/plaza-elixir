@@ -10,7 +10,7 @@ defmodule PlazaWeb.Auth.Login do
   def login_quick(assigns) do
     ~H"""
     <div>
-      <.login form={@form} full={false} />
+      <.login form={@form} full={false} button_right={@button_right} />
     </div>
     """
   end
@@ -25,6 +25,7 @@ defmodule PlazaWeb.Auth.Login do
 
   attr :form, :any, required: true
   attr :full, :boolean, default: true
+  attr :button_right, :boolean, default: true
 
   def login(assigns) do
     ~H"""
@@ -70,8 +71,18 @@ defmodule PlazaWeb.Auth.Login do
           Forgot your password?
         </.link>
       </:actions>
-      <div style="display: flex;">
+      <div :if={@button_right} style="display: flex;">
         <div style="margin-left: auto;">
+          <button phx-disable-with="signing in...">
+            <img src="/svg/yellow-ellipse.svg" />
+            <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+              sign in
+            </div>
+          </button>
+        </div>
+      </div>
+      <div :if={!@button_right} style="display: flex; justify-content: center;">
+        <div>
           <button phx-disable-with="signing in...">
             <img src="/svg/yellow-ellipse.svg" />
             <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
