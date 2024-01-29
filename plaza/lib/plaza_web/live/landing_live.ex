@@ -111,6 +111,23 @@ defmodule PlazaWeb.LandingLive do
 
   def render(assigns) do
     ~H"""
+    <.desktop
+      top_3_curated_products={@top_3_curated_products}
+      next_9_curated_products={@next_9_curated_products}
+      curated_cursor_before={@curated_cursor_before}
+      curated_cursor_after={@curated_cursor_after}
+    />
+    <.mobile
+      top_3_curated_products={@top_3_curated_products}
+      next_9_curated_products={@next_9_curated_products}
+      curated_cursor_before={@curated_cursor_before}
+      curated_cursor_after={@curated_cursor_after}
+    />
+    """
+  end
+
+  def desktop(assigns) do
+    ~H"""
     <div
       class="is-landing-desktop has-font-3"
       style="margin-top: 150px; margin-left: 20px; margin-right: 20px;"
@@ -222,86 +239,91 @@ defmodule PlazaWeb.LandingLive do
 
   def mobile(assigns) do
     ~H"""
-    <div class="is-landing-mobile has-font-3" style="margin-top: 150px;">
+    <div class="is-landing-mobile has-font-3" style="margin-top: 25px;">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column; text-align: center; width: 100%;">
-          <div style="padding-left: 10px; padding-right: 10px;">
-            <div :for={product <- @curated_products} style="margin-bottom: 150px;">
-              <ProductComponent.product product={product} meta={true} disabled={false} />
-            </div>
-            <div style="display: flex; justify-content: right; margin-top: 500px;">
-              <div>
-                <div style="font-size: 22px;">
-                  em alta esta semana
-                </div>
-                <div style="margin-left: 10px;">
-                  <img src="/svg/right-arrow.svg" />
-                </div>
-              </div>
-            </div>
-            <div style="display: flex; overflow-x: scroll; margin-bottom: 200px; padding-top: 15px;">
-              <div
-                :for={product <- @first_4_uncurated_products ++ @second_4_uncurated_products}
-                style="margin-right: 15px;"
-              >
-                <ProductComponent.product
-                  product={product}
-                  meta={true}
-                  disabled={false}
-                  style="width: 355px;"
-                />
-              </div>
+        <div style="display: flex; flex-direction: column; width: 100%; margin-left: 10px; margin-right: 10px;">
+          <div style="font-size: 28px; line-height: 32px; text-align: center;">
+            <h1>
+              Bem vindo ao plaza,
+            </h1>
+            <h2>
+              aqui você encontra camisetas e posters
+            </h2>
+            <h2>
+              de artistas independentes.
+            </h2>
+          </div>
+          <div style="display: flex; justify-content: center; margin-top: 25px; margin-bottom: 25px;">
+            <img src="/svg/star.svg" style="width: 40%; margin-right: 25px;" />
+            <img src="/svg/star.svg" style="width: 40%;" />
+          </div>
+          <h2 style="font-size: 38px; text-align: center; margin-bottom: 50px;">
+            Apoie a comunidade criativa
+          </h2>
+          <div style="display: flex; overflow-x: scroll; margin-bottom: 100px; padding-top: 15px;">
+            <div :for={product <- @top_3_curated_products} style="margin-right: 15px;">
+              <ProductComponent.product
+                product={product}
+                meta={true}
+                disabled={false}
+                style="width: 355px;"
+              />
             </div>
           </div>
-          <div>
-            <h2 style="font-size: 40px; line-height: 55px; margin-bottom: 50px;">
-              <div>
-                plazaaaaa é uma loja aberta
-              </div>
-              <div>
-                para vender camisetas
-              </div>
-              <div>
-                estampadas
-              </div>
+          <div style="display: flex; justify-content: center; margin-bottom: 25px;">
+            <img src="/svg/big-yellow-circle.svg" style="width: 175px;" />
+          </div>
+          <div style="font-size: 38px; line-height: 40px; text-align: center;">
+            <h2>
+              Inscreva-se e venda seus
             </h2>
-            <div style="display: flex; justify-content: center; margin-bottom: 50px;">
-              <img src="svg/star.svg" />
+          </div>
+          <div style="font-size: 38px; line-height: 40px; text-align: center; margin-bottom: 25px;">
+            <h2>
+              designs hoje mesmo.
+            </h2>
+          </div>
+          <div style="font-size: 26px; text-decoration: underline; text-align: center; margin-bottom: 100px;">
+            Saiba como funciona
+          </div>
+          <div style="font-size: 26px; line-height: 28px; display: flex; justify-content: center; margin-bottom: 25px;">
+            <div style="text-align: center; margin-right: 20px;">
+              <h3>
+                Arraste para ver
+              </h3>
+              <h3>
+                todos os produtos online
+              </h3>
             </div>
-            <h3 style="font-size: 20px; line-height: 28px; margin-bottom: 25px;">
-              <div>
-                qualquer um pode publicar seus designs e vender
-              </div>
-              <div>
-                por aqui, basta escolher sua margem de lucro e
-              </div>
-              <div>
-                subir a arte, o resto a gente cuida.
-              </div>
-            </h3>
-            <h3 style="font-size: 20px; line-height: 28px; margin-bottom: 25px;">
-              <div>
-                cada produto vendido é produzido sob demanda e
-              </div>
-              <div>
-                chega na casa do cliente final em até 7 dias úteis.
-              </div>
-            </h3>
-            <h3 style="font-size: 20px; line-height: 28px; margin-bottom: 25px;">
-              <div>
-                produzimos sob demanda e não tem desperdício,
-              </div>
-              <div>
-                você recebe seus lucros e basicamente é isso, bem
-              </div>
-              <div>
-                simples e facil como tudo deveria ser.
-              </div>
-            </h3>
-            <div style="margin-bottom: 250px;">
-              <.link navigate="/upload" style="text-decoration: underline; font-size: 28px;">
-                quero vender
-              </.link>
+            <div style="position: relative; top: 5px;">
+              <img src="/svg/arrow-down.svg" />
+            </div>
+          </div>
+          <div style="padding-left: 10px; padding-right: 10px;">
+            <div :for={product <- @next_9_curated_products} style="margin-bottom: 150px;">
+              <ProductComponent.product product={product} meta={true} disabled={false} />
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-around; margin-top: 25px; margin-bottom: 250px;">
+            <div style="margin-right: 50px;">
+              <button
+                :if={@curated_cursor_before}
+                phx-click="curated-cursor-before"
+                class="has-font-3"
+                style="font-size: 22px; text-decoration: underline;"
+              >
+                anterior
+              </button>
+            </div>
+            <div>
+              <button
+                :if={@curated_cursor_after}
+                phx-click="curated-cursor-after"
+                class="has-font-3"
+                style="font-size: 22px; text-decoration: underline;"
+              >
+                próxima
+              </button>
             </div>
           </div>
         </div>

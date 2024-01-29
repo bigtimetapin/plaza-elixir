@@ -342,10 +342,12 @@ $spacing-values: (
     /* Position the navbar at the top of the page */
     width: 100%;
     /* Full width */
-    height: 100px;
+    height: 107px;
     z-index: 101;
     // blend in
     background-color: #FFFFFF;
+    // border 
+    border-bottom: 1px solid grey;
   }
 }
 
