@@ -9,12 +9,23 @@ defmodule PlazaWeb.LandingLive do
   def mount(_params, _session, socket) do
     IO.inspect(socket.assigns.current_user)
     ## curated products 
-    curated_products = Products.top_4_paginated(%{before: nil, after: nil})
-    ## uncurated products
-    uncurated_products = Products.top_8_uncurated_paginated(%{before: nil, after: nil})
-    ## split first 4 and second 4 uncurated products
-    first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
-    second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
+    top_3_curated_products =
+      Products.top_n_paginated(
+        %{
+          before: nil,
+          after: nil
+        },
+        3
+      )
+
+    next_9_curated_products =
+      Products.top_n_paginated(
+        %{
+          before: nil,
+          after: top_3_curated_products.metadata.after
+        },
+        9
+      )
 
     seller =
       case socket.assigns.current_user do
@@ -27,13 +38,10 @@ defmodule PlazaWeb.LandingLive do
 
     socket =
       socket
-      |> assign(curated_products: curated_products.entries)
+      |> assign(top_3_curated_products: top_3_curated_products.entries)
+      |> assign(next_9_curated_products: next_9_curated_products.entries)
+      |> assign(curated_cursor_after: next_9_curated_products.metadata.after)
       |> assign(curated_cursor_before: nil)
-      |> assign(curated_cursor_after: curated_products.metadata.after)
-      |> assign(first_4_uncurated_products: first_4_uncurated_products)
-      |> assign(second_4_uncurated_products: second_4_uncurated_products)
-      |> assign(uncurated_cursor_before: nil)
-      |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
       |> assign(header: :landing)
       |> assign(seller: seller)
 
@@ -64,133 +72,156 @@ defmodule PlazaWeb.LandingLive do
   end
 
   def handle_event("curated-cursor-after", _, socket) do
-    curated_products =
-      Products.top_4_paginated(%{before: nil, after: socket.assigns.curated_cursor_after})
+    next_9_curated_products =
+      Products.top_n_paginated(
+        %{
+          before: nil,
+          after: socket.assigns.curated_cursor_after
+        },
+        9
+      )
 
     socket =
       socket
-      |> assign(curated_products: curated_products.entries)
-      |> assign(curated_cursor_before: curated_products.metadata.before)
-      |> assign(curated_cursor_after: curated_products.metadata.after)
+      |> assign(next_9_curated_products: next_9_curated_products.entries)
+      |> assign(curated_cursor_before: next_9_curated_products.metadata.before)
+      |> assign(curated_cursor_after: next_9_curated_products.metadata.after)
 
     {:noreply, socket}
   end
 
   def handle_event("curated-cursor-before", _, socket) do
-    curated_products =
-      Products.top_4_paginated(%{before: socket.assigns.curated_cursor_before, after: nil})
+    next_9_curated_products =
+      Products.top_n_paginated(
+        %{
+          before: socket.assigns.curated_cursor_before,
+          after: nil
+        },
+        9
+      )
 
     socket =
       socket
-      |> assign(curated_products: curated_products.entries)
-      |> assign(curated_cursor_before: curated_products.metadata.before)
-      |> assign(curated_cursor_after: curated_products.metadata.after)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("uncurated-cursor-after", _, socket) do
-    uncurated_products =
-      Products.top_8_uncurated_paginated(%{
-        before: nil,
-        after: socket.assigns.uncurated_cursor_after
-      })
-
-    first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
-    second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
-
-    socket =
-      socket
-      |> assign(first_4_uncurated_products: first_4_uncurated_products)
-      |> assign(second_4_uncurated_products: second_4_uncurated_products)
-      |> assign(uncurated_cursor_before: uncurated_products.metadata.before)
-      |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("uncurated-cursor-before", _, socket) do
-    uncurated_products =
-      Products.top_8_uncurated_paginated(%{
-        before: socket.assigns.uncurated_cursor_before,
-        after: nil
-      })
-
-    first_4_uncurated_products = Enum.slice(uncurated_products.entries, 0, 4)
-    second_4_uncurated_products = Enum.slice(uncurated_products.entries, 4, 4)
-
-    socket =
-      socket
-      |> assign(first_4_uncurated_products: first_4_uncurated_products)
-      |> assign(second_4_uncurated_products: second_4_uncurated_products)
-      |> assign(uncurated_cursor_before: uncurated_products.metadata.before)
-      |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
+      |> assign(next_9_curated_products: next_9_curated_products.entries)
+      |> assign(curated_cursor_before: next_9_curated_products.metadata.before)
+      |> assign(curated_cursor_after: next_9_curated_products.metadata.after)
 
     {:noreply, socket}
   end
 
   def render(assigns) do
     ~H"""
-    <div class="is-landing-desktop mt-large mx-large">
-      <div>
-        <ProductComponent.products4 products={@curated_products} />
-        <div style="display: flex; justify-content: space-around;">
-          <div>
-            <button :if={@curated_cursor_before} phx-click="curated-cursor-before">
-              prev
-            </button>
+    <div
+      class="is-landing-desktop has-font-3"
+      style="margin-top: 150px; margin-left: 20px; margin-right: 20px;"
+    >
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column; width: 100%; max-width: 1500px;">
+          <div style="display: flex; margin-bottom: 100px;">
+            <div style="margin-right: 75px;">
+              <img src="/svg/big-yellow-circle.svg" style="width: 300px;" />
+            </div>
+            <div>
+              <div style="font-size: 72px;">
+                Apoie a comunidade criativa
+              </div>
+              <div style="font-size: 36px; max-width: 775px; margin-bottom: 25px;">
+                Bem vindo ao plaza, aqui você encontra camisetas e posters de artistas independentes.
+              </div>
+              <div style="font-size: 36px; max-width: 775px;">
+                Inscreva-se e venda seus designs hoje mesmo.
+              </div>
+            </div>
           </div>
           <div>
-            <button :if={@curated_cursor_after} phx-click="curated-cursor-after">
-              next
-            </button>
+            <ProductComponent.products3 products={@top_3_curated_products} />
           </div>
-        </div>
-      </div>
-      <div style="display: flex; margin-top: 100px; margin-bottom: 100px;">
-        <div class="has-font-3">
-          <h2 style="font-size: 63px; margin-bottom: 25px;">
-            plazaaaaa é um espaço público para venda de camisetas
-          </h2>
-          <h3 style="font-size: 38px; min-width: 300px; max-width: 1005px; line-height: 45px; margin-bottom: 25px;">
-            qualquer um pode publicar seus designs e vender por aqui, basta escolher sua margem de lucro e subir a arte, o resto a gente cuida.
-          </h3>
-          <h3 style="font-size: 38px; min-width: 300px; max-width: 970px; line-height: 45px; margin-bottom: 25px;">
-            cada produto vendido é produzido sob demanda e chega na casa do cliente final em até 7 dias úteis.
-          </h3>
-          <h3 style="font-size: 38px; min-width: 300px; max-width: 970px; line-height: 45px; margin-bottom: 25px;">
-            produzimos sob demanda e não tem desperdício.
-            <.link navigate="/upload" style="text-decoration: underline; margin-left: 50px;">
-              quero vender
-            </.link>
-          </h3>
-        </div>
-        <div style="min-width: 250px;">
-          <img src="svg/star.svg" />
-        </div>
-      </div>
-      <div>
-        <div style="margin-bottom: 100px;">
-          <ProductComponent.products4 products={@first_4_uncurated_products} />
-        </div>
-        <div>
-          <ProductComponent.products4 products={@second_4_uncurated_products} />
-        </div>
-        <div style="display: flex; justify-content: space-around; margin-top: 25px; margin-bottom: 50px;">
+          <div style="display: flex; justify-content: center; margin-top: 100px; margin-bottom: 100px;">
+            <div>
+              <h2 style="font-size: 58px; margin-bottom: 25px;">
+                Monetize seus projetos com camisetas e posters
+              </h2>
+              <h3 style="font-size: 32px; min-width: 300px; max-width: 1005px; line-height: 36px; margin-bottom: 25px;">
+                Crie sua loja e comece a vender hoje mesmo, não tem nenhum custo.
+              </h3>
+              <h3 style="font-size: 32px; min-width: 300px; max-width: 670px; line-height: 36px; margin-bottom: 25px;">
+                A produção é feita sobre demanda sem quantidade mínima, sem desperdícios e entregue direto para o cliente final.
+              </h3>
+              <h3 style="font-size: 32px; line-height: 36px; margin-bottom: 25px;">
+                <.link navigate="/upload" style="text-decoration: underline;">
+                  quero vender
+                </.link>
+              </h3>
+            </div>
+            <div style="min-width: 250px;">
+              <img src="svg/star.svg" />
+            </div>
+          </div>
+          <div style="display: flex; margin-bottom: 20px;">
+            <div>
+              <h4 style="font-size: 58px; line-height: 45px;">
+                Designs Selecionados
+              </h4>
+              <h5 style="font-size: 32px;">
+                As estampas que a gente mais gosta
+              </h5>
+            </div>
+            <div style="margin-left: auto; margin-right: 120px; display: flex; position: relative; top: 45px;">
+              <div style="margin-right: 50px;">
+                <button
+                  :if={@curated_cursor_before}
+                  phx-click="curated-cursor-before"
+                  class="has-font-3"
+                  style="font-size: 28px; text-decoration: underline;"
+                >
+                  anterior
+                </button>
+              </div>
+              <div>
+                <button
+                  :if={@curated_cursor_after}
+                  phx-click="curated-cursor-after"
+                  class="has-font-3"
+                  style="font-size: 28px; text-decoration: underline;"
+                >
+                  próxima
+                </button>
+              </div>
+            </div>
+          </div>
           <div>
-            <button :if={@uncurated_cursor_before} phx-click="uncurated-cursor-before">
-              prev
-            </button>
+            <ProductComponent.products3 products={@next_9_curated_products} />
           </div>
-          <div>
-            <button :if={@uncurated_cursor_after} phx-click="uncurated-cursor-after">
-              next
-            </button>
+          <div style="display: flex; justify-content: space-around; margin-top: 25px; margin-bottom: 250px;">
+            <div style="margin-right: 50px;">
+              <button
+                :if={@curated_cursor_before}
+                phx-click="curated-cursor-before"
+                class="has-font-3"
+                style="font-size: 28px; text-decoration: underline;"
+              >
+                anterior
+              </button>
+            </div>
+            <div>
+              <button
+                :if={@curated_cursor_after}
+                phx-click="curated-cursor-after"
+                class="has-font-3"
+                style="font-size: 28px; text-decoration: underline;"
+              >
+                próxima
+              </button>
+            </div>
           </div>
         </div>
-        <div style="min-width: 300px; max-width: 1650px; height: 495px; border: 1px solid gray; margin-bottom: 1000px;" />
       </div>
     </div>
+    """
+  end
+
+  def mobile(assigns) do
+    ~H"""
     <div class="is-landing-mobile has-font-3" style="margin-top: 150px;">
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; flex-direction: column; text-align: center; width: 100%;">

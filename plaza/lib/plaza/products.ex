@@ -27,7 +27,7 @@ defmodule Plaza.Products do
     )
   end
 
-  def top_4_paginated(cursors) do
+  def top_n_paginated(cursors, n) do
     %{entries: entries, metadata: metadata} =
       Repo.paginate(
         from(
@@ -38,7 +38,7 @@ defmodule Plaza.Products do
         before: cursors.before,
         after: cursors.after,
         cursor_fields: [{:updated_at, :desc}, {:id, :desc}],
-        limit: 4
+        limit: n
       )
 
     %{entries: entries, metadata: metadata}

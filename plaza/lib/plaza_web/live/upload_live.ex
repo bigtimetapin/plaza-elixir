@@ -1133,7 +1133,7 @@ defmodule PlazaWeb.UploadLive do
       |> assign(:product_params, product_params)
 
     ~H"""
-    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px;">
+    <div class="has-font-3" style="margin-top: 250px; margin-bottom: 500px;">
       <div style="display: flex; justify-content: center;">
         <div style="font-size: 40px;">
           Produto publicado com sucesso!
@@ -1146,9 +1146,6 @@ defmodule PlazaWeb.UploadLive do
                 isitar página do produto
               </div>
             </.link>
-          </div>
-          <div style="display: flex; justify-content: center; margin-top: 75px; font-size: 34px;">
-            Copiar link para compartilhar
           </div>
         </div>
       </div>
