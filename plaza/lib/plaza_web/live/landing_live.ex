@@ -164,7 +164,10 @@ defmodule PlazaWeb.LandingLive do
               <h3 style="font-size: 32px; min-width: 300px; max-width: 670px; line-height: 36px; margin-bottom: 25px;">
                 A produção é feita sobre demanda sem quantidade mínima, sem desperdícios e entregue direto para o cliente final.
               </h3>
-              <h3 style="font-size: 32px; line-height: 36px; margin-bottom: 25px;">
+              <h3
+                style="font-size: 32px; line-height: 36px; margin-bottom: 25px;"
+                id="top-9-products-desktop"
+              >
                 <.link navigate="/upload" style="text-decoration: underline;">
                   quero vender
                 </.link>
@@ -211,24 +214,26 @@ defmodule PlazaWeb.LandingLive do
           </div>
           <div style="display: flex; justify-content: space-around; margin-top: 25px; margin-bottom: 250px;">
             <div style="margin-right: 50px;">
-              <button
+              <a
                 :if={@curated_cursor_before}
                 phx-click="curated-cursor-before"
                 class="has-font-3"
                 style="font-size: 28px; text-decoration: underline;"
+                href="#top-9-products-desktop"
               >
                 anterior
-              </button>
+              </a>
             </div>
             <div>
-              <button
+              <a
                 :if={@curated_cursor_after}
                 phx-click="curated-cursor-after"
                 class="has-font-3"
                 style="font-size: 28px; text-decoration: underline;"
+                href="#top-9-products-desktop"
               >
                 próxima
-              </button>
+              </a>
             </div>
           </div>
         </div>
@@ -283,7 +288,10 @@ defmodule PlazaWeb.LandingLive do
               designs hoje mesmo.
             </h2>
           </div>
-          <div style="font-size: 26px; text-decoration: underline; text-align: center; margin-bottom: 100px;">
+          <div
+            style="font-size: 26px; text-decoration: underline; text-align: center; margin-bottom: 100px;"
+            id="top-9-products"
+          >
             Saiba como funciona
           </div>
           <div style="font-size: 26px; line-height: 28px; display: flex; justify-content: center; margin-bottom: 25px;">
@@ -306,24 +314,26 @@ defmodule PlazaWeb.LandingLive do
           </div>
           <div style="display: flex; justify-content: space-around; margin-top: 25px; margin-bottom: 250px;">
             <div style="margin-right: 50px;">
-              <button
+              <a
                 :if={@curated_cursor_before}
                 phx-click="curated-cursor-before"
                 class="has-font-3"
                 style="font-size: 22px; text-decoration: underline;"
+                href="#top-9-products"
               >
                 anterior
-              </button>
+              </a>
             </div>
             <div>
-              <button
+              <a
                 :if={@curated_cursor_after}
                 phx-click="curated-cursor-after"
                 class="has-font-3"
                 style="font-size: 22px; text-decoration: underline;"
+                href="#top-9-products"
               >
                 próxima
-              </button>
+              </a>
             </div>
           </div>
         </div>
