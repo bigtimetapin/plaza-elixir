@@ -605,7 +605,7 @@ defmodule PlazaWeb.MyStoreLive do
             class="has-font-3"
             style="border-bottom: 2px solid black; width: 50px; font-size: 32px;"
           >
-            cancel
+            cancelar
           </button>
         </div>
       </div>
@@ -919,12 +919,18 @@ defmodule PlazaWeb.MyStoreLive do
       </div>
       <div>
         <div style="margin-left: 50px;">
-          <.form for={@seller_form} phx-change="change-seller-form" phx-submit="submit-seller-form">
+          <.form
+            for={@seller_form}
+            phx-change="change-seller-form"
+            phx-submit="submit-seller-form"
+            style="width: 450px;"
+          >
             <.input
               field={@seller_form[:user_name]}
               type="text"
               placeholder="username / nome da loja *"
               class="text-input-1"
+              style="width: 100%; text-align: center;"
               phx-debounce="500"
             >
             </.input>
@@ -933,6 +939,7 @@ defmodule PlazaWeb.MyStoreLive do
               type="text"
               placeholder="website"
               class="text-input-1"
+              style="width: 100%; text-align: center;"
               phx-debounce="500"
             >
             </.input>
@@ -941,6 +948,7 @@ defmodule PlazaWeb.MyStoreLive do
               type="text"
               placeholder="instagram"
               class="text-input-1"
+              style="width: 100%; text-align: center;"
               phx-debounce="500"
             >
             </.input>
@@ -949,6 +957,7 @@ defmodule PlazaWeb.MyStoreLive do
               type="text"
               placeholder="twitter"
               class="text-input-1"
+              style="width: 100%; text-align: center;"
               phx-debounce="500"
             >
             </.input>
@@ -957,6 +966,7 @@ defmodule PlazaWeb.MyStoreLive do
               type="text"
               placeholder="soundcloud"
               class="text-input-1"
+              style="width: 100%; text-align: center;"
               phx-debounce="500"
             >
             </.input>
@@ -968,7 +978,7 @@ defmodule PlazaWeb.MyStoreLive do
                   placeholder="Breve descrição da loja/artista"
                   phx-debounce="500"
                   maxlength="140"
-                  style="width: 500px; height: 100px;"
+                  style="width: 500px; height: 100px; padding-left: 10px;"
                 >
                 </.input>
               </div>
@@ -977,7 +987,7 @@ defmodule PlazaWeb.MyStoreLive do
                   field={@seller_form[:location]}
                   type="text"
                   placeholder="Localização"
-                  class="text-input-2"
+                  class="text-input-1"
                   phx-debounce="500"
                 >
                 </.input>

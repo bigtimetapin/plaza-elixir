@@ -384,15 +384,15 @@ defmodule PlazaWeb.CheckoutLive do
 
     socket =
       socket
+      |> assign(email: email)
       |> assign(email_form_is_empty: is_empty)
 
     {:noreply, socket}
   end
 
-  def handle_event("submit-email-form", %{"email-form" => %{"email" => email}}, socket) do
+  def handle_event("submit-email-form", _, socket) do
     socket =
       socket
-      |> assign(email: email)
       |> assign(step: 2)
 
     {:noreply, socket}
@@ -985,6 +985,7 @@ defmodule PlazaWeb.CheckoutLive do
 
   def render(%{step: 1} = assigns) do
     ~H"""
+    <div id="checkout-page-top" />
     <div class="is-checkout-page-desktop">
       <div
         class="has-font-3"
@@ -1222,7 +1223,6 @@ defmodule PlazaWeb.CheckoutLive do
                 </button>
               </div>
             </div>
-
             <div style="display: flex; border-top: 2px solid lightgrey; margin-top: 10px;">
               <div style="margin-left: auto;">
                 <div style="display: flex;">
@@ -1276,25 +1276,29 @@ defmodule PlazaWeb.CheckoutLive do
             </div>
             <div style="display: flex; justify-content: center;">
               <div style="display: flex; flex-direction: column;">
-                <.form for={@email_form} phx-change="change-email-form" phx-submit="submit-email-form">
+                <.form for={@email_form} phx-change="change-email-form">
                   <.input
                     field={@email_form[:email]}
-                    type="email"
-                    class="text-input-3"
+                    type="text"
+                    class="text-input-1"
                     placeholder="seu email"
                     autocomplete="email"
                   />
                   <div style={if @email_form_is_empty, do: "opacity: 50%;"}>
                     <div style="display: flex; justify-content: center; margin-top: 50px;">
-                      <button disabled={@email_form_is_empty}>
+                      <a
+                        disabled={@email_form_is_empty}
+                        href="#checkout-page-top"
+                        phx-click="submit-email-form"
+                      >
                         <img src="svg/yellow-ellipse.svg" />
                         <div
                           class="has-font-3"
-                          style="position: relative; bottom: 79px; font-size: 36px;"
+                          style="position: relative; bottom: 79px; left: 39px; font-size: 36px;"
                         >
                           Continuar
                         </div>
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </.form>
@@ -1335,22 +1339,26 @@ defmodule PlazaWeb.CheckoutLive do
 
   def render(%{step: 2} = assigns) do
     ~H"""
-    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 400px;">
+    <div
+      class="has-font-3"
+      style="margin-top: 150px; margin-bottom: 400px; margin-left: 10px; margin-right: 10px;"
+    >
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; flex-direction: column;">
           <div style="align-self: center; font-size: 40px;">
-            Entrega
+            Endereço para entrega
           </div>
-          <div style="align-self: center; font-size: 22px;">
-            coloque o endereço para entrega do seu pedido
+          <div style="align-self: center; font-size: 22px; margin-bottom: 25px;">
+            preencha com o endereço para calcular o frete
           </div>
-          <div style="margin-bottom: 50px; align-self: center;">
+          <div style="margin-bottom: 25px; align-self: center;">
             <.form for={@name_form} phx-change="change-name-form">
               <.input
                 field={@name_form[:name]}
                 type="text"
                 placeholder="nome"
                 class="text-input-1"
+                style="text-align: center; font-size: 28px; width: 300px;"
                 autocomplete="name"
                 phx-debounce="500"
               >
@@ -1368,8 +1376,8 @@ defmodule PlazaWeb.CheckoutLive do
                   field={@address_form[:line1]}
                   type="text"
                   placeholder="endereço"
-                  class="text-input-3"
-                  style="width: 270px; margin-right: 10px;"
+                  class="text-input-1"
+                  style="width: 240px; margin-right: 10px; font-size: 28px;"
                   autocomplete="shipping address-line1"
                   phx-debounce="500"
                 >
@@ -1378,8 +1386,8 @@ defmodule PlazaWeb.CheckoutLive do
                   field={@address_form[:line2]}
                   type="text"
                   placeholder="numero"
-                  class="text-input-3"
-                  style="width: 120px;"
+                  class="text-input-1"
+                  style="width: 100px; font-size: 28px;"
                   autocomplete="shipping address-line2"
                   phx-debounce="500"
                 >
@@ -1389,7 +1397,8 @@ defmodule PlazaWeb.CheckoutLive do
                 field={@address_form[:line3]}
                 type="text"
                 placeholder="complemento"
-                class="text-input-2"
+                class="text-input-1"
+                style="width: 350px; font-size: 28px;"
                 autocomplete="shipping address-line3"
                 phx-debounce="500"
               >
@@ -1399,7 +1408,8 @@ defmodule PlazaWeb.CheckoutLive do
                 field={@address_form[:postal_code]}
                 type="text"
                 placeholder="cep"
-                class="text-input-2"
+                class="text-input-1"
+                style="width: 350px; font-size: 28px;"
                 autocomplete="shipping postal-code"
                 phx-debounce="500"
                 onKeypress="window.hyphen();"
@@ -1410,8 +1420,8 @@ defmodule PlazaWeb.CheckoutLive do
                   field={@address_form[:city]}
                   type="text"
                   placeholder="cidade"
-                  class="text-input-3"
-                  style="width: 195px; margin-right: 10px;"
+                  class="text-input-1"
+                  style="width: 170px; margin-right: 10px; font-size: 28px;"
                   autocomplete="shipping address-level2"
                   phx-debounce="500"
                 >
@@ -1420,14 +1430,14 @@ defmodule PlazaWeb.CheckoutLive do
                   field={@address_form[:state]}
                   type="text"
                   placeholder="estado"
-                  class="text-input-3"
-                  style="width: 195px;"
+                  class="text-input-1"
+                  style="width: 170px; font-size: 28px;"
                   autocomplete="shipping address-level1"
                   phx-debounce="500"
                 >
                 </.input>
               </div>
-              <div style="display: flex; justify-content: center; position: relative; top: 400px;">
+              <div style="display: flex; justify-content: center; position: relative; top: 300px;">
                 <button
                   disabled={!(@name_form_valid && @address_form.source.valid?)}
                   style={if !(@name_form_valid && @address_form.source.valid?), do: "opacity: 50%"}
@@ -1513,18 +1523,23 @@ defmodule PlazaWeb.CheckoutLive do
             <.form for={@email_form} phx-change="change-email-form" phx-submit="submit-email-form">
               <.input
                 field={@email_form[:email]}
-                type="email"
+                type="text"
+                class="text-input-1"
+                style="width: 400px;"
                 placeholder="seu email"
                 autocomplete="email"
               />
-              <div style={if @email_form_is_empty, do: "opacity: 50%;"}>
-                <div style="display: flex; justify-content: center; margin-top: 50px;">
-                  <button disabled={@email_form_is_empty}>
-                    <img src="svg/yellow-ellipse.svg" />
-                    <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                      Continue
-                    </div>
-                  </button>
+              <div style="display: flex; width: 400px;">
+                <div style="margin-left: auto;">
+                  <div style={if @email_form_is_empty, do: "opacity: 50%;"}>
+                    <button
+                      disabled={@email_form_is_empty}
+                      style="font-size: 28px; text-decoration: underline;"
+                      class="has-font-3"
+                    >
+                      Continuar
+                    </button>
+                  </div>
                 </div>
               </div>
             </.form>
@@ -1559,7 +1574,7 @@ defmodule PlazaWeb.CheckoutLive do
       <div style="font-size: 28px;">
         Opções de frete:
       </div>
-      <div style="width: 500px;">
+      <div style="width: 350px;">
         <img src="gif/loading.gif" />
       </div>
     </div>
@@ -1598,14 +1613,15 @@ defmodule PlazaWeb.CheckoutLive do
   defp delivery_method_form(%{options: options, error: false, selected: selected} = assigns) do
     ~H"""
     <div style="text-align: center;">
-      <div style="font-size: 32px; margin-bottom: 10px;">
+      <div style="font-size: 28px; margin-bottom: 10px;">
         Opções de frete:
       </div>
       <div style="display: flex; justify-content: center;">
         <div>
           <button
             :for={option <- options}
-            style="display: flex;"
+            class="has-font-3"
+            style="display: flex; font-size: 26px;"
             phx-click="select-delivery-method"
             phx-value-id={option.id}
             phx-value-price={option.price}
