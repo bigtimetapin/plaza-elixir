@@ -462,11 +462,22 @@ defmodule PlazaWeb.CheckoutLive do
 
         {:ok, address} ->
           Task.async(fn ->
+            cart = socket.assigns.cart
+
+            total_quantity =
+              List.foldl(
+                cart,
+                0,
+                fn item, acc ->
+                  item.quantity + acc
+                end
+              )
+
             {
               :shipping_quote,
               Dimona.Requests.Shipping.post(%{
                 "zipcode" => address.postal_code,
-                "quantity" => 1
+                "quantity" => total_quantity
               })
             }
           end)
