@@ -271,7 +271,7 @@ defmodule PlazaWeb.LandingLive do
                 product={product}
                 meta={true}
                 disabled={false}
-                style="width: 355px;"
+                style="width: 325px;"
               />
             </div>
           </div>
