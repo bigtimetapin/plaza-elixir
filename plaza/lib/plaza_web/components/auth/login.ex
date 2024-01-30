@@ -17,7 +17,7 @@ defmodule PlazaWeb.Auth.Login do
 
   def login_full(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
+    <div>
       <.login form={@form} />
     </div>
     """
@@ -29,69 +29,98 @@ defmodule PlazaWeb.Auth.Login do
 
   def login(assigns) do
     ~H"""
-    <.header :if={@full} class="text-center">
-      Sign in to account
-      <:subtitle>
-        Don't have an account?
-        <.link navigate={~p"/users/register"} class="font-semibold text-brand hover:underline">
-          Sign up
-        </.link>
-        for an account now.
-      </:subtitle>
-    </.header>
-
-    <.simple_form
-      for={@form}
-      id="login_form"
-      action={if @full, do: ~p"/users/log_in", else: ~p"/users/log_in_quick"}
-      phx-update="ignore"
-    >
-      <.input
-        field={@form[:email]}
-        type="email"
-        label="Email"
-        required
-        style="border-bottom: 2px solid grey; font-size: 28px; border-left: none; border-right: none; border-top: none; width: 100%;"
-        class="has-font-3"
-        placeholder="seu email"
-      />
-      <.input
-        field={@form[:password]}
-        type="password"
-        label="Password"
-        required
-        style="border-bottom: 2px solid grey; font-size: 28px; border-left: none; border-right: none; border-top: none; width: 100%;"
-        class="has-font-3"
-        placeholder="senha"
-      />
-      <.input :if={!@full} field={@form[:redirect_url]} style="display: none;" />
-      <:actions :if={@full}>
-        <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
-        <.link href={~p"/users/reset_password"} class="text-sm font-semibold">
-          Forgot your password?
-        </.link>
-      </:actions>
-      <div :if={@button_right} style="display: flex;">
-        <div style="margin-left: auto;">
-          <button phx-disable-with="signing in...">
-            <img src="/svg/yellow-ellipse.svg" />
-            <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-              sign in
+    <div class="has-font-3" style="display: flex; justify-content: center;">
+      <div style="display: flex; flex-direction: column; width: 380px; margin-left: 10px; margin-right: 10px;">
+        <div :if={@full}>
+          <div style="border-bottom: 1px solid grey; margin-bottom: 25px;">
+            <div style="margin-left: 10px; font-size: 34px; line-height: 40px;">
+              Acessar Conta
             </div>
-          </button>
+          </div>
+          <div>
+            <.simple_form
+              for={@form}
+              id="login_form"
+              action={if @full, do: ~p"/users/log_in", else: ~p"/users/log_in_quick"}
+              phx-update="ignore"
+            >
+              <div style="margin-left: 10px; font-size: 22px;">
+                email
+              </div>
+              <.input
+                field={@form[:email]}
+                type="email"
+                label="Email"
+                required
+                style="border-bottom: 2px solid grey; font-size: 28px; width: 100%; background: #F8FC5F; margin-bottom: 25px;"
+                class="has-font-3"
+                placeholder="seu email"
+              />
+              <div style="margin-left: 10px; font-size: 22px;">
+                password
+              </div>
+              <.input
+                field={@form[:password]}
+                type="password"
+                label="Password"
+                required
+                style="border-bottom: 2px solid grey; font-size: 28px; width: 100%; background: #F8FC5F; margin-bottom: 25px;"
+                class="has-font-3"
+                placeholder="senha"
+              />
+              <.input :if={!@full} field={@form[:redirect_url]} style="display: none;" />
+              <div :if={@button_right} style="display: flex;">
+                <div style="margin-left: auto;">
+                  <button phx-disable-with="signing in...">
+                    <img src="/svg/yellow-ellipse.svg" />
+                    <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                      accesar
+                    </div>
+                  </button>
+                </div>
+              </div>
+              <div :if={!@button_right} style="display: flex; justify-content: center;">
+                <div>
+                  <button phx-disable-with="signing in...">
+                    <img src="/svg/yellow-ellipse.svg" />
+                    <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                      accesar
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </.simple_form>
+          </div>
+          <div :if={@full} style="display: flex; font-size: 20px;">
+            <div style="margin-left: auto; margin-right: 20px;">
+              <div style="display: flex;">
+                <div>
+                  <%= "Ainda não tenho conta >>" %>
+                </div>
+                <div style="margin-left: 3px;">
+                  <.link navigate={~p"/users/register"} style="text-decoration: underline;">
+                    Criar Conta
+                  </.link>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div :if={!@button_right} style="display: flex; justify-content: center;">
-        <div>
-          <button phx-disable-with="signing in...">
-            <img src="/svg/yellow-ellipse.svg" />
-            <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-              sign in
-            </div>
-          </button>
-        </div>
-      </div>
-    </.simple_form>
+    </div>
     """
   end
+
+  ## defp forget_your_password(assigns) do
+  ##   ~H"""
+  ##   <div>
+  ##     <:actions :if={@full}>
+  ##       <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />
+  ##       <.link href={~p"/users/reset_password"} class="text-sm font-semibold">
+  ##         Forgot your password?
+  ##       </.link>
+  ##     </:actions>
+  ##   </div>
+  ##   """
+  ## end
 end
