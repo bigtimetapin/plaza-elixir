@@ -10,6 +10,8 @@ defmodule Plaza.StripeHandler do
 
   @impl true
   def handle_event(%Stripe.Event{type: "payment_intent.succeeded", data: data}) do
+    IO.inspect("payment-intent-webhook")
+
     Task.Supervisor.start_child(Plaza.TaskSupervisor, fn ->
       %{object: %{metadata: %{"purchase_id" => purchase_id}}} = data
 
@@ -134,6 +136,12 @@ defmodule Plaza.StripeHandler do
       )
     end)
 
+    :ok
+  end
+
+  @impl true
+  def handle_event(%Stripe.Event{type: type}) do
+    IO.inspect("webhook event: #{type}")
     :ok
   end
 
