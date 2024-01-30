@@ -1245,7 +1245,7 @@ defmodule PlazaWeb.CheckoutLive do
             <div style="font-size: 20px; line-height: 18px; margin-left: 10px;">
               coloque seu email para fazer login
             </div>
-            <div style="font-size: 20px; line-height: 18px; margin-left: 10px;">
+            <div style="font-size: 20px; line-height: 18px; margin-left: 10px; margin-bottom: 35px;">
               ou continue como
               <button
                 class="has-font-3"
@@ -1256,11 +1256,12 @@ defmodule PlazaWeb.CheckoutLive do
               </button>
             </div>
             <div style="display: flex; justify-content: center;">
-              <div style="width: 300px;">
+              <div>
                 <PlazaWeb.Auth.Login.login_quick
                   form={@login_form}
                   redirect_url="/checkout"
                   button_right={false}
+                  width={300}
                 />
               </div>
             </div>
@@ -1505,11 +1506,12 @@ defmodule PlazaWeb.CheckoutLive do
         <div style="font-size: 22px;">
           coloque seu email para fazer login ou continue como convidado
         </div>
-        <div style="width: 500px;">
+        <div>
           <PlazaWeb.Auth.Login.login_quick
             form={@login_form}
             redirect_url="/checkout"
             button_right={true}
+            width={500}
           />
         </div>
         <div>
