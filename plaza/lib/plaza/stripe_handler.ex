@@ -35,7 +35,8 @@ defmodule Plaza.StripeHandler do
           charge.receipt_url
         )
 
-      IO.inspect("buyer-email-response: #{buyer_email_response}")
+      IO.inspect("buer-email-response")
+      IO.inspect(buyer_email_response)
 
       ## build transfer payment to sellers
       transfer_tasks =
@@ -71,7 +72,8 @@ defmodule Plaza.StripeHandler do
                     amount
                   )
 
-                IO.inspect("seller-email-response: #{seller_email_response}")
+                IO.inspect("seller-email-response")
+                IO.inspect(seller_email_response)
 
                 ## build increment-product-analytics tasks 
                 increment_product_analytics_stream =
@@ -87,7 +89,8 @@ defmodule Plaza.StripeHandler do
 
                 ## fire off tasks 
                 incremented_product_analytics = Enum.to_list(increment_product_analytics_stream)
-                IO.inspect("incremented-product-analytics: #{incremented_product_analytics}")
+                IO.inspect("incremented-product-analytics")
+                IO.inspect(incremented_product_analytics)
                 %{params | "paid" => true}
 
               {:error, error} ->
@@ -117,6 +120,7 @@ defmodule Plaza.StripeHandler do
       dimona_order_id =
         case dimona_result do
           {:ok, body} ->
+            IO.inspect("dimona-order-success-body")
             IO.inspect(body)
             body.order
 

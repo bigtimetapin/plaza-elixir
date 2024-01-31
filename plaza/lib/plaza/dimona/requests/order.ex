@@ -35,16 +35,14 @@ defmodule Plaza.Dimona.Requests.Order do
                 sku: product.id,
                 dimona_sku_id: Map.get(@sku_map, "white-#{purchase["size"]}"),
                 qty: purchase["quantity"],
-                designs:
-                  [
-                    product.designs.front,
-                    product.designs.back
-                  ]
-                  |> Enum.filter(& &1),
-                mocks: [
-                  product.mocks.front,
-                  product.mocks
-                ]
+                designs: %{
+                  front: product.designs.front,
+                  back: product.designs.back
+                },
+                mocks: %{
+                  front: product.mocks.front,
+                  back: product.mocks.back
+                }
               }
           end)
 
