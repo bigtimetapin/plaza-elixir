@@ -889,7 +889,6 @@ defmodule PlazaWeb.CheckoutLive do
           mode: "payment",
           line_items: line_items,
           payment_intent_data: %{
-            receipt_email: email,
             metadata: %{"purchase_id" => purchase.id},
             transfer_group: transfer_group
           },

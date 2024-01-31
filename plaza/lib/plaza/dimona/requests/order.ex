@@ -51,7 +51,8 @@ defmodule Plaza.Dimona.Requests.Order do
         IO.inspect(items)
 
         body = %{
-          order_id: purchase.id,
+          ## purchase.id, temporarily use uuid to get around dimona uid constraint
+          order_id: UUID.uuid1(),
           delivery_method_id: purchase.shipping_method_id,
           customer_name: purchase.customer_name,
           customer_email: purchase.email,

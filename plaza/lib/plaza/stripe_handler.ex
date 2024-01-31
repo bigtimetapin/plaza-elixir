@@ -10,8 +10,6 @@ defmodule Plaza.StripeHandler do
 
   @impl true
   def handle_event(%Stripe.Event{type: "payment_intent.succeeded", data: data}) do
-    IO.inspect("payment-intent-webhook")
-
     Task.Supervisor.start_child(Plaza.TaskSupervisor, fn ->
       %{object: %{metadata: %{"purchase_id" => purchase_id}}} = data
 
@@ -33,11 +31,11 @@ defmodule Plaza.StripeHandler do
       ## email receipt to buyer
       buyer_email_response =
         UserNotifier.deliver_receipt_to_buyer(
-          charge.receipt_email,
+          purchase.email,
           charge.receipt_url
         )
 
-      IO.inspect(buyer_email_response)
+      IO.inspect("buyer-email-response: #{buyer_email_response}")
 
       ## build transfer payment to sellers
       transfer_tasks =
@@ -73,7 +71,9 @@ defmodule Plaza.StripeHandler do
                     amount
                   )
 
-                ## increment product analytics 
+                IO.inspect("seller-email-response: #{seller_email_response}")
+
+                ## build increment-product-analytics tasks 
                 increment_product_analytics_stream =
                   Task.async_stream(
                     product_analytics,
@@ -85,10 +85,9 @@ defmodule Plaza.StripeHandler do
                     end
                   )
 
+                ## fire off tasks 
                 incremented_product_analytics = Enum.to_list(increment_product_analytics_stream)
-                IO.inspect(incremented_product_analytics)
-
-                IO.inspect(seller_email_response)
+                IO.inspect("incremented-product-analytics: #{incremented_product_analytics}")
                 %{params | "paid" => true}
 
               {:error, error} ->
@@ -103,36 +102,37 @@ defmodule Plaza.StripeHandler do
       ## payment analytics
       sellers_paid = Enum.all?(transfers, fn el -> validate_paid(el) end)
       sellers = Enum.map(transfers, fn {_, seller} -> seller end)
-      IO.inspect(sellers)
       ## build and fire off order create to dimona 
       dimona_order = purchase |> Order.build()
-      IO.inspect("here 01")
 
       dimona_result =
         case dimona_order do
           {:ok, body} ->
-            IO.inspect("here 02")
             body |> Order.post()
 
           :error ->
-            IO.inspect("here 03")
             :error
         end
 
-      case dimona_result do
-        {:ok, body} ->
-          IO.inspect("here 04")
-          IO.inspect(body)
+      dimona_order_id =
+        case dimona_result do
+          {:ok, body} ->
+            IO.inspect(body)
+            body.order
 
-        error ->
-          IO.inspect("here 05")
-          IO.inspect(error)
-      end
+          error ->
+            IO.inspect(error)
+            nil
+        end
 
       ## persist analytics 
       Purchases.update(
         purchase,
-        %{"sellers" => sellers, "sellers_paid" => sellers_paid}
+        %{
+          "sellers" => sellers,
+          "sellers_paid" => sellers_paid,
+          "dimona_order_id" => dimona_order_id
+        }
       )
     end)
 
