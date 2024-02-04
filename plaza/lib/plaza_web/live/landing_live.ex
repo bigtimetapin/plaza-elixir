@@ -397,7 +397,7 @@ defmodule PlazaWeb.LandingLive do
               </div>
             </div>
           </div>
-          <div style="font-size: 22px; line-height: 24px; display: flex; margin-top: 50px; margin-bottom: 35px;">
+          <div style="font-size: 22px; line-height: 24px; display: flex; margin-top: 50px; margin-bottom: 50px; margin-left: 10px;">
             <div style="position: relative; margin-right: 20px;">
               <img src="/svg/arrow-down.svg" />
             </div>
@@ -411,7 +411,7 @@ defmodule PlazaWeb.LandingLive do
             </div>
           </div>
           <div style="padding-left: 10px; padding-right: 10px;">
-            <div :for={product <- @uncurated_products} style="margin-bottom: 150px;">
+            <div :for={product <- @uncurated_products} style="margin-bottom: 50px;">
               <ProductComponent.product product={product} meta={true} disabled={false} />
             </div>
           </div>

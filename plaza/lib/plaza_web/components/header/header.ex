@@ -486,7 +486,7 @@ defmodule PlazaWeb.Header do
       >
         <div style="display: flex; justify-content: center; padding-top: 100px; padding-bottom: 250px;">
           <div style="display: flex; flex-direction: column; align-items: center;">
-            <div style="margin-top: 100px;">
+            <div>
               <%= render_slot(@landing) %>
             </div>
             <div style="margin-top: 100px;">
