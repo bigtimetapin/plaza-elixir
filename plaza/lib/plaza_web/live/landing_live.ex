@@ -191,9 +191,10 @@ defmodule PlazaWeb.LandingLive do
       uncurated_cursor_after={@uncurated_cursor_after}
     />
     <.mobile
-      curated_products={@curated_products}
-      curated_cursor_before={@curated_cursor_before}
-      curated_cursor_after={@curated_cursor_after}
+      top_products={@top_products}
+      uncurated_products={@uncurated_products}
+      uncurated_cursor_before={@uncurated_cursor_before}
+      uncurated_cursor_after={@uncurated_cursor_after}
     />
     """
   end
@@ -326,57 +327,81 @@ defmodule PlazaWeb.LandingLive do
   def mobile(assigns) do
     ~H"""
     <div class="is-landing-mobile has-font-3" style="margin-top: 25px;">
-      <div style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column; width: 100%; margin-left: 10px; margin-right: 10px;">
-          <div style="font-size: 28px; line-height: 32px; text-align: center;">
-            <h1>
-              Bem vindo ao plaza,
-            </h1>
-            <h2>
-              aqui você encontra camisetas e posters
+      <div style="display: flex; justify-content: center; margin-left: 10px; margin-right: 10px;">
+        <div style="display: flex; flex-direction: column; width: 100%;">
+          <div style="margin-left: 10px; margin-right: 10px;">
+            <div style="font-size: 24px; line-height: 26px;">
+              <h1>
+                Bem vindo ao plaza,
+              </h1>
+              <h2>
+                aqui você encontra camisetas e posters
+              </h2>
+              <h2>
+                de artistas independentes.
+              </h2>
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 25px; margin-bottom: 25px;">
+              <div style="width: 30%; margin-right: 25px;">
+                <img src="/svg/yellow-rectangle.svg" style="width: 100%;" />
+              </div>
+              <div style="width: 37%; margin-right: 25px;">
+                <img src="/svg/big-yellow-ellipse.svg" style="width: 100%;" />
+              </div>
+              <div style="width: 33%;">
+                <img src="/svg/yellow-polygon.svg" style="width: 100%;" />
+              </div>
+            </div>
+            <h2 style="font-size: 32px; line-height: 34px;">
+              Apoie a comunidade criativa
             </h2>
-            <h2>
-              de artistas independentes.
+            <h2 style="font-size: 24px;  margin-bottom: 50px;">
+              Compre de artistas independentes
             </h2>
           </div>
-          <div style="display: flex; justify-content: center; margin-top: 25px; margin-bottom: 25px;">
-            <img src="/svg/star.svg" style="width: 40%; margin-right: 25px;" />
-            <img src="/svg/star.svg" style="width: 40%;" />
-          </div>
-          <h2 style="font-size: 38px; text-align: center; margin-bottom: 50px;">
-            Apoie a comunidade criativa
-          </h2>
           <div style="display: flex; overflow-x: scroll; margin-bottom: 100px; padding-top: 15px;">
-            <div :for={product <- @curated_products} style="margin-right: 15px;">
+            <div :for={product <- @top_products} style="margin-right: 15px;">
               <ProductComponent.product
                 product={product}
                 meta={true}
                 disabled={false}
-                style="width: 325px;"
+                style="width: 315px;"
               />
             </div>
           </div>
-          <div style="display: flex; justify-content: center; margin-bottom: 25px;">
-            <img src="/svg/big-yellow-circle.svg" style="width: 175px;" />
+          <div style="border-top: 1px solid lightgrey; border-bottom: 1px solid lightgrey;">
+            <div style="margin-left: 20px;">
+              <div style="font-size: 32px; line-height: 34px; margin-top: 35px; margin-bottom: 17px;">
+                <h2>
+                  Para Artistas
+                </h2>
+              </div>
+              <div style="margin-bottom: 25px;">
+                <img src="/svg/big-yellow-circle.svg" style="width: 140px;" />
+              </div>
+              <div style="font-size: 32px; line-height: 34px;">
+                <h2>
+                  Inscreva-se e venda seus
+                </h2>
+              </div>
+              <div style="font-size: 32px; line-height: 34px;margin-bottom: 25px;">
+                <h2>
+                  designs hoje mesmo.
+                </h2>
+              </div>
+              <div
+                style="font-size: 24px; text-decoration: underline; margin-bottom: 75px;"
+                id="top-products"
+              >
+                Saiba como funciona
+              </div>
+            </div>
           </div>
-          <div style="font-size: 38px; line-height: 40px; text-align: center;">
-            <h2>
-              Inscreva-se e venda seus
-            </h2>
-          </div>
-          <div style="font-size: 38px; line-height: 40px; text-align: center; margin-bottom: 25px;">
-            <h2>
-              designs hoje mesmo.
-            </h2>
-          </div>
-          <div
-            style="font-size: 26px; text-decoration: underline; text-align: center; margin-bottom: 100px;"
-            id="top-9-products"
-          >
-            Saiba como funciona
-          </div>
-          <div style="font-size: 26px; line-height: 28px; display: flex; justify-content: center; margin-bottom: 25px;">
-            <div style="text-align: center; margin-right: 20px;">
+          <div style="font-size: 22px; line-height: 24px; display: flex; margin-top: 50px; margin-bottom: 35px;">
+            <div style="position: relative; margin-right: 20px;">
+              <img src="/svg/arrow-down.svg" />
+            </div>
+            <div>
               <h3>
                 Arraste para ver
               </h3>
@@ -384,34 +409,31 @@ defmodule PlazaWeb.LandingLive do
                 todos os produtos online
               </h3>
             </div>
-            <div style="position: relative; top: 5px;">
-              <img src="/svg/arrow-down.svg" />
-            </div>
           </div>
           <div style="padding-left: 10px; padding-right: 10px;">
-            <div :for={product <- @curated_products} style="margin-bottom: 150px;">
+            <div :for={product <- @uncurated_products} style="margin-bottom: 150px;">
               <ProductComponent.product product={product} meta={true} disabled={false} />
             </div>
           </div>
           <div style="display: flex; justify-content: space-around; margin-top: 25px; margin-bottom: 250px;">
             <div style="margin-right: 50px;">
               <a
-                :if={@curated_cursor_before}
-                phx-click="curated-cursor-before"
+                :if={@uncurated_cursor_before}
+                phx-click="uncurated-cursor-before"
                 class="has-font-3"
-                style="font-size: 22px; text-decoration: underline;"
-                href="#top-9-products"
+                style="font-size: 20px; text-decoration: underline;"
+                href="#top-products"
               >
                 anterior
               </a>
             </div>
             <div>
               <a
-                :if={@curated_cursor_after}
-                phx-click="curated-cursor-after"
+                :if={@uncurated_cursor_after}
+                phx-click="uncurated-cursor-after"
                 class="has-font-3"
-                style="font-size: 22px; text-decoration: underline;"
-                href="#top-9-products"
+                style="font-size: 20px; text-decoration: underline;"
+                href="#top-products"
               >
                 próxima
               </a>
