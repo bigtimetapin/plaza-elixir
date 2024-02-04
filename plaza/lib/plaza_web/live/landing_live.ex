@@ -7,43 +7,62 @@ defmodule PlazaWeb.LandingLive do
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    IO.inspect(socket.assigns.current_user)
-    ## curated products 
-    top_3_curated_products =
-      Products.top_n_paginated(
-        %{
-          before: nil,
-          after: nil
-        },
-        3
-      )
-
-    next_9_curated_products =
-      Products.top_n_paginated(
-        %{
-          before: nil,
-          after: top_3_curated_products.metadata.after
-        },
-        9
-      )
-
-    seller =
-      case socket.assigns.current_user do
-        nil ->
-          nil
-
-        %{id: id} ->
-          Accounts.get_seller_by_id(id)
-      end
-
     socket =
-      socket
-      |> assign(top_3_curated_products: top_3_curated_products.entries)
-      |> assign(next_9_curated_products: next_9_curated_products.entries)
-      |> assign(curated_cursor_after: next_9_curated_products.metadata.after)
-      |> assign(curated_cursor_before: nil)
-      |> assign(header: :landing)
-      |> assign(seller: seller)
+      case connected?(socket) do
+        true ->
+          ## top products
+          top_product_ids = GenServer.call(TopProducts, :get)
+          first = Products.get_product(top_product_ids.first)
+          second = Products.get_product(top_product_ids.second)
+          third = Products.get_product(top_product_ids.third)
+          top_products = [first, second, third]
+          ## curated products 
+          curated_products =
+            Products.top_n_paginated(
+              %{
+                before: nil,
+                after: nil
+              },
+              3,
+              true
+            )
+
+          ## uncurated products
+          uncurated_products =
+            Products.top_n_paginated(
+              %{
+                before: nil,
+                after: nil
+              },
+              9,
+              false
+            )
+
+          seller =
+            case socket.assigns.current_user do
+              nil ->
+                nil
+
+              %{id: id} ->
+                Accounts.get_seller_by_id(id)
+            end
+
+          socket
+          |> assign(top_products: top_products)
+          |> assign(curated_products: curated_products.entries)
+          |> assign(curated_cursor_after: curated_products.metadata.after)
+          |> assign(curated_cursor_before: nil)
+          |> assign(uncurated_products: uncurated_products.entries)
+          |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
+          |> assign(uncurated_cursor_before: nil)
+          |> assign(header: :landing)
+          |> assign(seller: seller)
+          |> assign(waiting: false)
+
+        false ->
+          socket
+          |> assign(waiting: true)
+      end
 
     {:ok, socket}
   end
@@ -72,54 +91,107 @@ defmodule PlazaWeb.LandingLive do
   end
 
   def handle_event("curated-cursor-after", _, socket) do
-    next_9_curated_products =
+    curated_products =
       Products.top_n_paginated(
         %{
           before: nil,
           after: socket.assigns.curated_cursor_after
         },
-        9
+        3,
+        true
       )
 
     socket =
       socket
-      |> assign(next_9_curated_products: next_9_curated_products.entries)
-      |> assign(curated_cursor_before: next_9_curated_products.metadata.before)
-      |> assign(curated_cursor_after: next_9_curated_products.metadata.after)
+      |> assign(curated_products: curated_products.entries)
+      |> assign(curated_cursor_before: curated_products.metadata.before)
+      |> assign(curated_cursor_after: curated_products.metadata.after)
 
     {:noreply, socket}
   end
 
   def handle_event("curated-cursor-before", _, socket) do
-    next_9_curated_products =
+    curated_products =
       Products.top_n_paginated(
         %{
           before: socket.assigns.curated_cursor_before,
           after: nil
         },
-        9
+        3,
+        true
       )
 
     socket =
       socket
-      |> assign(next_9_curated_products: next_9_curated_products.entries)
-      |> assign(curated_cursor_before: next_9_curated_products.metadata.before)
-      |> assign(curated_cursor_after: next_9_curated_products.metadata.after)
+      |> assign(curated_products: curated_products.entries)
+      |> assign(curated_cursor_before: curated_products.metadata.before)
+      |> assign(curated_cursor_after: curated_products.metadata.after)
 
     {:noreply, socket}
+  end
+
+  def handle_event("uncurated-cursor-after", _, socket) do
+    uncurated_products =
+      Products.top_n_paginated(
+        %{
+          before: nil,
+          after: socket.assigns.uncurated_cursor_after
+        },
+        9,
+        false
+      )
+
+    socket =
+      socket
+      |> assign(uncurated_products: uncurated_products.entries)
+      |> assign(uncurated_cursor_before: uncurated_products.metadata.before)
+      |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("uncurated-cursor-before", _, socket) do
+    uncurated_products =
+      Products.top_n_paginated(
+        %{
+          before: socket.assigns.uncurated_cursor_before,
+          after: nil
+        },
+        9,
+        false
+      )
+
+    socket =
+      socket
+      |> assign(uncurated_products: uncurated_products.entries)
+      |> assign(uncurated_cursor_before: uncurated_products.metadata.before)
+      |> assign(uncurated_cursor_after: uncurated_products.metadata.after)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def render(%{waiting: true} = assigns) do
+    ~H"""
+    <div style="margin-top: 200px; display: flex; justify-content: center;">
+      <img src="gif/loading.gif" class="is-loading" />
+    </div>
+    """
   end
 
   def render(assigns) do
     ~H"""
     <.desktop
-      top_3_curated_products={@top_3_curated_products}
-      next_9_curated_products={@next_9_curated_products}
+      top_products={@top_products}
+      curated_products={@curated_products}
       curated_cursor_before={@curated_cursor_before}
       curated_cursor_after={@curated_cursor_after}
+      uncurated_products={@uncurated_products}
+      uncurated_cursor_before={@uncurated_cursor_before}
+      uncurated_cursor_after={@uncurated_cursor_after}
     />
     <.mobile
-      top_3_curated_products={@top_3_curated_products}
-      next_9_curated_products={@next_9_curated_products}
+      curated_products={@curated_products}
       curated_cursor_before={@curated_cursor_before}
       curated_cursor_after={@curated_cursor_after}
     />
@@ -134,7 +206,7 @@ defmodule PlazaWeb.LandingLive do
     >
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; flex-direction: column; width: 100%; max-width: 1500px;">
-          <div style="display: flex; margin-bottom: 100px;">
+          <div style="display: flex; margin-bottom: 150px;">
             <div style="margin-right: 75px;">
               <img src="/svg/big-yellow-circle.svg" style="width: 300px;" />
             </div>
@@ -151,9 +223,9 @@ defmodule PlazaWeb.LandingLive do
             </div>
           </div>
           <div>
-            <ProductComponent.products3 products={@top_3_curated_products} />
+            <ProductComponent.products3 products={@top_products} />
           </div>
-          <div style="display: flex; justify-content: center; margin-top: 100px; margin-bottom: 100px;">
+          <div style="display: flex; justify-content: center; margin-top: 125px; margin-bottom: 100px;">
             <div>
               <h2 style="font-size: 58px; margin-bottom: 25px;">
                 Monetize seus projetos com camisetas e posters
@@ -164,10 +236,7 @@ defmodule PlazaWeb.LandingLive do
               <h3 style="font-size: 32px; min-width: 300px; max-width: 670px; line-height: 36px; margin-bottom: 25px;">
                 A produção é feita sobre demanda sem quantidade mínima, sem desperdícios e entregue direto para o cliente final.
               </h3>
-              <h3
-                style="font-size: 32px; line-height: 36px; margin-bottom: 25px;"
-                id="top-9-products-desktop"
-              >
+              <h3 style="font-size: 32px; line-height: 36px; margin-bottom: 25px;">
                 <.link navigate="/upload" style="text-decoration: underline;">
                   quero vender
                 </.link>
@@ -177,60 +246,72 @@ defmodule PlazaWeb.LandingLive do
               <img src="svg/star.svg" />
             </div>
           </div>
-          <div style="display: flex; margin-bottom: 20px;">
+          <div style="display: flex; margin-bottom: 30px;">
             <div>
               <h4 style="font-size: 58px; line-height: 45px;">
-                Designs Selecionados
+                Theme Selection of the month
               </h4>
               <h5 style="font-size: 32px;">
-                As estampas que a gente mais gosta
+                Envios do tema mês de fevereiro Carros e Veículos
               </h5>
             </div>
             <div style="margin-left: auto; margin-right: 120px; display: flex; position: relative; top: 45px;">
-              <div style="margin-right: 50px;">
-                <button
-                  :if={@curated_cursor_before}
-                  phx-click="curated-cursor-before"
-                  class="has-font-3"
-                  style="font-size: 28px; text-decoration: underline;"
-                >
-                  anterior
+              <div style="margin-right: 55px;">
+                <button :if={@curated_cursor_before} phx-click="curated-cursor-before">
+                  <img src="/svg/yellow-circle.svg" style="position: absolute; width: 40px;" />
+                  <div style="position: absolute; color: grey; font-size: 42px;">
+                    <div style="position: relative; left: 4px; bottom: 15px;">
+                      <%= "<" %>
+                    </div>
+                  </div>
                 </button>
               </div>
               <div>
-                <button
-                  :if={@curated_cursor_after}
-                  phx-click="curated-cursor-after"
-                  class="has-font-3"
-                  style="font-size: 28px; text-decoration: underline;"
-                >
-                  próxima
+                <button :if={@curated_cursor_after} phx-click="curated-cursor-after">
+                  <img src="/svg/yellow-circle.svg" style="position: absolute; width: 40px;" />
+                  <div style="position: absolute; color: grey; font-size: 42px;">
+                    <div style="position: relative; left: 7px; bottom: 15px;">
+                      <%= ">" %>
+                    </div>
+                  </div>
                 </button>
               </div>
             </div>
           </div>
           <div>
-            <ProductComponent.products3 products={@next_9_curated_products} />
+            <ProductComponent.products3 products={@curated_products} />
           </div>
-          <div style="display: flex; justify-content: space-around; margin-top: 25px; margin-bottom: 250px;">
+          <div id="top-products-desktop" style="margin-bottom: 100px;" />
+          <div style="margin-bottom: 25px;">
+            <h4 style="font-size: 58px; line-height: 45px;">
+              Todos os produtos
+            </h4>
+            <h5 style="font-size: 32px;">
+              Estampas da comunidade
+            </h5>
+          </div>
+          <div>
+            <ProductComponent.products3 products={@uncurated_products} />
+          </div>
+          <div style="display: flex; justify-content: space-around;  margin-bottom: 250px;">
             <div style="margin-right: 50px;">
               <a
-                :if={@curated_cursor_before}
-                phx-click="curated-cursor-before"
+                :if={@uncurated_cursor_before}
+                phx-click="uncurated-cursor-before"
                 class="has-font-3"
                 style="font-size: 28px; text-decoration: underline;"
-                href="#top-9-products-desktop"
+                href="#top-products-desktop"
               >
                 anterior
               </a>
             </div>
             <div>
               <a
-                :if={@curated_cursor_after}
-                phx-click="curated-cursor-after"
+                :if={@uncurated_cursor_after}
+                phx-click="uncurated-cursor-after"
                 class="has-font-3"
                 style="font-size: 28px; text-decoration: underline;"
-                href="#top-9-products-desktop"
+                href="#top-products-desktop"
               >
                 próxima
               </a>
@@ -266,7 +347,7 @@ defmodule PlazaWeb.LandingLive do
             Apoie a comunidade criativa
           </h2>
           <div style="display: flex; overflow-x: scroll; margin-bottom: 100px; padding-top: 15px;">
-            <div :for={product <- @top_3_curated_products} style="margin-right: 15px;">
+            <div :for={product <- @curated_products} style="margin-right: 15px;">
               <ProductComponent.product
                 product={product}
                 meta={true}
@@ -308,7 +389,7 @@ defmodule PlazaWeb.LandingLive do
             </div>
           </div>
           <div style="padding-left: 10px; padding-right: 10px;">
-            <div :for={product <- @next_9_curated_products} style="margin-bottom: 150px;">
+            <div :for={product <- @curated_products} style="margin-bottom: 150px;">
               <ProductComponent.product product={product} meta={true} disabled={false} />
             </div>
           </div>

@@ -27,12 +27,12 @@ defmodule Plaza.Products do
     )
   end
 
-  def top_n_paginated(cursors, n) do
+  def top_n_paginated(cursors, n, curated) do
     %{entries: entries, metadata: metadata} =
       Repo.paginate(
         from(
           p in Product,
-          where: [active: true, curated: true],
+          where: [active: true, curated: ^curated],
           order_by: [desc: :updated_at, desc: :id]
         ),
         before: cursors.before,
