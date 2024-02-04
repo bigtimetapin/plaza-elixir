@@ -131,7 +131,7 @@ defmodule PlazaWeb.ArtistLive do
             <div style="font-size: 24px; text-align: center; margin-bottom: 20px;">
               <%= @seller.description %>
             </div>
-            <div style="font-size: 20px; text-decoration: underline;">
+            <div style="font-size: 20px; text-decoration: underline; text-align: center;">
               <.urls_mobile seller={@seller} />
             </div>
           </div>
