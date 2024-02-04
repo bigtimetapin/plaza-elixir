@@ -35,105 +35,58 @@ defmodule PlazaWeb.MyAccountLive do
     {:noreply, socket}
   end
 
-  def handle_event("user-name-change", %{"user-name" => str}, socket) do
-    socket =
-      socket
-      |> assign(user_name_form: str)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("user-name-submit", %{"user-name" => str}, socket) do
-    attrs = %{
-      user_id: socket.assigns.current_user.id,
-      user_name: str
-    }
-
-    {:ok, seller} = Accounts.create_seller(attrs)
-    IO.inspect(seller)
-
-    socket =
-      socket
-      |> assign(:seller, seller)
-
-    {:noreply, socket}
-  end
-
   @impl Phoenix.LiveView
-  def render(%{seller: nil} = assigns) do
-    ~H"""
-    <div class="mt-large mx-large">
-      <div>
-        create user-name
-        <form phx-change="user-name-change" phx-submit="user-name-submit">
-          <input type="text" name="user-name" value={@user_name_form} />
-          <button type="submit">submit</button>
-        </form>
-      </div>
-
-      <.logout />
-    </div>
-    """
-  end
-
-  def render(%{seller: %Seller{stripe_id: nil}} = assigns) do
-    ~H"""
-    <div class="mt-large mx-large">
-      <%= @seller.user_name %>
-    </div>
-
-    <.logout />
-
-    <div class="mt-large mx-large">
-      <button phx-click="stripe-link-account">link stripe account</button>
-    </div>
-    """
-  end
-
-  def render(%{payouts_enabled: false} = assigns) do
-    ~H"""
-    <div class="mt-large mx-large">
-      <%= @seller.user_name %>
-    </div>
-
-    <.logout />
-
-    <div class="mt-large mx-large">
-      <div>
-        <%= "your seller stripe-id: #{@seller.stripe_id}" %>
-      </div>
-      <div>
-        <button phx-click="stripe-enable-payouts" phx-value-stripe-id={@seller.stripe_id}>
-          enable payouts
-        </button>
-      </div>
-    </div>
-    """
-  end
-
   def render(assigns) do
     ~H"""
-    <div class="mt-large mx-large">
-      <%= @seller.user_name %>
-    </div>
-
-    <div class="mt-large mx-large">
-      <div>
-        <%= "your seller stripe-id: #{@seller.stripe_id}" %>
+    <div class="is-my-account-page-desktop">
+      <div
+        class="has-font-3"
+        style="display: flex; margin-top: 200px; margin-bottom: 250px; margin-left: 100px; margin-right: 10px;"
+      >
+        <div style="margin-right: 50px;">
+          <img src="/svg/big-yellow-circle.svg" style="width: 350px;" />
+        </div>
+        <div style="margin-top: 30px;">
+          <h2 style="font-size: 32px; margin-bottom: 50px;">
+            Minha Conta
+          </h2>
+          <div style="font-size: 24px;">
+            email cadastrado:
+          </div>
+          <div style="font-size: 24px; margin-bottom: 50px;">
+            <%= @current_user.email %>
+          </div>
+          <div style="font-size: 24px; text-decoration: underline;">
+            <.link href="/users/log_out" method="delete">
+              Sair
+            </.link>
+          </div>
+        </div>
       </div>
-      <div>
-        payouts enabled
-      </div>
     </div>
-    """
-  end
-
-  defp logout(assigns) do
-    ~H"""
-    <div>
-      <.link href="/users/log_out" method="delete">
-        log out
-      </.link>
+    <div class="is-my-account-page-mobile">
+      <div
+        class="has-font-3"
+        style="display: flex; justify-content: center; margin-top: 200px; margin-bottom: 250px; margin-left: 10px; margin-right: 10px;"
+      >
+        <div style="display: flex; flex-direction: column;">
+          <img src="/svg/yellow-rectangle.svg" style="margin-bottom: 50px;" />
+          <h2 style="font-size: 32px; margin-bottom: 50px;">
+            Minha Conta
+          </h2>
+          <div style="font-size: 24px;">
+            email cadastrado:
+          </div>
+          <div style="font-size: 24px; margin-bottom: 50px;">
+            <%= @current_user.email %>
+          </div>
+          <div style="font-size: 24px; text-decoration: underline;">
+            <.link href="/users/log_out" method="delete">
+              Sair
+            </.link>
+          </div>
+        </div>
+      </div>
     </div>
     """
   end

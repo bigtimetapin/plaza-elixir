@@ -390,6 +390,18 @@ $spacing-values: (
   }
 }
 
+.is-my-account-page-desktop {
+  @include until($tablet) {
+    display: none;
+  }
+}
+
+.is-my-account-page-mobile {
+  @include from($tablet) {
+    display: none;
+  }
+}
+
 .is-checkout-page-desktop {
   @include until($tablet) {
     display: none;
