@@ -114,7 +114,7 @@ defmodule PlazaWeb.ArtistLive do
         <.right products={@products} all_products={@all_products} />
       </div>
     </div>
-    <div class="is-artist-page-mobile has-font-3" style="margin-top: 150px;">
+    <div class="is-artist-page-mobile has-font-3" style="margin-top: 100px;">
       <div style="display: flex; margin-left: 5px; margin-right: 5px;">
         <div style="display: flex; flex-direction: column; width: 100%;">
           <div style="width: 150px; height: 150px; background: lightgrey; overflow: hidden; margin-bottom: 25px; align-self: center;">
