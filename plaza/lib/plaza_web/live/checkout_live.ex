@@ -1318,17 +1318,21 @@ defmodule PlazaWeb.CheckoutLive do
           </div>
           <div :if={@current_user}>
             <div style="display: flex; justify-content: center; margin-top: 50px; margin-bottom: 50px;">
-              <button
+              <a
                 phx-click="step"
                 phx-value-step="2"
                 style={if @cart_out_of_stock, do: "opacity: 50%"}
                 disabled={@cart_out_of_stock}
+                href="#top"
               >
                 <img src="svg/yellow-ellipse.svg" />
-                <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
+                <div
+                  class="has-font-3"
+                  style="position: relative; bottom: 79px; left: 45px; font-size: 36px;"
+                >
                   Comprar
                 </div>
-              </button>
+              </a>
             </div>
           </div>
         </div>
