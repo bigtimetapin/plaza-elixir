@@ -54,6 +54,9 @@ COPY lib lib
 
 COPY assets assets
 
+# install css dependencies 
+RUN npm install --prefix ./assets/sass 
+
 # install js dependencies 
 RUN npm install --prefix ./assets 
 
