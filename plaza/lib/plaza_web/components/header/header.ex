@@ -438,7 +438,7 @@ defmodule PlazaWeb.Header do
     ~H"""
     <div class="hero-head has-font-3">
       <div class="is-navbar is-navbar-desktop">
-        <nav class="level" style="position: relative; top: 20px; margin-left: 50px">
+        <nav class="level" style="position: relative; top: 20px; margin-left: 150px">
           <div class="level-left">
             <div class="level-item">
               <div style="font-size: 72px;">
@@ -448,7 +448,10 @@ defmodule PlazaWeb.Header do
               </div>
             </div>
           </div>
-          <div class="level-right is-size-5" style="position: relative; top: 11px;">
+          <div
+            class="level-right is-size-5"
+            style="position: relative; top: 11px; margin-right: 150px;"
+          >
             <%= render_slot(@right) %>
           </div>
         </nav>
