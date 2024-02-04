@@ -15,6 +15,11 @@ defmodule PlazaWeb.AdminLive do
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     is_admin = Enum.member?(@admin_list, socket.assigns.current_user.email)
+    top_products = GenServer.call(TopProducts, :get)
+    IO.inspect(top_products)
+    first = Products.get_product(top_products.first)
+    second = Products.get_product(top_products.second)
+    third = Products.get_product(top_products.third)
 
     socket =
       socket
@@ -25,10 +30,21 @@ defmodule PlazaWeb.AdminLive do
             "seller_user_name" => nil
           })
       )
+      |> assign(
+        top_products_form:
+          to_form(%{
+            "first" => top_products.first,
+            "second" => top_products.second,
+            "third" => top_products.third
+          })
+      )
       |> assign(sellers: [])
       |> assign(seller: nil)
       |> assign(seller_products: [])
       |> assign(num_seller_products: 0)
+      |> assign(first: first)
+      |> assign(second: second)
+      |> assign(third: third)
 
     {:ok, socket}
   end
@@ -102,11 +118,121 @@ defmodule PlazaWeb.AdminLive do
     {:noreply, socket}
   end
 
+  def handle_event("change-top-products-form-first", %{"first" => ""}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("change-top-products-form-first", %{"first" => product_id}, socket) do
+    first = Products.get_product(product_id)
+
+    socket =
+      socket
+      |> assign(first: first)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-top-products-form-second", %{"second" => ""}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("change-top-products-form-second", %{"second" => product_id}, socket) do
+    second = Products.get_product(product_id)
+
+    socket =
+      socket
+      |> assign(second: second)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("change-top-products-form-third", %{"third" => ""}, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("change-top-products-form-third", %{"third" => product_id}, socket) do
+    third = Products.get_product(product_id)
+
+    socket =
+      socket
+      |> assign(third: third)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("submit-top-products-form", _, socket) do
+    first = socket.assigns.first.id
+    second = socket.assigns.second.id
+    third = socket.assigns.third.id
+    state = %{first: first, second: second, third: third}
+    GenServer.cast(TopProducts, {:set, state})
+    {:noreply, socket}
+  end
+
   @impl Phoenix.LiveView
   def render(%{is_admin: true, seller: nil} = assigns) do
     ~H"""
-    <div class="has-font-3" style="display: flex; justify-content: center;">
+    <div
+      class="has-font-3"
+      style="display: flex; justify-content: center; margin-top: 150px; margin-bottom: 200px;"
+    >
       <div style="display: flex; flex-direction: column;">
+        <div style="margin-bottom: 200px;">
+          <.form
+            for={@top_products_form}
+            style="border: 1px dotted grey;"
+            phx-submit="submit-top-products-form"
+          >
+            <div style="font-size: 36px; text-align: center; margin-top: 25px;">
+              top 3 products
+            </div>
+            <div style="display: flex; margin-top: 25px;">
+              <div style="width: 400px; margin-left: 50px; margin-right: 50px; border: 1px double grey;">
+                <.input
+                  field={@top_products_form[:first]}
+                  type="text"
+                  placeholder="first"
+                  style="width: 150px; margin: 10px;"
+                  phx-debounce="500"
+                  phx-change="change-top-products-form-first"
+                />
+                <div style="margin: 10px;">
+                  <ProductComponent.product product={@first} meta={false} disabled={true} />
+                </div>
+              </div>
+              <div style="width: 400px; margin-right: 50px; border: 1px double grey;">
+                <.input
+                  field={@top_products_form[:second]}
+                  type="text"
+                  placeholder="second"
+                  style="width: 150px; margin: 10px;"
+                />
+                <div style="margin: 10px;">
+                  <ProductComponent.product product={@second} meta={false} disabled={true} />
+                </div>
+              </div>
+              <div style="width: 400px; margin-right: 50px; border: 1px double grey;">
+                <.input
+                  field={@top_products_form[:third]}
+                  type="text"
+                  placeholder="third"
+                  style="width: 150px; margin: 10px;"
+                />
+                <div style="margin: 10px;">
+                  <ProductComponent.product product={@third} meta={false} disabled={true} />
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 50px; margin-bottom: 50px;">
+              <button
+                class="has-font-3"
+                style="width: 500px; font-size: 28px; border: 1px dotted grey;"
+              >
+                submit
+              </button>
+            </div>
+          </.form>
+        </div>
         <div>
           <.form for={@search_form} phx-change="change-search-form" phx-submit="submit-search-form">
             <.input
@@ -114,6 +240,7 @@ defmodule PlazaWeb.AdminLive do
               type="text"
               placeholder="seller-user-name"
               class="text-input-1"
+              style="text-align: center; width: 100%;"
               phx-debounce="500"
             />
           </.form>
@@ -140,7 +267,7 @@ defmodule PlazaWeb.AdminLive do
         </div>
         <div
           :for={product <- @seller_products}
-          style="display: flex; flex-direction: column; border: 1px dotted black; margin-bottom: 25px;"
+          style="display: flex; flex-direction: column; border: 1px dotted black; margin-bottom: 25px; padding: 50px;"
         >
           <ProductComponent.product product={product} meta={true} disabled={true} />
           <div style="text-align: center;">

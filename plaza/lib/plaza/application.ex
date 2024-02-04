@@ -20,6 +20,21 @@ defmodule Plaza.Application do
       PlazaWeb.Endpoint,
       # Start the Cron Scheduler 
       Plaza.Scheduler,
+      # Start the Top Products GenServer
+      %{
+        id: PlazaWeb.TopProducts,
+        start: {
+          PlazaWeb.TopProducts,
+          :start_link,
+          [
+            %{
+              first: 1,
+              second: 2,
+              third: 3
+            }
+          ]
+        }
+      },
       # Dynamic Task Supervisor 
       {Task.Supervisor, name: Plaza.TaskSupervisor}
       # Start a worker by calling: Plaza.Worker.start_link(arg)
