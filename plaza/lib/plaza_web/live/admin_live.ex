@@ -233,17 +233,22 @@ defmodule PlazaWeb.AdminLive do
             </div>
           </.form>
         </div>
-        <div>
-          <.form for={@search_form} phx-change="change-search-form" phx-submit="submit-search-form">
-            <.input
-              field={@search_form[:seller_user_name]}
-              type="text"
-              placeholder="seller-user-name"
-              class="text-input-1"
-              style="text-align: center; width: 100%;"
-              phx-debounce="500"
-            />
-          </.form>
+        <div style="border-top: 1px solid grey; display: flex; justify-content: center;">
+          <div>
+            <div style="font-size: 36px; text-align: center; margin-top: 25px; margin-bottom: 25px;">
+              curate products by seller
+            </div>
+            <.form for={@search_form} phx-change="change-search-form" phx-submit="submit-search-form">
+              <.input
+                field={@search_form[:seller_user_name]}
+                type="text"
+                placeholder="seller-user-name"
+                class="text-input-1"
+                style="text-align: center; width: 500px;"
+                phx-debounce="500"
+              />
+            </.form>
+          </div>
         </div>
         <div style="display: flex; flex-direction: column;">
           <button :for={seller <- @sellers} phx-click="seller" phx-value-user-id={seller.user_id}>
