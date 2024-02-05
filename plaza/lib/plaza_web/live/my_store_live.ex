@@ -542,150 +542,180 @@ defmodule PlazaWeb.MyStoreLive do
 
   def render(%{seller: nil, product_buffer: nil} = assigns) do
     ~H"""
-    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 250px; font-size: 34px;">
-      <div style="display: flex; justify-content: center; margin-bottom: 100px;">
-        <.link navigate="/upload" style="text-decoration: underline;">
-          go upload some stuff
-        </.link>
+    <div class="is-my-store-page-desktop">
+      <div class="has-font-3" style="margin-top: 150px; margin-bottom: 250px; font-size: 34px;">
+        <div style="display: flex; justify-content: center; margin-bottom: 100px;">
+          <.link navigate="/upload" style="text-decoration: underline;">
+            go upload some stuff
+          </.link>
+        </div>
+        <div style="display: flex; justify-content: center;">
+          Ou preencha para criar seu perfil de loja
+        </div>
+        <div style="position: relative; top: 50px;">
+          <.seller_form
+            seller_form={@seller_form}
+            logo_upload={@logo_upload}
+            seller={@seller}
+            uuid={@uuid}
+          />
+        </div>
       </div>
-      <div style="display: flex; justify-content: center;">
-        Ou preencha para criar seu perfil de loja
-      </div>
-      <div style="position: relative; top: 50px;">
-        <.seller_form
-          seller_form={@seller_form}
-          logo_upload={@logo_upload}
-          seller={@seller}
-          uuid={@uuid}
-        />
-      </div>
+    </div>
+    <div class="is-my-store-page-mobile">
+      <PlazaWeb.CustomComponents.how_it_works_seller_mobile />
     </div>
     """
   end
 
   def render(%{seller: nil, product_buffer: product} = assigns) do
     ~H"""
-    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 250px;">
-      <div style="display: flex; justify-content: center;">
-        <div>
-          you've uploaded your first product
+    <div class="is-my-store-page-desktop">
+      <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 250px;">
+        <div style="display: flex; justify-content: center;">
           <div>
-            <ProductComponent.product product={product} meta={false} disabled={true} />
+            you've uploaded your first product
+            <div>
+              <ProductComponent.product product={product} meta={false} disabled={true} />
+            </div>
           </div>
         </div>
+        <div style="display: flex; justify-content: center; margin-top: 100px; margin-bottom: 50px;">
+          create your store before the product goes live
+        </div>
+        <div>
+          <.seller_form
+            seller_form={@seller_form}
+            logo_upload={@logo_upload}
+            seller={@seller}
+            uuid={@uuid}
+          />
+        </div>
       </div>
-      <div style="display: flex; justify-content: center; margin-top: 100px; margin-bottom: 50px;">
-        create your store before the product goes live
-      </div>
-      <div>
-        <.seller_form
-          seller_form={@seller_form}
-          logo_upload={@logo_upload}
-          seller={@seller}
-          uuid={@uuid}
-        />
-      </div>
+    </div>
+    <div class="is-my-store-page-mobile">
+      <PlazaWeb.CustomComponents.how_it_works_seller_mobile />
     </div>
     """
   end
 
   def render(%{step: "edit-seller"} = assigns) do
     ~H"""
-    <div style="margin-top: 150px; margin-bottom: 150px;">
-      <div style="display: flex; flex-direction: column;">
-        <.seller_form
-          seller_form={@seller_form}
-          logo_upload={@logo_upload}
-          seller={@seller}
-          uuid={@uuid}
-        />
-        <div style="display: flex; justify-content: center; margin-top: 50px;">
-          <button
-            phx-click="cancel-edit-seller"
-            class="has-font-3"
-            style="border-bottom: 2px solid black; width: 50px; font-size: 32px;"
-          >
-            cancelar
-          </button>
+    <div class="is-my-store-page-desktop">
+      <div style="margin-top: 150px; margin-bottom: 150px;">
+        <div style="display: flex; flex-direction: column;">
+          <.seller_form
+            seller_form={@seller_form}
+            logo_upload={@logo_upload}
+            seller={@seller}
+            uuid={@uuid}
+          />
+          <div style="display: flex; justify-content: center; margin-top: 50px;">
+            <button
+              phx-click="cancel-edit-seller"
+              class="has-font-3"
+              style="border-bottom: 2px solid black; width: 50px; font-size: 32px;"
+            >
+              cancelar
+            </button>
+          </div>
         </div>
       </div>
+    </div>
+    <div class="is-my-store-page-mobile">
+      <PlazaWeb.CustomComponents.how_it_works_seller_mobile />
     </div>
     """
   end
 
   def render(%{seller: %Seller{stripe_id: nil}, products: []} = assigns) do
     ~H"""
-    <div style="display: flex; margin-bottom: 50px;">
-      <.left seller={@seller} />
-      <div style="margin-left: 150px; margin-top: 150px;">
-        <div class="has-font-3" style="font-size: 34px;">
-          <div style="display: flex; justify-content: center;">
-            <div style="text-align: center;">
-              <div style="margin-bottom: 50px;">
-                Ok you've created your seller (loja) profile
-              </div>
-              <div style="margin-bottom: 50px;">
-                Go upload your first product
-                <div style="text-decoration: underline;">
-                  <.link navigate="/upload">
-                    upload
-                  </.link>
+    <div class="is-my-store-page-desktop">
+      <div style="display: flex; margin-bottom: 50px;">
+        <.left seller={@seller} />
+        <div style="margin-left: 150px; margin-top: 150px;">
+          <div class="has-font-3" style="font-size: 34px;">
+            <div style="display: flex; justify-content: center;">
+              <div style="text-align: center;">
+                <div style="margin-bottom: 50px;">
+                  Ok you've created your seller (loja) profile
                 </div>
-              </div>
-              <div style="width: 785px;">
-                Or link your bank info with stripe so you can get paid for every sale.
-                You'll need to do this before your products go live.
-                <div style="text-decoration: underline;">
-                  <button phx-click="stripe-link-account">link stripe account</button>
+                <div style="margin-bottom: 50px;">
+                  Go upload your first product
+                  <div style="text-decoration: underline;">
+                    <.link navigate="/upload">
+                      upload
+                    </.link>
+                  </div>
+                </div>
+                <div style="width: 785px;">
+                  Or link your bank info with stripe so you can get paid for every sale.
+                  You'll need to do this before your products go live.
+                  <div style="text-decoration: underline;">
+                    <button phx-click="stripe-link-account">link stripe account</button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+    <div class="is-my-store-page-mobile">
+      <PlazaWeb.CustomComponents.how_it_works_seller_mobile />
     </div>
     """
   end
 
   def render(%{seller: %Seller{stripe_id: nil}, products: [product]} = assigns) do
     ~H"""
-    <div style="display: flex; margin-bottom: 50px;">
-      <.left seller={@seller} />
-      <div style="margin-left: 150px; margin-top: 150px;">
-        <div class="has-font-3" style="font-size: 34px;">
-          <div style="text-align: center;">
-            <div style="margin-bottom: 50px;">
-              Ok you've created your seller (loja) profile
-            </div>
-            <div style="margin-bottom: 50px;">
-              and you've uploaded your first product
-              <div style="display: flex; justify-content: center; margin-top: 50px;">
-                <ProductComponent.product
-                  product={product}
-                  meta={false}
-                  disabled={true}
-                  style="width: 500px;"
-                />
+    <div class="is-my-store-page-desktop">
+      <div style="display: flex; margin-bottom: 50px;">
+        <.left seller={@seller} />
+        <div style="margin-left: 150px; margin-top: 150px;">
+          <div class="has-font-3" style="font-size: 34px;">
+            <div style="text-align: center;">
+              <div style="margin-bottom: 50px;">
+                Ok you've created your seller (loja) profile
+              </div>
+              <div style="margin-bottom: 50px;">
+                and you've uploaded your first product
+                <div style="display: flex; justify-content: center; margin-top: 50px;">
+                  <ProductComponent.product
+                    product={product}
+                    meta={false}
+                    disabled={true}
+                    style="width: 500px;"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-          <div style="border: 1px dotted black; text-align: center;">
-            You just need to link your bank info with stripe so you can get paid for every sale.
-            <div style="text-decoration: underline; margin-top: 50px;">
-              <button phx-click="stripe-link-account">link stripe account</button>
+            <div style="border: 1px dotted black; text-align: center;">
+              You just need to link your bank info with stripe so you can get paid for every sale.
+              <div style="text-decoration: underline; margin-top: 50px;">
+                <button phx-click="stripe-link-account">link stripe account</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+    <div class="is-my-store-page-mobile">
+      <PlazaWeb.CustomComponents.how_it_works_seller_mobile />
     </div>
     """
   end
 
   def render(assigns) do
     ~H"""
-    <div style="display: flex;">
-      <.left seller={@seller} />
-      <.right products={@products} all_products={@all_products} />
+    <div class="is-my-store-page-desktop">
+      <div style="display: flex;">
+        <.left seller={@seller} />
+        <.right products={@products} all_products={@all_products} />
+      </div>
+    </div>
+    <div class="is-my-store-page-mobile">
+      <PlazaWeb.CustomComponents.how_it_works_seller_mobile />
     </div>
     """
   end
