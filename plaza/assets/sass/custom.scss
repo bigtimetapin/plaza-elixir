@@ -366,6 +366,18 @@ $spacing-values: (
   }
 }
 
+.is-how-it-works-desktop {
+  @include until($tablet) {
+    display: none;
+  }
+}
+
+.is-how-it-works-mobile {
+  @include from($tablet) {
+    display: none;
+  }
+}
+
 .is-landing-desktop {
   @include until($tablet) {
     display: none;

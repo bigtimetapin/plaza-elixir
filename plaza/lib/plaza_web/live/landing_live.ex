@@ -393,7 +393,9 @@ defmodule PlazaWeb.LandingLive do
                 style="font-size: 24px; text-decoration: underline; margin-bottom: 75px;"
                 id="top-products"
               >
-                Saiba como funciona
+                <.link navigate="/how-it-works/seller">
+                  Saiba como funciona
+                </.link>
               </div>
             </div>
           </div>
