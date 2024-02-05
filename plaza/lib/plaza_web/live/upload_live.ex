@@ -677,85 +677,100 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: -2, product_buffer: product} = assigns) do
     ~H"""
-    <div class="has-font-3 is-size-4" style="margin-top: 125px; margin-bottom: 125px;">
-      <div style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column; width: 500px;">
-          <div style="display: flex; justify-content: center;">
-            <PlazaWeb.ProductComponent.product
-              product={product}
-              meta={false}
-              disabled={true}
-              style="width: 500px;"
-            />
-          </div>
-          <div style="text-align: center;">
-            you've already uploaded your first product but haven't created a seller profile yet.
-            <.link
-              navigate="/my-store"
-              style="margin-left: 5px; margin-right: 5px; text-decoration: underline;"
-            >
-              go do that
-            </.link>
+    <div class="is-upload-page-desktop">
+      <div class="has-font-3 is-size-4" style="margin-top: 125px; margin-bottom: 125px;">
+        <div style="display: flex; justify-content: center;">
+          <div style="display: flex; flex-direction: column; width: 500px;">
+            <div style="display: flex; justify-content: center;">
+              <PlazaWeb.ProductComponent.product
+                product={product}
+                meta={false}
+                disabled={true}
+                style="width: 500px;"
+              />
+            </div>
+            <div style="text-align: center;">
+              you've already uploaded your first product but haven't created a seller profile yet.
+              <.link
+                navigate="/my-store"
+                style="margin-left: 5px; margin-right: 5px; text-decoration: underline;"
+              >
+                go do that
+              </.link>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+    <div class="is-upload-page-mobile">
+      <PlazaWeb.CustomComponents.how_it_works_seller_mobile />
     </div>
     """
   end
 
   def render(%{step: -1} = assigns) do
     ~H"""
-    <div class="has-font-3 is-size-4" style="margin-top: 125px; margin-bottom: 125px;">
-      <div style="display: flex; justify-content: center;">
-        <div style="width: 500px; text-align: center;">
-          you've already uploaded your first product but haven't linked your bank account yet.
-          <.link
-            navigate="/my-store"
-            style="margin-left: 5px; margin-right: 5px; text-decoration: underline;"
-          >
-            go do that
-          </.link>
-          to activate your first product and continue uploading more products.
+    <div class="is-upload-page-desktop">
+      <div class="has-font-3 is-size-4" style="margin-top: 125px; margin-bottom: 125px;">
+        <div style="display: flex; justify-content: center;">
+          <div style="width: 500px; text-align: center;">
+            you've already uploaded your first product but haven't linked your bank account yet.
+            <.link
+              navigate="/my-store"
+              style="margin-left: 5px; margin-right: 5px; text-decoration: underline;"
+            >
+              go do that
+            </.link>
+            to activate your first product and continue uploading more products.
+          </div>
         </div>
       </div>
+    </div>
+    <div class="is-upload-page-mobile">
+      <PlazaWeb.CustomComponents.how_it_works_seller_mobile />
     </div>
     """
   end
 
   def render(%{step: 1} = assigns) do
     ~H"""
-    <div class="has-font-3 is-size-4" style="text-align: center; margin-top: 125px;">
-      <div class="mb-xsmall">
-        É Fácil e totalmente grátis.
-      </div>
-      <div class="mb-xsmall">
-        Você faz o upload da sua arte, configura o produto, escolhe o preço de venda e publica sua campanha de vendas.
-      </div>
-      <div class="mb-xsmall">
-        A partir daí você só precisa esperar pra receber seus lucros.
-      </div>
-      <div class="mb-xsmall">
-        A gente vai produzir cada produto vendido e entregar direto na casa do cliente.
-      </div>
-      <div class="mb-xxsmall">
-        <div>
-          Fabricamos apenas o que for vendido, assim não temos desperdício de recursos.
+    <div class="is-upload-page-desktop">
+      <div class="has-font-3 is-size-4" style="text-align: center; margin-top: 125px;">
+        <div class="mb-xsmall">
+          É Fácil e totalmente grátis.
         </div>
-        <div style="position: relative; bottom: 15px;">
-          Você recebe pelo que vender.
+        <div class="mb-xsmall">
+          Você faz o upload da sua arte, configura o produto, escolhe o preço de venda e publica sua campanha de vendas.
+        </div>
+        <div class="mb-xsmall">
+          A partir daí você só precisa esperar pra receber seus lucros.
+        </div>
+        <div class="mb-xsmall">
+          A gente vai produzir cada produto vendido e entregar direto na casa do cliente.
+        </div>
+        <div class="mb-xxsmall">
+          <div>
+            Fabricamos apenas o que for vendido, assim não temos desperdício de recursos.
+          </div>
+          <div style="position: relative; bottom: 15px;">
+            Você recebe pelo que vender.
+          </div>
+        </div>
+        <div class="mb-xsmall">
+          E se não vender tudo bem, ninguém perde nada.
         </div>
       </div>
-      <div class="mb-xsmall">
-        E se não vender tudo bem, ninguém perde nada.
+      <div style="display: flex; justify-content: center; margin-top: 85px; margin-bottom: 75px;">
+        <button phx-click="step" phx-value-step="2">
+          <img src="svg/yellow-ellipse.svg" />
+          <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
+            Criar Produto
+          </div>
+        </button>
       </div>
     </div>
-    <div style="display: flex; justify-content: center; margin-top: 85px; margin-bottom: 75px;">
-      <button phx-click="step" phx-value-step="2">
-        <img src="svg/yellow-ellipse.svg" />
-        <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
-          Criar Produto
-        </div>
-      </button>
+    <div class="is-upload-page-mobile">
+      <PlazaWeb.CustomComponents.how_it_works_seller_mobile />
     </div>
     """
   end
@@ -796,14 +811,19 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 4} = assigns) do
     ~H"""
-    <.upload_generic
-      step={@step}
-      side="front"
-      front_local_upload={@front_local_upload}
-      back_local_upload={@back_local_upload}
-      product_form={@product_form}
-      uuid={@uuid}
-    />
+    <div class="is-upload-page-desktop">
+      <.upload_generic
+        step={@step}
+        side="front"
+        front_local_upload={@front_local_upload}
+        back_local_upload={@back_local_upload}
+        product_form={@product_form}
+        uuid={@uuid}
+      />
+    </div>
+    <div class="is-upload-page-mobile">
+      <PlazaWeb.CustomComponents.how_it_works_seller_mobile />
+    </div>
     """
   end
 

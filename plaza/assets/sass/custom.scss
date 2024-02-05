@@ -438,6 +438,30 @@ $spacing-values: (
   }
 }
 
+.is-my-store-page-desktop {
+  @include until($tablet) {
+    display: none;
+  }
+}
+
+.is-my-store-page-mobile {
+  @include from($tablet) {
+    display: none;
+  }
+}
+
+.is-upload-page-desktop {
+  @include until($tablet) {
+    display: none;
+  }
+}
+
+.is-upload-page-mobile {
+  @include from($tablet) {
+    display: none;
+  }
+}
+
 .is-product-page-desktop {
   @include until($tablet) {
     display: none;
