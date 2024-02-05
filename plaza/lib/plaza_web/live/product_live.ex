@@ -554,7 +554,7 @@ defmodule PlazaWeb.ProductLive do
         </div>
       </div>
     </div>
-    <div class="is-product-page-mobile has-font-3" style="margin-top: 100px;">
+    <div class="is-product-page-mobile has-font-3" style="margin-top: 50px;">
       <div style="margin-left: 25px; margin-right: 25px;">
         <div style="display: flex; justify-content: center; font-size: 32px;">
           <div>

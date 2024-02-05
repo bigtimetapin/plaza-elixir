@@ -114,14 +114,14 @@ defmodule PlazaWeb.ArtistLive do
         <.right products={@products} all_products={@all_products} />
       </div>
     </div>
-    <div class="is-artist-page-mobile has-font-3" style="margin-top: 100px;">
+    <div class="is-artist-page-mobile has-font-3" style="margin-top: 50px;">
       <div style="display: flex; margin-left: 5px; margin-right: 5px;">
         <div style="display: flex; flex-direction: column; width: 100%;">
           <div style="width: 150px; height: 150px; background: lightgrey; overflow: hidden; margin-bottom: 25px; align-self: center;">
             <img
               :if={@seller.profile_photo_url}
               src={@seller.profile_photo_url}
-              style="min-width: 100%; min-height: 100%;"
+              style="min-width: 100%; min-height: 100%; border: 1px dotted lightgrey;"
             />
           </div>
           <div style="font-size: 32px; text-align: center; margin-bottom: 10px;">
