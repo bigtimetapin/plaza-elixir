@@ -115,9 +115,14 @@ defmodule PlazaWeb.HowItWorksLive do
                     <div style="line-height: 26px;">
                       Não tem limite para quanto você pode vender. Através da ferramenta de
                     </div>
-                    <div style="line-height: 26px;">
-                      pagamentos stripe você recebe e acompanha as finanças da sua loja.
+                    <div style="line-height: 26px; margin-bottom: 50px;">
+                      pagamentos
+                      <a href="https://stripe.com/en-br/connect" target="_blank">
+                        <em style="text-decoration: underline;">stripe</em>
+                      </a>
+                      você recebe e acompanha as finanças da sua loja.
                     </div>
+                    <div></div>
                   </div>
                 </div>
               </div>
