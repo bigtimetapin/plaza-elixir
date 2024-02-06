@@ -247,7 +247,7 @@ defmodule PlazaWeb.LandingLive do
               <img src="svg/star.svg" />
             </div>
           </div>
-          <div style="display: flex; margin-bottom: 30px;">
+          <div :if={!Enum.empty?(@curated_products)} style="display: flex; margin-bottom: 30px;">
             <div>
               <h4 style="font-size: 58px; line-height: 45px;">
                 Theme Selection of the month
@@ -279,10 +279,10 @@ defmodule PlazaWeb.LandingLive do
               </div>
             </div>
           </div>
-          <div>
+          <div id="top-products-desktop" />
+          <div :if={!Enum.empty?(@curated_products)} style="margin-bottom: 100px;">
             <ProductComponent.products3 products={@curated_products} />
           </div>
-          <div id="top-products-desktop" style="margin-bottom: 100px;" />
           <div style="margin-bottom: 25px;">
             <h4 style="font-size: 58px; line-height: 45px;">
               Todos os produtos
