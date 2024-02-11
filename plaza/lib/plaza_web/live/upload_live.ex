@@ -853,7 +853,7 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 6} = assigns) do
     ~H"""
-    <div style="margin-top: 150px; margin-bottom: 250px;">
+    <div style="margin-top: 150px; margin-bottom: 250px; margin-left: 5px; margin-right: 5px;">
       <PlazaWeb.UploadLive.header
         step={@step}
         front_local_upload={@front_local_upload}
