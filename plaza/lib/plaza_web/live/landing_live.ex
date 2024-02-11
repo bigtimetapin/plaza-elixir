@@ -221,6 +221,11 @@ defmodule PlazaWeb.LandingLive do
               <div style="font-size: 36px; max-width: 775px;">
                 Inscreva-se e venda seus designs hoje mesmo.
               </div>
+              <div style="font-size: 24px; text-decoration: underline;">
+                <.link navigate="/how-it-works/seller">
+                  Saiba como funciona
+                </.link>
+              </div>
             </div>
           </div>
           <div>
