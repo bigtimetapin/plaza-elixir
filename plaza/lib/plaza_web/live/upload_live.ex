@@ -734,39 +734,42 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 1} = assigns) do
     ~H"""
-    <div class="is-upload-page-desktop">
-      <div class="has-font-3 is-size-4" style="text-align: center; margin-top: 125px;">
-        <div class="mb-xsmall">
-          É Fácil e totalmente grátis.
-        </div>
-        <div class="mb-xsmall">
-          Você faz o upload da sua arte, configura o produto, escolhe o preço de venda e publica sua campanha de vendas.
-        </div>
-        <div class="mb-xsmall">
-          A partir daí você só precisa esperar pra receber seus lucros.
-        </div>
-        <div class="mb-xsmall">
-          A gente vai produzir cada produto vendido e entregar direto na casa do cliente.
-        </div>
-        <div class="mb-xxsmall">
-          <div>
-            Fabricamos apenas o que for vendido, assim não temos desperdício de recursos.
+    <div class="is-upload-page-desktop" style="margin-top: 150px;">
+      <div class="has-font-3" style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column;">
+          <div style="font-size: 54px; margin-bottom: 50px;">
+            Vender no plaza é fácil e totalmente grátis
           </div>
-          <div style="position: relative; bottom: 15px;">
-            Você recebe pelo que vender.
+          <div style="font-size: 32px; line-height: 34px; margin-bottom: 25px;">
+            Faça o upload da sua arte, configure o produto, escolha o preço e publique sua campanha de vendas.
+          </div>
+          <div style="font-size: 32px; line-height: 34px; margin-bottom: 25px;">
+            Crie sua loja e conecte com nosso parceiro de pagamentos
+            <a href="https://stripe.com/en-br/connect" target="_blank">
+              <em style="text-decoration: underline;">stripe.</em>
+            </a>
+          </div>
+          <div style="font-size: 32px; line-height: 34px;">
+            A partir daí você só precisa esperar pra receber seus lucros.
+          </div>
+          <div style="font-size: 32px; line-height: 34px; margin-bottom: 25px;">
+            Receba pelo que vender, e se não vender tudo bem, ninguém perde nada.
+          </div>
+          <div style="font-size: 32px; line-height: 34px;">
+            Cada produto vendido é produzido sobre demanda e entregue direto para o cliente final,
+          </div>
+          <div style="font-size: 32px; line-height: 34px; margin-bottom: 100px;">
+            assim não temos desperdício de recursos e você não precisa investir produzindo um estoque.
+          </div>
+          <div style="font-size: 36px;">
+            <button phx-click="step" phx-value-step="2">
+              <img src="/svg/yellow-ellipse.svg" />
+              <div class="has-font-3" style="position: relative; bottom: 79px;">
+                Criar Produto
+              </div>
+            </button>
           </div>
         </div>
-        <div class="mb-xsmall">
-          E se não vender tudo bem, ninguém perde nada.
-        </div>
-      </div>
-      <div style="display: flex; justify-content: center; margin-top: 85px; margin-bottom: 75px;">
-        <button phx-click="step" phx-value-step="2">
-          <img src="/svg/yellow-ellipse.svg" />
-          <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
-            Criar Produto
-          </div>
-        </button>
       </div>
     </div>
     <div class="is-upload-page-mobile">
@@ -777,34 +780,42 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 2} = assigns) do
     ~H"""
-    <div class="has-font-3 is-size-4" style="text-align: center; margin-top: 150px;">
-      <div class="mb-xsmall">
-        Tem mais um detalhe importante:
+    <div class="is-upload-page-desktop" style="margin-top: 150px;">
+      <div class="has-font-3" style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column;">
+          <div style="font-size: 54px; margin-bottom: 50px;">
+            Tem mais um detalhe importante
+          </div>
+          <div style="font-size: 32px; line-height: 34px; margin-bottom: 25px;">
+            As campanhas de vendas tem tempo LIMITADO.
+          </div>
+          <div style="font-size: 32px; line-height: 34px;">
+            Escolha a duração da sua campanha entre  7, 14, 21, 30 ou 45 dias.
+          </div>
+          <div style="font-size: 32px; line-height: 34px;">
+            45 dias é mais tempo para você divulgar e receber pedidos, mas um produto exclusivo
+          </div>
+          <div style="font-size: 32px; line-height: 34px; margin-bottom: 25px;">
+            por apenas 7 dias pode ser um sucesso também.
+          </div>
+          <div style="font-size: 32px; line-height: 34px;">
+            Após o período de campanha seu produto
+            <span style="text-decoration: underline;">não estará mais disponível</span>
+            para encomendas.
+          </div>
+          <div style="font-size: 32px; line-height: 34px; margin-bottom: 50px;">
+            E apenas você poderá republicar a campanha por mais períodos se tiver interesse.
+          </div>
+          <div style="font-size: 36px; margin-bottom: 50px;">
+            <button phx-click="step" phx-value-step="3">
+              <img src="/svg/yellow-ellipse.svg" />
+              <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
+                Ok
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="mb-xsmall">
-        <div>
-          Seu produto vai ficar disponível na nossa loja por tempo limitado.
-        </div>
-        <div style="position: relative; bottom: 15px;">
-          Você pode decidir se sua campanha de vendas ficará disponível por 7, 14, 21 ou 30 dias.
-        </div>
-      </div>
-      <div>
-        <div>
-          Após o final do prazo de vendas seu produto não estará mais disponível para encomendas.
-        </div>
-        <div style="position: relative; bottom: 15px;">
-          Você tem liberdade de republicar o produto por mais períodos de até 30 dias novamente se quiser.
-        </div>
-      </div>
-    </div>
-    <div style="display: flex; justify-content: center; margin-top: 85px; margin-bottom: 50px;">
-      <button phx-click="step" phx-value-step="3">
-        <img src="/svg/yellow-ellipse.svg" />
-        <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
-          Ok
-        </div>
-      </button>
     </div>
     """
   end
@@ -1275,35 +1286,36 @@ defmodule PlazaWeb.UploadLive do
     <div
       id={"plaza-file-uploader-#{@step}"}
       phx-hook="FileReader"
-      style="margin-top: 150px; margin-bottom: 750px;"
+      style="margin-top: 150px; margin-bottom: 200px;"
     >
-      <PlazaWeb.UploadLive.header
-        step={@step}
-        front_local_upload={@front_local_upload}
-        back_local_upload={@back_local_upload}
-        product_form={@product_form}
-      />
-
-      <div style="display: inline-block; position: absolute; margin-left: 50px;">
-        <div style="margin-top: 50px;">
-          <.upload_form
-            side={@side}
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column;">
+          <PlazaWeb.UploadLive.header
+            step={@step}
             front_local_upload={@front_local_upload}
             back_local_upload={@back_local_upload}
+            product_form={@product_form}
           />
-        </div>
-      </div>
-      <div style="display: inline-block; position: relative; left: 900px; top: 50px;">
-        <div style="display: inline-block;">
-          <.upload_preview step={@step} side={@side} uid={@uuid} />
-        </div>
-        <div style="display: inline-block; position: absolute;">
-          <div style="position: relative; left: 25px;">
-            <.upload_toggle
-              step={@step}
-              front_local_upload={@front_local_upload}
-              back_local_upload={@back_local_upload}
-            />
+          <div style="display: flex; margin-top: 50px; max-width: 1750px;">
+            <div style="width: 50%; margin-left: 10px;">
+              <.upload_form
+                side={@side}
+                front_local_upload={@front_local_upload}
+                back_local_upload={@back_local_upload}
+              />
+            </div>
+            <div style="width: 50%; display: flex;">
+              <div style="margin-right: 10px;">
+                <.upload_preview step={@step} side={@side} uid={@uuid} size="auto" />
+              </div>
+              <div>
+                <.upload_toggle
+                  step={@step}
+                  front_local_upload={@front_local_upload}
+                  back_local_upload={@back_local_upload}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1317,20 +1329,54 @@ defmodule PlazaWeb.UploadLive do
 
   defp upload_form(assigns) do
     ~H"""
-    <div>
+    <div class="has-font-3">
       <.upload_input side={@side} />
-      <div class="has-font-3" style="width: 760px; font-size: 28px;">
-        <div style="margin-top: 25px;">
+      <div style="width: 90%; font-size: 28px;">
+        <div style="margin-top: 25px; line-height: 32px;">
           Arquivo PNG com formato de cores RGB com pelo menos 300 dpi de resolução.
-          Medidas ajustadas dentro dos limites do A3 (29 x 42 cm)
         </div>
-        <div style="margin-top: 50px; margin-left: 20px;">
+        <div style="font-size: 23px;">
+          Envie seu arquivo com as medidas ajustadas dentro da proporção 1:1.414 do A3 (29,7 x 42 cm)
+        </div>
+        <div style="margin-top: 50px;">
           Seus arquivos:
         </div>
       </div>
-      <div style="margin-left: 20px;">
+      <div style="margin-bottom: 50px;">
         <.upload_item side="front" local_upload={@front_local_upload} no_file_yet="front.png" />
         <.upload_item side="back" local_upload={@back_local_upload} no_file_yet="back.png" />
+      </div>
+      <div class="has-font-1" style="font-size: 30px; display: flex; margin-bottom: 25px;">
+        <div style="text-decoration: underline; margin-right: 5px">
+          Camiseta
+        </div>
+        <div style="margin-right: 5px;">/</div>
+        <div style="color: lightgrey; text-decoration: underline;">Poster</div>
+      </div>
+      <div style="font-size: 28px; margin-bottom: 50px;">
+        Tecido: <span style="text-decoration: underline;">Plaza Standard 100% Algodão</span>
+      </div>
+      <div style="font-size: 22px;">
+        Custo de produção por unidade:
+      </div>
+      <div style="font-size: 20px;">
+        Estampa apenas de um lado <span class="has-font-1">R$ 46,90</span>
+      </div>
+      <div style="font-size: 20px;">
+        Estampa frente e costas <span class="has-font-1">R$ 64,90</span>
+      </div>
+      <div style="font-size: 14px; margin-bottom: 100px;">
+        Produtos tamanho XGG podem ter um acrescimo no valor final.
+      </div>
+      <div style="font-size: 28px;">
+        Dúvidas?
+        <a
+          style="text-decoration: underline; color: #000000;"
+          target="_blank"
+          href="https://plaza-static-dev.s3.us-west-2.amazonaws.com/Gabarito_A3_Plazaaaaa_2.0.psdt"
+        >
+          Baixe o arquivo gabarito
+        </a>
       </div>
     </div>
     """
@@ -1343,8 +1389,8 @@ defmodule PlazaWeb.UploadLive do
     <div>
       <form>
         <label
-          class="has-font-3 is-size-4"
-          style="width: 760px; height: 130px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
+          class="has-font-3"
+          style="font-size: 34px; width: 90%; height: 130px; border: 1px solid black; display: flex; justify-content: center; align-items: center;"
         >
           <input
             type="file"
@@ -1389,7 +1435,7 @@ defmodule PlazaWeb.UploadLive do
 
   attr :step, :integer, required: true
   attr :side, :string, values: ~w(front back)
-  attr :size, :string, default: "big", values: ~w(big small)
+  attr :size, :string, default: "big", values: ~w(big small auto)
   attr :uid, :string, default: "uid"
 
   defp upload_preview(assigns) do
@@ -1397,7 +1443,11 @@ defmodule PlazaWeb.UploadLive do
     <div
       id={"plaza-file-display-container-#{@step}-#{@side}-#{@uid}"}
       phx-hook="FileDisplay"
-      style={if @size == "small", do: "width: 400px;", else: "width: 650px;"}
+      style={
+        if @size == "small",
+          do: "width: 400px;",
+          else: if(@size == "big", do: "width: 650px;", else: "")
+      }
     >
       <img
         id={"plaza-file-display-#{@side}"}
@@ -1451,7 +1501,7 @@ defmodule PlazaWeb.UploadLive do
           Costas
         </button>
       </div>
-      <div style="position: relative; top: 620px; width: 200px;">
+      <div style="position: relative; top: 20px; width: 200px;">
         <button :if={@front_local_upload || @back_local_upload} phx-click="step" phx-value-step="6">
           <img src="/svg/yellow-ellipse.svg" />
           <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
