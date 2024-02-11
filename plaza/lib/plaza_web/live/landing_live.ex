@@ -244,7 +244,7 @@ defmodule PlazaWeb.LandingLive do
               </h3>
             </div>
             <div style="min-width: 250px;">
-              <img src="svg/star.svg" />
+              <img src="/svg/star.svg" />
             </div>
           </div>
           <div :if={!Enum.empty?(@curated_products)} style="display: flex; margin-bottom: 30px;">

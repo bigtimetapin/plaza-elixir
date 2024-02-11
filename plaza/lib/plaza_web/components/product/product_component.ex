@@ -118,7 +118,7 @@ defmodule PlazaWeb.ProductComponent do
         style="position: absolute; z-index: 99; width: 150px; transform: rotate(-16deg);"
       >
         <div style="position: relative; right: 22px; bottom: 10px;">
-          <img src="svg/yellow-ellipse.svg" style="position: absolute;" />
+          <img src="/svg/yellow-ellipse.svg" style="position: absolute;" />
           <div
             class="has-font-3"
             style="position: absolute; font-size: 30px; margin-top: 15px; margin-left: 11px;"

@@ -29,7 +29,7 @@ defmodule PlazaWeb.HowItWorksLive do
           </div>
           <div style="font-size: 24px; text-align: center; margin-bottom: 50px;">
             <div style="margin-bottom: 10px;">
-              plaza é um espaço para criadores e artistas independentes.
+              Plaza é um espaço para criadores e artistas independentes.
             </div>
             <div style="line-height: 26px;">
               Oferecemos ferramentas para vender, fabricar e distribuir suas criações.
@@ -157,8 +157,113 @@ defmodule PlazaWeb.HowItWorksLive do
 
   def render(%{live_action: :buyer} = assigns) do
     ~H"""
-    <div style="display: flex; justify-content: center; margin-top: 250px;">
-      buyer
+    <div class="is-how-it-works-desktop">
+      <div class="has-font-3" style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column; justify-content: center; width: 100%; max-width: 1100px; margin-top: 150px;">
+          <div style="font-size: 38px; text-align: center; margin-bottom: 25px;">
+            Como funciona para
+          </div>
+          <div style="display: flex; justify-content: center; margin-bottom: 25px;">
+            <div style="font-size: 64px; text-decoration: underline; color: lightgrey; margin-right: 75px;">
+              <.link navigate="/how-it-works/seller" style="color: lightgrey;">
+                CRIADORES
+              </.link>
+            </div>
+            <div style="font-size: 64px; text-decoration: underline;">
+              <.link navigate="/how-it-works/buyer">
+                COMPRADORES
+              </.link>
+            </div>
+          </div>
+          <div style="font-size: 28px; text-align: center; margin-bottom: 25px;">
+            <div style="line-height: 30px;">
+              Plaza é um marketplace de artistas originais,
+            </div>
+            <div style="line-height: 30px;">
+              produtos impressos com qualidade e ética.
+            </div>
+          </div>
+          <div style="font-size: 22px; text-align: center; margin-bottom: 50px;">
+            <div style="line-height: 24px;">
+              Mas não somos qualquer loja online, para minimizar o risco
+            </div>
+            <div style="line-height: 24px;">
+              dos artistas e diminuir recursos desperdiçados produzimos
+            </div>
+            <div style="line-height: 24px;">
+              apenas quantos produtos forem vendidos. On-demand.
+            </div>
+            <div style="line-height: 24px;">
+              Um a um, sem quantidade mínima.
+            </div>
+          </div>
+          <div style="display: flex; justify-content: center; margin-bottom: 25px;">
+            <img src="/svg/big-arrow-down.svg" />
+          </div>
+          <div style="display: flex; align-self: center; margin-bottom: 100px;">
+            <div class="has-font-1" style="font-size: 62px; margin-right: 25px;">
+              01
+            </div>
+            <div>
+              <div style="font-size: 62px;">
+                Escolha seu produto
+              </div>
+              <div style="font-size: 24px;">
+                <div style="line-height: 26px;">
+                  Navegue na nossa loja e encontre seus designs favoritos.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-self: center; margin-bottom: 25px;">
+            <div class="has-font-1" style="font-size: 62px; margin-right: 25px;">
+              02
+            </div>
+            <div style="margin-right: 50px;">
+              <div style="font-size: 62px;">
+                Adicione ao carrinho
+              </div>
+              <div style="font-size: 24px;">
+                <div style="line-height: 26px;">
+                  Prossiga para o pagamento e informações de entrega.
+                </div>
+              </div>
+            </div>
+            <div style="position: relative; bottom: 20px;">
+              <img src="/svg/big-yellow-circle.svg" style="width: 225px;" />
+            </div>
+          </div>
+          <div style="display: flex; align-self: center; margin-bottom: 150px;">
+            <div class="has-font-1" style="font-size: 62px; margin-right: 25px;">
+              03
+            </div>
+            <div style="width: 100%;">
+              <div style="font-size: 62px;">
+                Entregamos direto pra você
+              </div>
+              <div style="font-size: 24px;">
+                <div style="line-height: 26px;">
+                  Fique de olho no seu email para atualizações e espere seu pedido em casa.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-self: center; margin-bottom: 100px;">
+            <.link navigate="/">
+              <img src="/svg/yellow-ellipse.svg" />
+              <div
+                class="has-font-3"
+                style="position: relative; bottom: 79px; left: 15px; font-size: 34px;"
+              >
+                Voltar para loja
+              </div>
+            </.link>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="is-how-it-works-mobile">
+      <CustomComponents.how_it_works_seller_mobile />
     </div>
     """
   end
