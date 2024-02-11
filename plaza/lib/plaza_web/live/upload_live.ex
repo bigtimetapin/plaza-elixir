@@ -853,38 +853,38 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 6} = assigns) do
     ~H"""
-    <div style="margin-top: 150px; margin-bottom: 750px;">
+    <div style="margin-top: 150px; margin-bottom: 250px;">
       <PlazaWeb.UploadLive.header
         step={@step}
         front_local_upload={@front_local_upload}
         back_local_upload={@back_local_upload}
         product_form={@product_form}
       />
-      <div style="display: flex; justify-content: center;  margin-top: 50px;">
-        <div class="has-font-3" style="font-size: 30px;">
-          <div style="display: flex; justify-content: center; margin-bottom: 25px;">
+      <div class="has-font-3" style="display: flex; justify-content: center;  margin-top: 50px;">
+        <div style="display: flex; flex-direction: column; max-width: 1250px;">
+          <div style="font-size: 30px; margin-bottom: 25px; align-self: center;">
             Seu produto ficou assim:
           </div>
-          <div style="position: relative;">
-            <button phx-click="step" phx-value-step="7">
-              <img src="/svg/yellow-ellipse.svg" />
-              <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
-                Próximo
-              </div>
-            </button>
-          </div>
-          <div>
-            <div style="display: inline-block;">
-              <.upload_preview step={@step} side="front" />
-              <div style="position: relative; bottom: 350px; left: 10px; font-size: 34px;">
+          <div style="display: flex;">
+            <div style="width: 50%; margin-right: 100px;">
+              <.upload_preview step={@step} side="front" size="auto" />
+              <div style="font-size: 34px;">
                 Frente
               </div>
             </div>
-            <div style="display: inline-block; margin-left: 150px;">
-              <.upload_preview step={@step} side="back" />
-              <div style="position: relative; bottom: 350px; left: 10px; font-size: 34px;">
+            <div style="width: 50%; margin-right: 10px;">
+              <.upload_preview step={@step} side="back" size="auto" />
+              <div style="font-size: 34px;">
                 Costas
               </div>
+            </div>
+            <div style="position: relative; top: 50px;">
+              <button phx-click="step" phx-value-step="7">
+                <img src="/svg/yellow-ellipse.svg" />
+                <div class="has-font-3 is-size-4" style="position: relative; bottom: 68px;">
+                  Confirmar
+                </div>
+              </button>
             </div>
           </div>
         </div>
