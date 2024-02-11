@@ -762,7 +762,7 @@ defmodule PlazaWeb.UploadLive do
       </div>
       <div style="display: flex; justify-content: center; margin-top: 85px; margin-bottom: 75px;">
         <button phx-click="step" phx-value-step="2">
-          <img src="svg/yellow-ellipse.svg" />
+          <img src="/svg/yellow-ellipse.svg" />
           <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
             Criar Produto
           </div>
@@ -800,7 +800,7 @@ defmodule PlazaWeb.UploadLive do
     </div>
     <div style="display: flex; justify-content: center; margin-top: 85px; margin-bottom: 50px;">
       <button phx-click="step" phx-value-step="3">
-        <img src="svg/yellow-ellipse.svg" />
+        <img src="/svg/yellow-ellipse.svg" />
         <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
           Ok
         </div>
@@ -856,7 +856,7 @@ defmodule PlazaWeb.UploadLive do
           </div>
           <div style="position: relative;">
             <button phx-click="step" phx-value-step="7">
-              <img src="svg/yellow-ellipse.svg" />
+              <img src="/svg/yellow-ellipse.svg" />
               <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
                 Próximo
               </div>
@@ -994,7 +994,7 @@ defmodule PlazaWeb.UploadLive do
                         @product_form.data.price
                     }>
                       <button phx-click="step" phx-value-step="8">
-                        <img src="svg/yellow-ellipse.svg" />
+                        <img src="/svg/yellow-ellipse.svg" />
                         <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
                           Próximo
                         </div>
@@ -1053,7 +1053,7 @@ defmodule PlazaWeb.UploadLive do
               >
                 <img
                   :if={@product_form.data.campaign_duration == 7}
-                  src="svg/yellow-circle.svg"
+                  src="/svg/yellow-circle.svg"
                   style="position: relative; top: 47px;"
                 />
                 <div style="position: relative;">
@@ -1069,7 +1069,7 @@ defmodule PlazaWeb.UploadLive do
               >
                 <img
                   :if={@product_form.data.campaign_duration == 14}
-                  src="svg/yellow-circle.svg"
+                  src="/svg/yellow-circle.svg"
                   style="position: relative; top: 47px;"
                 />
                 <div style="position: relative;">
@@ -1085,7 +1085,7 @@ defmodule PlazaWeb.UploadLive do
               >
                 <img
                   :if={@product_form.data.campaign_duration == 21}
-                  src="svg/yellow-circle.svg"
+                  src="/svg/yellow-circle.svg"
                   style="position: relative; top: 47px;"
                 />
                 <div style="position: relative;">
@@ -1101,7 +1101,7 @@ defmodule PlazaWeb.UploadLive do
               >
                 <img
                   :if={@product_form.data.campaign_duration == 30}
-                  src="svg/yellow-circle.svg"
+                  src="/svg/yellow-circle.svg"
                   style="position: relative; top: 47px;"
                 />
                 <div style="position: relative;">
@@ -1117,7 +1117,7 @@ defmodule PlazaWeb.UploadLive do
               >
                 <img
                   :if={@product_form.data.campaign_duration == 45}
-                  src="svg/yellow-circle.svg"
+                  src="/svg/yellow-circle.svg"
                   style="position: relative; top: 47px;"
                 />
                 <div style="position: relative;">
@@ -1131,7 +1131,7 @@ defmodule PlazaWeb.UploadLive do
               Você terminou de configurar seu produto, publicar na loja?
               <div style="display: flex; justify-content: center; margin-top: 25px;">
                 <button phx-click="publish">
-                  <img src="svg/yellow-ellipse.svg" />
+                  <img src="/svg/yellow-ellipse.svg" />
                   <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
                     Publicar
                   </div>
@@ -1224,11 +1224,11 @@ defmodule PlazaWeb.UploadLive do
           Configurar Estampa
           <img
             :if={Enum.member?([3, 4, 5, 6], @step)}
-            src="svg/yellow-circle.svg"
+            src="/svg/yellow-circle.svg"
             style="position: relative; left: 87px;"
           />
         </a>
-        <img src="svg/seperator.svg" class="mr-small" style="display: inline-block;" />
+        <img src="/svg/seperator.svg" class="mr-small" style="display: inline-block;" />
         <a
           phx-click="step"
           phx-value-step={
@@ -1240,9 +1240,9 @@ defmodule PlazaWeb.UploadLive do
           style="display: inline-block;"
         >
           Configuração de Campanha
-          <img :if={@step == 7} src="svg/yellow-circle.svg" style="position: relative; left: 123px;" />
+          <img :if={@step == 7} src="/svg/yellow-circle.svg" style="position: relative; left: 123px;" />
         </a>
-        <img src="svg/seperator.svg" class="mr-small" style="display: inline-block;" />
+        <img src="/svg/seperator.svg" class="mr-small" style="display: inline-block;" />
         <a
           phx-click="step"
           phx-value-step={
@@ -1256,7 +1256,7 @@ defmodule PlazaWeb.UploadLive do
           style="display: inline-block;"
         >
           Publique seu Produto
-          <img :if={@step == 8} src="svg/yellow-circle.svg" style="position: relative; left: 93px;" />
+          <img :if={@step == 8} src="/svg/yellow-circle.svg" style="position: relative; left: 93px;" />
         </a>
       </nav>
     </div>
@@ -1401,7 +1401,7 @@ defmodule PlazaWeb.UploadLive do
     >
       <img
         id={"plaza-file-display-#{@side}"}
-        src={if @side == "front", do: "png/mockup-front.png", else: "png/mockup-back.png"}
+        src={if @side == "front", do: "/png/mockup-front.png", else: "/png/mockup-back.png"}
       />
     </div>
     """
@@ -1453,7 +1453,7 @@ defmodule PlazaWeb.UploadLive do
       </div>
       <div style="position: relative; top: 620px; width: 200px;">
         <button :if={@front_local_upload || @back_local_upload} phx-click="step" phx-value-step="6">
-          <img src="svg/yellow-ellipse.svg" />
+          <img src="/svg/yellow-ellipse.svg" />
           <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
             Próximo
           </div>

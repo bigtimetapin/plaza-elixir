@@ -100,7 +100,7 @@ defmodule PlazaWeb.HowItWorksLive do
                   </div>
                 </div>
               </div>
-              <div style="display: flex; margin-bottom: 50px;">
+              <div style="display: flex; margin-bottom: 75px;">
                 <div class="has-font-1" style="font-size: 62px; margin-right: 25px;">
                   04
                 </div>
@@ -115,14 +115,24 @@ defmodule PlazaWeb.HowItWorksLive do
                     <div style="line-height: 26px;">
                       Não tem limite para quanto você pode vender. Através da ferramenta de
                     </div>
-                    <div style="line-height: 26px; margin-bottom: 50px;">
+                    <div style="line-height: 26px; margin-bottom: 150px;">
                       pagamentos
                       <a href="https://stripe.com/en-br/connect" target="_blank">
                         <em style="text-decoration: underline;">stripe</em>
                       </a>
                       você recebe e acompanha as finanças da sua loja.
                     </div>
-                    <div></div>
+                    <div>
+                      <.link navigate="/upload">
+                        <img src="/svg/yellow-ellipse.svg" />
+                        <div
+                          class="has-font-3"
+                          style="position: relative; bottom: 79px; left: 15px; font-size: 36px;"
+                        >
+                          Quero Vender
+                        </div>
+                      </.link>
+                    </div>
                   </div>
                 </div>
               </div>
