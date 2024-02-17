@@ -206,7 +206,7 @@ defmodule PlazaWeb.LandingLive do
       style="margin-top: 150px; margin-left: 20px; margin-right: 20px;"
     >
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column; width: 100%; max-width: 1500px;">
+        <div style="display: flex; flex-direction: column; width: 100%; max-width: 1750px;">
           <div style="display: flex; margin-bottom: 150px;">
             <div style="margin-right: 75px;">
               <img src="/svg/big-yellow-circle.svg" style="width: 300px;" />
