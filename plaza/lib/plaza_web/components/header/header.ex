@@ -447,12 +447,12 @@ defmodule PlazaWeb.Header do
     <div>
       <nav :if={!@open} class="is-navbar-mobile-closed">
         <div style="display: flex;">
-          <div class="has-font-3" style="font-size: 60px; margin-right: auto; margin-left: 25px;">
+          <div class="has-font-3" style="font-size: 60px; margin-right: auto; margin-left: 20px;">
             <.link navigate="/">
               plazaaaaa
             </.link>
           </div>
-          <div style="margin-left: auto; margin-right: 25px;">
+          <div style="margin-left: auto; margin-right: 20px;">
             <div style="margin-top: 25px;">
               <button class="has-font-3" style="width: 110px;" phx-click="open-mobile-header">
                 <img src="/svg/yellow-ellipse.svg" />
