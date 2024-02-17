@@ -1143,7 +1143,7 @@ defmodule PlazaWeb.CheckoutLive do
       </div>
     </div>
     <div class="is-checkout-page-mobile has-font-3">
-      <div style="display: flex; justify-content: center; margin-left: 10px; margin-right: 10px; margin-top: 100px;">
+      <div style="display: flex; justify-content: center; margin-left: 10px; margin-right: 10px; margin-top: 50px;">
         <div style="display: flex; flex-direction: column; width: 100%;">
           <div style="border-bottom: 2px solid grey; margin-bottom: 10px;">
             <div style="font-size: 36px; line-height: 40px; margin-left: 10px;">
