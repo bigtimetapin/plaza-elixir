@@ -895,127 +895,141 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 7} = assigns) do
     ~H"""
-    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
+    <div style="margin-top: 150px; margin-bottom: 250px; margin-left: 5px; margin-right: 5px;">
       <PlazaWeb.UploadLive.header
         step={@step}
         front_local_upload={@front_local_upload}
         back_local_upload={@back_local_upload}
         product_form={@product_form}
       />
-      <div style="display: inline-block; margin-left: 50px;">
-        <div>
-          Foto do seu produto na loja:
-          <button
-            :if={@product_form.data.designs.display == 0}
-            class="has-font-3"
-            style="border-bottom: 2px solid black; height: 45px;"
-          >
-            Frente
-          </button>
-          <button
-            :if={@product_form.data.designs.display == 0}
-            class="has-font-3"
-            phx-click="change-product-display"
-          >
-            / Costas
-          </button>
-
-          <button
-            :if={@product_form.data.designs.display == 1}
-            class="has-font-3"
-            phx-click="change-product-display"
-          >
-            Frente
-          </button>
-          <button
-            :if={@product_form.data.designs.display == 1}
-            class="has-font-3"
-            style="border-bottom: 2px solid black; height: 45px;"
-          >
-            / Costas
-          </button>
-          <div style="margin-top: 10px;">
-            <div :if={@product_form.data.designs.display == 0}>
-              <.upload_preview step={@step} side="front" uid={@uuid} />
+      <div class="has-font-3" style="display: flex; justify-content: center;  margin-top: 50px;">
+        <div style="display: flex; max-width: 1550px; width: 100%;">
+          <div style="width: 34%; margin-right: 25px; max-width: 400px;">
+            <div style="display: flex;">
+              <div style="font-size: 22px; margin-left: auto;">
+                Foto principal:
+                <button
+                  :if={@product_form.data.designs.display == 0}
+                  class="has-font-3"
+                  style="border-bottom: 2px solid black; height: 35px;"
+                >
+                  Frente
+                </button>
+                <button
+                  :if={@product_form.data.designs.display == 0}
+                  class="has-font-3"
+                  phx-click="change-product-display"
+                >
+                  / Costas
+                </button>
+                <button
+                  :if={@product_form.data.designs.display == 1}
+                  class="has-font-3"
+                  phx-click="change-product-display"
+                >
+                  Frente
+                </button>
+                <button
+                  :if={@product_form.data.designs.display == 1}
+                  class="has-font-3"
+                  style="border-bottom: 2px solid black; height: 35px;"
+                >
+                  / Costas
+                </button>
+              </div>
             </div>
-            <div :if={@product_form.data.designs.display == 1}>
-              <.upload_preview step={@step} side="back" uid={@uuid} />
+            <div style="margin-top: 10px;">
+              <div :if={@product_form.data.designs.display == 0}>
+                <.upload_preview step={@step} side="front" uid={@uuid} size="auto" />
+              </div>
+              <div :if={@product_form.data.designs.display == 1}>
+                <.upload_preview step={@step} side="back" uid={@uuid} size="auto" />
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div style="display: inline-block; position: absolute;">
-        <div style="position: relative; left: 50px; top: 50px;">
-          <.form for={@product_form} phx-change="change-product-form" phx-submit="submit-product-form">
-            <div style="display: inline-block;">
-              <div>
-                <.input
-                  field={@product_form[:name]}
-                  type="textarea"
-                  placeholder="*Nome do produto"
-                  style="color: #707070; font-size: 36px; text-decoration-line: underline; border: none;"
-                  class="has-font-3"
-                  phx-debounce="500"
-                >
-                </.input>
-              </div>
-              <div>
-                <.input
-                  field={@product_form[:description]}
-                  type="textarea"
-                  placeholder="*Descrição"
-                  style="color: #707070; font-size: 28px; text-decoration-line: underline; border: none; width: 500px; height: 250px; max-height: 250px;"
-                  class="has-font-3"
-                  phx-debounce="500"
-                >
-                </.input>
-              </div>
-            </div>
-            <div style="display: inline-block; position: absolute; width: 500px; height: 800px;">
-              <div style="display: flex; flex-direction: column; height: 100%; position: relative; right: 165px;">
-                <div style="margin-top: auto;">
+          <div style="width: 66%;">
+            <.form
+              for={@product_form}
+              phx-change="change-product-form"
+              phx-submit="submit-product-form"
+            >
+              <div style="display: flex;">
+                <div style="width: 100%; max-width: 500px; margin-right: 10px;">
                   <div>
-                    Defina o preço final de venda:
-                  </div>
-                  <div style="position: relative; bottom: 98px; left: 370px;">
-                    <div style="position: absolute;">
-                      <div style="position: relative; top: 26px; left: 17px; background-color: #F8FC5F; width: 20px; z-index: 99;">
-                        R$
-                      </div>
-                    </div>
                     <.input
-                      field={@product_form[:price]}
-                      value={@product_form.data.price}
-                      type="number"
-                      phx-change="change-product-price"
+                      field={@product_form[:name]}
+                      type="textarea"
+                      placeholder="*Nome do produto"
+                      style="color: #707070; font-size: 36px; text-decoration-line: underline; border: none;"
                       class="has-font-3"
-                      style="font-size: 34px; border: 1px solid gray; background-color: #F8FC5F; width: 150px; height: 100px; border-radius: 50px; padding-left: 50px;"
+                      phx-debounce="500"
                     >
                     </.input>
                   </div>
-                  <div style="position: relative; bottom: 50px;">
-                    Se vender 30 unidades seu lucro será: R$<%= ((@product_form.data.price -
-                                                                    @product_form.data.internal_expense) *
-                                                                   30)
-                    |> Float.round(2) %>
+                  <div>
+                    <.input
+                      field={@product_form[:description]}
+                      type="textarea"
+                      placeholder="*Descrição"
+                      style="color: #707070; font-size: 28px; text-decoration-line: underline; border: none; height: 250px; max-height: 250px; width: 100%"
+                      class="has-font-3"
+                      phx-debounce="500"
+                    >
+                    </.input>
                   </div>
-                  <div style="width: 300px; height: 150px;" }>
-                    <div :if={
-                      @product_form.data.name && @product_form.data.description &&
-                        @product_form.data.price
-                    }>
-                      <button phx-click="step" phx-value-step="8">
-                        <img src="/svg/yellow-ellipse.svg" />
-                        <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
-                          Próximo
+                </div>
+                <div style="margin-left: auto; font-size: 24px;">
+                  <div style="display: flex; flex-direction: column; height: 100%;">
+                    <div style="margin-top: auto;">
+                      <div style="height: 150px; margin-bottom: 50px;">
+                        <div :if={
+                          @product_form.data.name && @product_form.data.description &&
+                            @product_form.data.price
+                        }>
+                          <button phx-click="step" phx-value-step="8">
+                            <img src="/svg/yellow-ellipse.svg" />
+                            <div
+                              class="has-font-3 is-size-4"
+                              style="position: relative; bottom: 79px;"
+                            >
+                              Próximo
+                            </div>
+                          </button>
                         </div>
-                      </button>
+                      </div>
+                      <div style="display: flex; margin-bottom: 10px;">
+                        <div style="align-self: center; margin-bottom: 5px; margin-right: 5px;">
+                          Defina o preço final de venda:
+                        </div>
+                        <div>
+                          <div style="position: absolute;">
+                            <div style="position: relative; top: 25px; left: 17px; background-color: #F8FC5F; width: 20px; z-index: 99; font-size: 34px;">
+                              R$
+                            </div>
+                          </div>
+                          <.input
+                            field={@product_form[:price]}
+                            value={@product_form.data.price}
+                            type="number"
+                            phx-change="change-product-price"
+                            class="has-font-3"
+                            style="font-size: 34px; border: 1px solid gray; background-color: #F8FC5F; width: 150px; height: 100px; border-radius: 50px; padding-left: 50px;"
+                          >
+                          </.input>
+                        </div>
+                      </div>
+                      <div>
+                        Se vender 30 unidades seu lucro será: R$<%= ((@product_form.data.price -
+                                                                        @product_form.data.internal_expense) *
+                                                                       30)
+                        |> Float.round(2) %>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </.form>
+            </.form>
+          </div>
         </div>
       </div>
     </div>
