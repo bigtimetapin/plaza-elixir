@@ -990,9 +990,9 @@ defmodule PlazaWeb.CheckoutLive do
         class="has-font-3"
         style="margin-top: 150px; margin-bottom: 150px; display: flex; justify-content: center;"
       >
-        <div style="display: flex; max-width: 1600px; width: 100%;">
-          <div style="font-size: 44px;">
-            <div style="display: flex; border-bottom: 2px solid grey; width: 800px;">
+        <div style="display: flex; max-width: 1750px; width: 100%; margin-left: 10px;">
+          <div style="font-size: 44px; width: 50%;">
+            <div style="display: flex; border-bottom: 2px solid grey; width: 100%">
               <div>
                 carrinho
               </div>
@@ -1003,7 +1003,7 @@ defmodule PlazaWeb.CheckoutLive do
                 valor
               </div>
             </div>
-            <div style="margin-top: 20px;">
+            <div style="margin-top: 20px; width: 100%;">
               <div :for={item <- @cart} style="display: flex;">
                 <div style="width: 100px;">
                   <button phx-click="product-href" phx-value-product-id={item.product.id}>
@@ -1110,8 +1110,8 @@ defmodule PlazaWeb.CheckoutLive do
                 </div>
               </div>
             </div>
-            <div>
-              <div style="display: flex; border-bottom: 2px solid grey; width: 800px;"></div>
+            <div style="width: 100%;">
+              <div style="display: flex; border-bottom: 2px solid grey; width: 100%;"></div>
               <div style="display: flex; font-size: 28px;">
                 <div>
                   valor dos prodotus
@@ -1130,7 +1130,7 @@ defmodule PlazaWeb.CheckoutLive do
               </div>
             </div>
           </div>
-          <div style="font-size: 44px; margin-left: auto;">
+          <div style="font-size: 44px; margin-left: auto; width: 50%;">
             <.sign_in_or_continue_as_guest
               current_user={@current_user}
               cart_out_of_stock={@cart_out_of_stock}
@@ -1557,7 +1557,7 @@ defmodule PlazaWeb.CheckoutLive do
 
   defp sign_in_or_continue_as_guest(assigns) do
     ~H"""
-    <div style="display: flex; justify-content: center; width: 500px; margin-top: 150px;">
+    <div style="display: flex; justify-content: center; width: 100%; margin-top: 150px;">
       <button
         phx-click="step"
         phx-value-step="2"
