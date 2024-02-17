@@ -315,7 +315,7 @@ defmodule PlazaWeb.ProductLive do
 
   def render(%{product: product, seller: seller} = assigns) do
     ~H"""
-    <div class="is-product-page-desktop" style="margin-top: 150px;">
+    <div class="is-product-page-desktop" style="margin-top: 100px;">
       <div style="display: flex; justify-content: center;">
         <div style="max-width: 1750px; width: 100%;">
           <div class="has-font-3 columns is-desktop" style="margin-top: 50px; margin-bottom: 150px;">
