@@ -92,20 +92,15 @@ defmodule PlazaWeb.Header do
     <div>
       <.left_desktop>
         <:right>
-          <div class="level-item pr-xmedium">
+          <div class="pr-xmedium">
             <div>
               log in
-              <div style="position: absolute;">
-                <div style="position: relative; left: 11px;">
-                  <img src="/svg/yellow-circle.svg" />
-                </div>
-              </div>
             </div>
           </div>
-          <div class="level-item pr-xmedium">
+          <div class="pr-xmedium">
             <.checkout_href />
           </div>
-          <div class="level-item pr-xmedium">
+          <div>
             <.no_store_yet_href />
           </div>
         </:right>
@@ -187,11 +182,6 @@ defmodule PlazaWeb.Header do
         <:store>
           <div>
             <.my_store_href />
-            <div style="position: absolute;">
-              <div style="position: relative; left: 35px;">
-                <img src="/svg/yellow-circle.svg" />
-              </div>
-            </div>
           </div>
         </:store>
       </.my_store_desktop>
@@ -341,13 +331,13 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.left_desktop>
       <:right>
-        <div class="level-item pr-xmedium">
+        <div class="pr-xmedium">
           <%= render_slot(@login) %>
         </div>
-        <div class="level-item pr-xmedium">
+        <div class="pr-xmedium">
           <.checkout_href />
         </div>
-        <div class="level-item pr-xmedium">
+        <div>
           <%= render_slot(@store) %>
         </div>
       </:right>
@@ -362,20 +352,15 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.left_desktop>
       <:right>
-        <div class="level-item pr-xmedium">
+        <div class="pr-xmedium">
           <%= render_slot(@login) %>
         </div>
-        <div class="level-item pr-xmedium">
+        <div class="pr-xmedium">
           <.link phx-click="close-mobile-header" navigate="/checkout">
             carrinho
-            <div style="position: absolute;">
-              <div style="position: relative; left: 26px;">
-                <img src="/svg/yellow-circle.svg" />
-              </div>
-            </div>
           </.link>
         </div>
-        <div class="level-item pr-xmedium">
+        <div>
           <%= render_slot(@store) %>
         </div>
       </:right>
@@ -389,20 +374,15 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.left_desktop>
       <:right>
-        <div class="level-item pr-xmedium">
+        <div class="pr-xmedium">
           <div>
             <.my_account_href />
-            <div style="position: absolute;">
-              <div style="position: relative; left: 13px;">
-                <img src="/svg/yellow-circle.svg" />
-              </div>
-            </div>
           </div>
         </div>
-        <div class="level-item pr-xmedium">
+        <div class="pr-xmedium">
           <.checkout_href />
         </div>
-        <div class="level-item pr-xmedium">
+        <div>
           <%= render_slot(@store) %>
         </div>
       </:right>
@@ -417,13 +397,13 @@ defmodule PlazaWeb.Header do
     ~H"""
     <.left_desktop>
       <:right>
-        <div class="level-item pr-xmedium">
+        <div class="pr-xmedium">
           <%= render_slot(@login) %>
         </div>
-        <div class="level-item pr-xmedium">
+        <div class="pr-xmedium">
           <.checkout_href />
         </div>
-        <div class="level-item pr-xmedium">
+        <div>
           <%= render_slot(@store) %>
         </div>
       </:right>
@@ -438,21 +418,23 @@ defmodule PlazaWeb.Header do
     ~H"""
     <div class="hero-head has-font-3">
       <div class="is-navbar is-navbar-desktop">
-        <nav class="level" style="position: relative; top: 20px; margin-left: 150px">
-          <div class="level-left">
-            <div class="level-item">
-              <div style="font-size: 72px;">
+        <nav style="display: flex; justify-content: center; margin-left: 10px; margin-right: 10px;">
+          <div style="display: flex; max-width: 1750px; width: 100%;">
+            <div style="font-size: 72px;">
+              <div style="display: flex;">
+                <div style="align-self: center; margin-right: 20px; margin-top: 15px;">
+                  <img src="/svg/yellow-circle.svg" />
+                </div>
                 <.link navigate="/">
                   plazaaaaa
                 </.link>
               </div>
             </div>
-          </div>
-          <div
-            class="level-right is-size-5"
-            style="position: relative; top: 11px; margin-right: 150px;"
-          >
-            <%= render_slot(@right) %>
+            <div class="is-size-5" style="margin-left: auto; align-self: center; margin-top: 20px;">
+              <div style="display: flex;">
+                <%= render_slot(@right) %>
+              </div>
+            </div>
           </div>
         </nav>
       </div>
@@ -541,11 +523,6 @@ defmodule PlazaWeb.Header do
     ~H"""
     <div>
       quero vender
-      <div style="position: absolute;">
-        <div style="position: relative; left: 45px;">
-          <img src="/svg/yellow-circle.svg" />
-        </div>
-      </div>
     </div>
     """
   end
