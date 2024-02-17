@@ -1038,7 +1038,7 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 8} = assigns) do
     ~H"""
-    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px; font-size: 34px;">
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 250px; font-size: 34px;">
       <PlazaWeb.UploadLive.header
         step={@step}
         front_local_upload={@front_local_upload}
@@ -1200,7 +1200,7 @@ defmodule PlazaWeb.UploadLive do
 
   def render(%{step: 9, write_status: :local_storage} = assigns) do
     ~H"""
-    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 750px;">
+    <div class="has-font-3" style="margin-top: 250px; margin-bottom: 500px;">
       <div style="display: flex; justify-content: center;">
         <div style="font-size: 40px;">
           <div style="display: flex; justify-content: center;">
