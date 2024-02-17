@@ -756,7 +756,7 @@ defmodule PlazaWeb.ProductLive do
         </div>
         <div
           :for={{product, index} <- Enum.with_index(@top_3_other_products)}
-          style="margin-bottom: 100px; margin-left: 10px; margin-right: 10px;"
+          style="margin-bottom: 100px; margin-left: 20px; margin-right: 20px;"
         >
           <ProductComponent.product product={product} meta={true} disabled={false} />
         </div>
