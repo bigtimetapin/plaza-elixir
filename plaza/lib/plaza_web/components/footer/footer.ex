@@ -58,7 +58,7 @@ defmodule PlazaWeb.Footer do
                     <span style="text-decoration: underline;">increva-se para ser avisado</span>
                     desta e mais novidades.
                   </div>
-                  <div style="margin-bottom: 6vw;">
+                  <div style="margin-bottom: 5.7vw;">
                     <.form
                       for={@email_form}
                       phx-change="change-email-form"
@@ -93,8 +93,8 @@ defmodule PlazaWeb.Footer do
                 </div>
               </div>
               <div style="width: 50%">
-                <div style="display: flex;">
-                  <div>
+                <div style="display: flex; margin-bottom: 7vw;">
+                  <div style="margin-right: 2.5vw;">
                     <div style="font-size: min(1.7vw, 32px);" class="has-font-1">
                       Comprando
                     </div>
@@ -102,6 +102,41 @@ defmodule PlazaWeb.Footer do
                       <.link navigate="/how-it-works/buyer">
                         Como funciona
                       </.link>
+                    </div>
+                  </div>
+                  <div style="margin-right: 2.5vw;">
+                    <div style="font-size: min(1.7vw, 32px);" class="has-font-1">
+                      Vendendo
+                    </div>
+                    <div style="text-decoration: underline; font-size: min(1.4vw, 28px);">
+                      <.link navigate="/how-it-works/seller">
+                        Como funciona
+                      </.link>
+                    </div>
+                    <div style="text-decoration: underline; font-size: min(1.4vw, 28px);">
+                      <.link navigate="/upload">
+                        Quero Vender
+                      </.link>
+                    </div>
+                  </div>
+                  <div style="margin-right: 2.5vw;">
+                    <div style="font-size: min(1.7vw, 32px);" class="has-font-1">
+                      Conta
+                    </div>
+                    <div style="text-decoration: underline; font-size: min(1.4vw, 28px);">
+                      <.link navigate="/my-account">
+                        Acessar Conta
+                      </.link>
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-size: min(1.7vw, 32px);" class="has-font-1">
+                      Sobre
+                    </div>
+                    <div style="text-decoration: underline; font-size: min(1.4vw, 28px);">
+                      <a href="mailto:admin@plazaaaaa.com">
+                        Contato
+                      </a>
                     </div>
                   </div>
                 </div>
