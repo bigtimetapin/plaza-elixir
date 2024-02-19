@@ -15,6 +15,18 @@ defmodule Plaza.Accounts.UserNotifier do
     Mailer.deliver(email)
   end
 
+  def deliver_newsletter_registration(email) do
+    deliver(email, "Confirmado", """
+    Bem vindo ao Plaza Newsletter,
+
+    Seu email foi cadastrado com sucesso.
+
+    Este é um email automatico do site plazaaaaa.com por favor não responder diretamente para este remetente.
+
+    Se não foi você por favor desconsidere esta mensagem.
+    """)
+  end
+
   def deliver_receipt_to_seller(seller_email, their_share) do
     deliver(seller_email, "Uma venda", """
     Você realizou uma vendaaaaa

@@ -2,6 +2,9 @@ defmodule PlazaWeb.Footer do
   use Phoenix.LiveComponent
   import PlazaWeb.CoreComponents
 
+  alias Plaza.Accounts
+  alias Plaza.Accounts.UserNotifier
+
   @impl true
   def update(_assigns, socket) do
     socket =
@@ -12,7 +15,7 @@ defmodule PlazaWeb.Footer do
             %{
               "email" => nil
             },
-            as: "email"
+            as: "email-form"
           )
       )
 
@@ -24,9 +27,21 @@ defmodule PlazaWeb.Footer do
     {:noreply, socket}
   end
 
-  def handle_event("submit-email-form", params, socket) do
-    IO.inspect(params)
-    Process.sleep(5000)
+  def handle_event("submit-email-form", %{"email-form" => %{"email" => email}}, socket) do
+    case Accounts.get_email(email) do
+      nil ->
+        case Accounts.set_email(email) do
+          {:ok, _} ->
+            UserNotifier.deliver_newsletter_registration(email)
+
+          _ ->
+            nil
+        end
+
+      _ ->
+        nil
+    end
+
     {:noreply, socket}
   end
 
