@@ -1,4 +1,4 @@
-defmodule PlazaWeb.Footer do
+defmodule PlazaWeb.DesktopFooter do
   use Phoenix.LiveComponent
   import PlazaWeb.CoreComponents
 

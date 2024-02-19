@@ -10,19 +10,10 @@
     <div :if={!assigns[:mobile_header_open]} style="border-top: 1px solid #707070">
       <footer class="is-footer-desktop"
         style="margin-left: 10px; margin-right: 10px; margin-top: 50px; margin-bottom: 50px;">
-        <.live_component module={PlazaWeb.Footer} id="footer-desktop" />
+        <.live_component module={PlazaWeb.DesktopFooter} id="footer-desktop" />
       </footer>
-      <footer class=" is-footer-mobile" style="height: 500px;">
-        <div style="display: flex; justify-content: center;">
-          <div style="display: flex; flex-direction: column; margin-top: 100px;">
-            <div>
-              <img src="/svg/big-yellow-circle.svg" style="width: 175px;" />
-            </div>
-            <div class="has-font-3" style="font-size: 52px;">
-              plaza web
-            </div>
-          </div>
-        </div>
+      <footer class=" is-footer-mobile">
+        <PlazaWeb.MobileFooter.render />
       </footer>
     </div>
   </section>
