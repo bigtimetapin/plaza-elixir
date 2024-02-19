@@ -396,6 +396,18 @@ $spacing-values: (
   }
 }
 
+.is-footer-desktop-left {
+  @include until($desktop) {
+    display: none;
+  }
+}
+
+.is-footer-desktop-right {
+  @include from($desktop) {
+    display: none;
+  }
+}
+
 .is-footer-mobile {
   @include from($tablet) {
     display: none;
