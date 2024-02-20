@@ -110,45 +110,45 @@ defmodule PlazaWeb.DesktopFooter do
               <div style="width: 50%">
                 <div style="display: flex; margin-bottom: min(7vw, 125px);">
                   <div style="margin-right: 2.5vw;">
-                    <div style="font-size: min(1.7vw, 32px);" class="has-font-1">
+                    <div style="font-size: min(1.7vw, 30px);" class="has-font-1">
                       Comprando
                     </div>
-                    <div style="text-decoration: underline; font-size: min(1.4vw, 28px);">
+                    <div style="text-decoration: underline; font-size: min(1.4vw, 26px);">
                       <.link navigate="/how-it-works/buyer">
                         Como funciona
                       </.link>
                     </div>
                   </div>
                   <div style="margin-right: 2.5vw;">
-                    <div style="font-size: min(1.7vw, 32px);" class="has-font-1">
+                    <div style="font-size: min(1.7vw, 30px);" class="has-font-1">
                       Vendendo
                     </div>
-                    <div style="text-decoration: underline; font-size: min(1.4vw, 28px);">
+                    <div style="text-decoration: underline; font-size: min(1.4vw, 26px);">
                       <.link navigate="/how-it-works/seller">
                         Como funciona
                       </.link>
                     </div>
-                    <div style="text-decoration: underline; font-size: min(1.4vw, 28px);">
+                    <div style="text-decoration: underline; font-size: min(1.4vw, 26px);">
                       <.link navigate="/upload">
                         Quero Vender
                       </.link>
                     </div>
                   </div>
                   <div style="margin-right: 2.5vw;">
-                    <div style="font-size: min(1.7vw, 32px);" class="has-font-1">
+                    <div style="font-size: min(1.7vw, 30px);" class="has-font-1">
                       Conta
                     </div>
-                    <div style="text-decoration: underline; font-size: min(1.4vw, 28px);">
+                    <div style="text-decoration: underline; font-size: min(1.4vw, 26px);">
                       <.link navigate="/my-account">
                         Acessar Conta
                       </.link>
                     </div>
                   </div>
                   <div>
-                    <div style="font-size: min(1.7vw, 32px);" class="has-font-1">
+                    <div style="font-size: min(1.7vw, 30px);" class="has-font-1">
                       Sobre
                     </div>
-                    <div style="text-decoration: underline; font-size: min(1.4vw, 28px);">
+                    <div style="text-decoration: underline; font-size: min(1.4vw, 26px);">
                       <a href="mailto:admin@plazaaaaa.com">
                         Contato
                       </a>
