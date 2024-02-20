@@ -59,7 +59,7 @@ defmodule PlazaWeb.DesktopFooter do
           </div>
           <div
             class="has-font-3 is-footer-desktop-left"
-            style="position: relative; bottom: min(26.5vw, 465px); height: 0px;"
+            style="position: relative; bottom: min(29vw, 465px); height: 0px;"
           >
             <div style="display: flex; margin-left: 40px; margin-right: 40px;">
               <div style="width: 50%;">
@@ -163,7 +163,7 @@ defmodule PlazaWeb.DesktopFooter do
           </div>
           <div
             class="has-font-3 is-footer-desktop-right"
-            style="position: relative; bottom: min(25vw, 465px); height: 0px; margin-left: 40px;"
+            style="position: relative; bottom: 28vw; height: 0px; margin-left: 40px;"
           >
             <div style="display: flex;">
               <div style="width: 50%;">
