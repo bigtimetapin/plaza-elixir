@@ -430,7 +430,7 @@ defmodule PlazaWeb.Header do
                 </.link>
               </div>
             </div>
-            <div class="is-size-5" style="margin-left: auto; align-self: center; margin-top: 20px;">
+            <div style="margin-left: auto; align-self: center; margin-top: 20px; font-size: 36px;">
               <div style="display: flex;">
                 <%= render_slot(@right) %>
               </div>
