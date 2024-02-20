@@ -631,28 +631,30 @@ defmodule PlazaWeb.MyStoreLive do
   def render(%{seller: %Seller{stripe_id: nil}, products: []} = assigns) do
     ~H"""
     <div class="is-my-store-page-desktop">
-      <div style="display: flex; margin-bottom: 50px;">
-        <.left seller={@seller} />
-        <div style="margin-left: 150px; margin-top: 150px;">
-          <div class="has-font-3" style="font-size: 34px;">
-            <div style="display: flex; justify-content: center;">
-              <div style="text-align: center;">
-                <div style="margin-bottom: 50px;">
-                  Ok you've created your seller (loja) profile
-                </div>
-                <div style="margin-bottom: 50px;">
-                  Go upload your first product
-                  <div style="text-decoration: underline;">
-                    <.link navigate="/upload">
-                      upload
-                    </.link>
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; margin-bottom: 50px; max-width: 1750px; width: 100%;">
+          <.left seller={@seller} />
+          <div style="margin-left: 150px; margin-top: 150px;">
+            <div class="has-font-3" style="font-size: 34px;">
+              <div style="display: flex; justify-content: center;">
+                <div style="text-align: center;">
+                  <div style="margin-bottom: 50px;">
+                    Ok you've created your seller (loja) profile
                   </div>
-                </div>
-                <div style="width: 785px;">
-                  Or link your bank info with stripe so you can get paid for every sale.
-                  You'll need to do this before your products go live.
-                  <div style="text-decoration: underline;">
-                    <button phx-click="stripe-link-account">link stripe account</button>
+                  <div style="margin-bottom: 50px;">
+                    Go upload your first product
+                    <div style="text-decoration: underline;">
+                      <.link navigate="/upload">
+                        upload
+                      </.link>
+                    </div>
+                  </div>
+                  <div style="width: 785px;">
+                    Or link your bank info with stripe so you can get paid for every sale.
+                    You'll need to do this before your products go live.
+                    <div style="text-decoration: underline;">
+                      <button phx-click="stripe-link-account">link stripe account</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -670,30 +672,32 @@ defmodule PlazaWeb.MyStoreLive do
   def render(%{seller: %Seller{stripe_id: nil}, products: [product]} = assigns) do
     ~H"""
     <div class="is-my-store-page-desktop">
-      <div style="display: flex; margin-bottom: 50px;">
-        <.left seller={@seller} />
-        <div style="margin-left: 150px; margin-top: 150px;">
-          <div class="has-font-3" style="font-size: 34px;">
-            <div style="text-align: center;">
-              <div style="margin-bottom: 50px;">
-                Ok you've created your seller (loja) profile
-              </div>
-              <div style="margin-bottom: 50px;">
-                and you've uploaded your first product
-                <div style="display: flex; justify-content: center; margin-top: 50px;">
-                  <ProductComponent.product
-                    product={product}
-                    meta={false}
-                    disabled={true}
-                    style="width: 500px;"
-                  />
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; margin-bottom: 50px; max-width: 1750px; width: 100%;">
+          <.left seller={@seller} />
+          <div style="margin-left: 150px; margin-top: 150px;">
+            <div class="has-font-3" style="font-size: 34px;">
+              <div style="text-align: center;">
+                <div style="margin-bottom: 50px;">
+                  Ok you've created your seller (loja) profile
+                </div>
+                <div style="margin-bottom: 50px;">
+                  and you've uploaded your first product
+                  <div style="display: flex; justify-content: center; margin-top: 50px;">
+                    <ProductComponent.product
+                      product={product}
+                      meta={false}
+                      disabled={true}
+                      style="width: 500px;"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-            <div style="border: 1px dotted black; text-align: center;">
-              You just need to link your bank info with stripe so you can get paid for every sale.
-              <div style="text-decoration: underline; margin-top: 50px;">
-                <button phx-click="stripe-link-account">link stripe account</button>
+              <div style="border: 1px dotted black; text-align: center;">
+                You just need to link your bank info with stripe so you can get paid for every sale.
+                <div style="text-decoration: underline; margin-top: 50px;">
+                  <button phx-click="stripe-link-account">link stripe account</button>
+                </div>
               </div>
             </div>
           </div>
@@ -709,9 +713,11 @@ defmodule PlazaWeb.MyStoreLive do
   def render(assigns) do
     ~H"""
     <div class="is-my-store-page-desktop">
-      <div style="display: flex;">
-        <.left seller={@seller} />
-        <.right products={@products} all_products={@all_products} />
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; max-width: 1750px; width: 100%;">
+          <.left seller={@seller} />
+          <.right products={@products} all_products={@all_products} />
+        </div>
       </div>
     </div>
     <div class="is-my-store-page-mobile">
@@ -791,7 +797,7 @@ defmodule PlazaWeb.MyStoreLive do
       |> assign(user_urls: urls)
 
     ~H"""
-    <div class="has-font-3" style="position: relative; top: 50px;">
+    <div class="has-font-3">
       <div style="width: 377px; height: 377px; overflow: hidden; border-bottom: 1px solid grey;">
         <div
           :if={!@seller.profile_photo_url}

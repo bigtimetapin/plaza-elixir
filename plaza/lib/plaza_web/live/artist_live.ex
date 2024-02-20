@@ -109,9 +109,11 @@ defmodule PlazaWeb.ArtistLive do
   def render(assigns) do
     ~H"""
     <div class="is-artist-page-desktop">
-      <div style="display: flex;">
-        <.left seller={@seller} />
-        <.right products={@products} all_products={@all_products} />
+      <div style="display: flex; justify-content: center;">
+        <div style="display: flex; max-width: 1750px; width: 100%;">
+          <.left seller={@seller} />
+          <.right products={@products} all_products={@all_products} />
+        </div>
       </div>
     </div>
     <div class="is-artist-page-mobile has-font-3" style="margin-top: 50px;">
@@ -263,7 +265,7 @@ defmodule PlazaWeb.ArtistLive do
       |> assign(user_urls: urls)
 
     ~H"""
-    <div class="has-font-3" style="position: relative; top: 50px;">
+    <div class="has-font-3">
       <div style="width: 377px; height: 377px; overflow: hidden; border-bottom: 1px solid grey;">
         <img
           src={if @seller.profile_photo_url, do: @seller.profile_photo_url, else: "png/pep.png"}
