@@ -73,7 +73,7 @@ defmodule PlazaWeb.DesktopFooter do
                     <span style="text-decoration: underline;">increva-se para ser avisado</span>
                     desta e mais novidades.
                   </div>
-                  <div style="margin-bottom: 5.7vw;">
+                  <div style="margin-bottom: min(5.7vw, 110px);">
                     <.form
                       for={@email_form}
                       phx-change="change-email-form"
@@ -108,7 +108,7 @@ defmodule PlazaWeb.DesktopFooter do
                 </div>
               </div>
               <div style="width: 50%">
-                <div style="display: flex; margin-bottom: 7vw;">
+                <div style="display: flex; margin-bottom: min(7vw, 125px);">
                   <div style="margin-right: 2.5vw;">
                     <div style="font-size: min(1.7vw, 32px);" class="has-font-1">
                       Comprando
