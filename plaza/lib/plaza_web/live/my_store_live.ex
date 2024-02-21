@@ -534,7 +534,7 @@ defmodule PlazaWeb.MyStoreLive do
   @impl Phoenix.LiveView
   def render(%{waiting: true} = assigns) do
     ~H"""
-    <div style="margin-top: 200px; display: flex; justify-content: center;">
+    <div style="margin-top: 200px; margin-bottom: 200px; display: flex; justify-content: center;">
       <img src="gif/loading.gif" class="is-loading" />
     </div>
     """
@@ -819,7 +819,7 @@ defmodule PlazaWeb.MyStoreLive do
         />
       </div>
       <div style="display: flex; flex-direction: column;">
-        <div style="margin-left: auto; padding-top: 10px; width: 316px; height: 600px;">
+        <div style="margin-left: 25px; margin-top: 10px; height: 600px;">
           <div class="is-size-6 mb-small" style="text-decoration: underline;">
             <%= @seller.user_name %>
           </div>

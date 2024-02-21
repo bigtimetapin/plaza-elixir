@@ -90,7 +90,7 @@ defmodule PlazaWeb.ArtistLive do
   @impl Phoenix.LiveView
   def render(%{waiting: true} = assigns) do
     ~H"""
-    <div style="margin-top: 200px; display: flex; justify-content: center;">
+    <div style="margin-top: 200px; margin-bottom: 200px; display: flex; justify-content: center;">
       <img src="gif/loading.gif" class="is-loading" />
     </div>
     """
@@ -273,7 +273,7 @@ defmodule PlazaWeb.ArtistLive do
         />
       </div>
       <div style="display: flex; flex-direction: column;">
-        <div style="margin-left: auto; padding-top: 10px; width: 316px; height: 600px;">
+        <div style="margin-left: 25px; margin-top: 10px; height: 600px;">
           <div class="is-size-6 mb-small" style="text-decoration: underline;">
             <%= @seller.user_name %>
           </div>
@@ -333,13 +333,13 @@ defmodule PlazaWeb.ArtistLive do
 
   defp right(assigns) do
     ~H"""
-    <div style="padding-top: 150px; width: 100%; border-left: 1px solid #707070;">
-      <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 200px">
+    <div style="padding-top: 75px; width: 100%; border-left: 1px solid #707070;">
+      <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 25px">
         <ProductComponent.products3 products={@products} />
       </div>
       <div
         :if={!@all_products && Enum.count(@products) == 3}
-        style="display: flex; justify-content: center; margin-bottom: 100px;"
+        style="display: flex; justify-content: center; margin-bottom: 200px;"
       >
         <button
           class="has-font-3"

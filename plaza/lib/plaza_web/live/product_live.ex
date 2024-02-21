@@ -267,7 +267,7 @@ defmodule PlazaWeb.ProductLive do
   @impl Phoenix.LiveView
   def render(%{waiting: true} = assigns) do
     ~H"""
-    <div style="margin-top: 200px; display: flex; justify-content: center;">
+    <div style="margin-top: 200px; margin-bottom: 200px; display: flex; justify-content: center;">
       <img src="gif/loading.gif" class="is-loading" />
     </div>
     """
@@ -302,12 +302,7 @@ defmodule PlazaWeb.ProductLive do
     ~H"""
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
-        <div>
-          <ProductComponent.product product={product} meta={true} disabled={true} />
-        </div>
-        <div>
-          this product is no longer available
-        </div>
+        <ProductComponent.product product={product} meta={true} disabled={true} style="width: 350px;" />
       </div>
     </div>
     """

@@ -669,7 +669,7 @@ defmodule PlazaWeb.UploadLive do
   @impl Phoenix.LiveView
   def render(%{waiting: true} = assigns) do
     ~H"""
-    <div style="margin-top: 200px; display: flex; justify-content: center;">
+    <div style="margin-top: 200px; margin-bottom: 200px; display: flex; justify-content: center;">
       <img src="gif/loading.gif" class="is-loading" />
     </div>
     """
