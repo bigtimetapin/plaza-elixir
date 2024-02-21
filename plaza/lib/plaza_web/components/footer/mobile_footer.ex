@@ -25,13 +25,24 @@ defmodule PlazaWeb.MobileFooter do
         <div style="display: flex; justify-content: center; margin-bottom: 75px; margin-left: 25px; margin-right: 25px;">
           <img src="/svg/footer-left-02.svg" />
         </div>
-        <div style="font-size: 22px; line-height: 24px; display: flex; justify-content: center; margin-bottom: 75px; margin-left: 10px;">
-          <div style="width: 335px; ">
-            Plaza é uma plataforma de integração de serviços e pagamentos automatizados para artistas e criadores,
-            entre em contato para saber mais, trabalhar conosco ou qualquer dúvida.
-            <a style="text-decoration: underline;" href="mailto:admin@plazaaaaa.com">
-              CONTATO
-            </a>
+        <div style="display: flex; justify-content: center; margin-bottom: 75px; margin-left: 10px;">
+          <div style="font-size: 22px; line-height: 24px; ">
+            <div>
+              Plaza é uma plataforma de integração de
+            </div>
+            <div>
+              serviços e pagamentos automatizados para
+            </div>
+            <div>
+              artistas e criadores, entre em contato para
+            </div>
+            <div>
+              saber mais, trabalhar conosco ou qualquer
+            </div>
+            <div>
+              dúvida.
+              <a style="text-decoration: underline;" href="mailto:admin@plazaaaaa.com">CONTATO</a>
+            </div>
           </div>
         </div>
         <div style="margin-bottom: 75px; display: flex; justify-content: center; margin-right: 30px;">
