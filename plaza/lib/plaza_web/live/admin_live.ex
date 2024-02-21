@@ -206,6 +206,8 @@ defmodule PlazaWeb.AdminLive do
                   type="text"
                   placeholder="second"
                   style="width: 150px; margin: 10px;"
+                  phx-debounce="500"
+                  phx-change="change-top-products-form-second"
                 />
                 <div style="margin: 10px;">
                   <ProductComponent.product product={@second} meta={false} disabled={true} />
@@ -217,6 +219,8 @@ defmodule PlazaWeb.AdminLive do
                   type="text"
                   placeholder="third"
                   style="width: 150px; margin: 10px;"
+                  phx-debounce="500"
+                  phx-change="change-top-products-form-third"
                 />
                 <div style="margin: 10px;">
                   <ProductComponent.product product={@third} meta={false} disabled={true} />
