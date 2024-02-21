@@ -276,7 +276,7 @@ defmodule PlazaWeb.AdminLive do
         </div>
         <div
           :for={product <- @seller_products}
-          style="display: flex; flex-direction: column; border: 1px dotted black; margin-bottom: 25px; padding: 50px;"
+          style="display: flex; flex-direction: column; border: 1px dotted black; margin-bottom: 25px; padding: 50px; width: 600px;"
         >
           <ProductComponent.product product={product} meta={true} disabled={true} />
           <div style="text-align: center;">
