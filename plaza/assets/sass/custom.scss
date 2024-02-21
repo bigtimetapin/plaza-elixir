@@ -490,7 +490,6 @@ $spacing-values: (
 
 .is-product-1 {
   @include from($tablet) {
-    max-width: 400px;
     min-width: 225px;
   }
 }

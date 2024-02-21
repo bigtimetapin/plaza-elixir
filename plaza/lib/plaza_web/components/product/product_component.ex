@@ -5,7 +5,7 @@ defmodule PlazaWeb.ProductComponent do
 
   def products3(assigns) do
     ~H"""
-    <div class="columns is-multiline">
+    <div class="columns is-multiline is-variable is-7">
       <%= for product <- @products do %>
         <div class="column is-one-third">
           <.product product={product} meta={true} disabled={false} />
@@ -90,10 +90,10 @@ defmodule PlazaWeb.ProductComponent do
             />
           </div>
           <div :if={@meta}>
-            <div style="display: flex; font-size: 24px; margin-bottom: 5px;">
+            <div style="display: flex; font-size: 26px; margin-bottom: 5px;">
               <%= @product.name %>
             </div>
-            <div style="display: flex; font-size: 18px;">
+            <div style="display: flex; font-size: 22px;">
               <.link navigate={@artist_href}>
                 <%= @product.user_name %>
               </.link>
