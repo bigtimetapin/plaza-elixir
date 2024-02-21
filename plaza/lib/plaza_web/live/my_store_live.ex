@@ -886,7 +886,7 @@ defmodule PlazaWeb.MyStoreLive do
           Criar mais produtos
         </.link>
       </div>
-      <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 25px">
+      <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 75px">
         <ProductComponent.products3 products={@products} />
       </div>
       <div :if={!@all_products} style="display: flex; justify-content: center; margin-bottom: 200px;">

@@ -300,7 +300,7 @@ defmodule PlazaWeb.ProductLive do
 
   def render(%{product: product, step: -2} = assigns) do
     ~H"""
-    <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
+    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <ProductComponent.product product={product} meta={true} disabled={true} style="width: 350px;" />
       </div>

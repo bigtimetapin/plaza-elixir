@@ -7,7 +7,7 @@ defmodule PlazaWeb.ProductComponent do
     ~H"""
     <div class="columns is-multiline">
       <%= for product <- @products do %>
-        <div class="column is-one-third" style="margin-bottom: 100px;">
+        <div class="column is-one-third">
           <.product product={product} meta={true} disabled={false} />
         </div>
       <% end %>
@@ -89,26 +89,20 @@ defmodule PlazaWeb.ProductComponent do
               style="width: 100%;"
             />
           </div>
-          <div :if={@meta} style="position: relative; top: 56px;">
-            <div style="position: absolute; bottom: 25px; left: 10px;"><%= @product.name %></div>
-            <div class="pr-xsmall" style="position: absolute; bottom: 25px; right: 0px;">
-              <%= "R$ #{@product.price}" %>
+          <div :if={@meta}>
+            <div style="display: flex; font-size: 24px; margin-bottom: 5px;">
+              <%= @product.name %>
             </div>
-            <div
-              class="has-dark-gray-text is-size-7"
-              style="position: absolute; bottom: 0px; left: 10px;"
-            >
-              <p>
-                <.link navigate={@artist_href}>
-                  <%= @product.user_name %>
-                </.link>
-              </p>
+            <div style="display: flex; font-size: 18px;">
+              <.link navigate={@artist_href}>
+                <%= @product.user_name %>
+              </.link>
             </div>
-            <div
-              class="has-dark-gray-text is-size-7"
-              style="position: absolute; bottom: 0px; right: 0px;"
-            >
+            <div style="display: flex; font-size: 18px; color: grey;">
               <%= @days_remaining %>
+            </div>
+            <div style="display: flex; font-size: 20px;">
+              <%= "R$ #{@product.price}" %>
             </div>
           </div>
         </button>

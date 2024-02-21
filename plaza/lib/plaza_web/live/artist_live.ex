@@ -334,7 +334,7 @@ defmodule PlazaWeb.ArtistLive do
   defp right(assigns) do
     ~H"""
     <div style="padding-top: 75px; width: 100%; border-left: 1px solid #707070;">
-      <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 25px">
+      <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 75px">
         <ProductComponent.products3 products={@products} />
       </div>
       <div

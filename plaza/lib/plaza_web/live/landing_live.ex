@@ -201,64 +201,38 @@ defmodule PlazaWeb.LandingLive do
 
   def desktop(assigns) do
     ~H"""
-    <div
-      class="is-landing-desktop has-font-3"
-      style="margin-top: 150px; margin-left: 20px; margin-right: 20px;"
-    >
+    <div class="is-landing-desktop has-font-3" style="margin-left: 20px; margin-right: 20px;">
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; flex-direction: column; width: 100%; max-width: 1750px;">
-          <div style="display: flex; margin-bottom: 150px;">
-            <div style="margin-right: 75px;">
-              <img src="/svg/big-yellow-circle.svg" style="width: 300px;" />
+          <div style="font-size: min(24.5vw, 476px); line-height: min(24.5vw, 476px); margin-bottom: min(3vw, 50px);">
+            <div>
+              Bem vindo
             </div>
             <div>
-              <div style="font-size: 72px;">
-                Apoie a comunidade criativa
-              </div>
-              <div style="font-size: 36px; max-width: 775px; margin-bottom: 25px;">
-                Bem vindo ao plaza, aqui você encontra camisetas e posters de artistas independentes.
-              </div>
-              <div style="font-size: 36px; max-width: 775px;">
-                Inscreva-se e venda seus designs hoje mesmo.
-              </div>
-              <div style="font-size: 24px; text-decoration: underline;">
-                <.link navigate="/how-it-works/seller">
-                  Saiba como funciona
-                </.link>
-              </div>
+              ao Plaza!
             </div>
           </div>
-          <div>
+          <div style="margin-bottom: 50px;">
             <ProductComponent.products3 products={@top_products} />
           </div>
-          <div style="display: flex; justify-content: center; margin-top: 125px; margin-bottom: 100px;">
+          <div style="font-size: min(11.5vw, 220px); line-height: min(11.6vw, 230px); margin-bottom: 100px;">
             <div>
-              <h2 style="font-size: 58px; margin-bottom: 25px;">
-                Monetize seus projetos com camisetas e posters
-              </h2>
-              <h3 style="font-size: 32px; min-width: 300px; max-width: 1005px; line-height: 36px; margin-bottom: 25px;">
-                Crie sua loja e comece a vender hoje mesmo, não tem nenhum custo.
-              </h3>
-              <h3 style="font-size: 32px; min-width: 300px; max-width: 670px; line-height: 36px; margin-bottom: 25px;">
-                A produção é feita sobre demanda sem quantidade mínima, sem desperdícios e entregue direto para o cliente final.
-              </h3>
-              <h3 style="font-size: 32px; line-height: 36px; margin-bottom: 25px;">
-                <.link navigate="/upload" style="text-decoration: underline;">
-                  quero vender
-                </.link>
-              </h3>
+              aqui você encontra
             </div>
-            <div style="min-width: 250px;">
-              <img src="/svg/star.svg" />
+            <div>
+              camisetas e posters de
+            </div>
+            <div>
+              artistas independentes.
             </div>
           </div>
           <div :if={!Enum.empty?(@curated_products)} style="display: flex; margin-bottom: 30px;">
             <div>
               <h4 style="font-size: 58px; line-height: 45px;">
-                Theme Selection of the month
+                Produtos do Mês
               </h4>
               <h5 style="font-size: 32px;">
-                Envios do tema mês de fevereiro Carros e Veículos
+                Melhores envios de fevereiro
               </h5>
             </div>
             <div style="margin-left: auto; margin-right: 120px; display: flex; position: relative; top: 45px;">
@@ -285,8 +259,21 @@ defmodule PlazaWeb.LandingLive do
             </div>
           </div>
           <div id="top-products-desktop" />
-          <div :if={!Enum.empty?(@curated_products)} style="margin-bottom: 100px;">
+          <div :if={!Enum.empty?(@curated_products)} style="margin-bottom: 50px;">
             <ProductComponent.products3 products={@curated_products} />
+          </div>
+          <div style="font-size: min(11vw, 210px); line-height: min(11.5vw, 220px); margin-bottom: 100px;">
+            <.link navigate="/upload">
+              <div style="text-decoration: underline; text-decoration-thickness: min(0.5vw, 9px);">
+                Crie um produto,
+              </div>
+              <div style="text-decoration: underline; text-decoration-thickness: min(0.5vw, 9px);">
+                coloque a venda,
+              </div>
+              <div style="text-decoration: underline; text-decoration-thickness: min(0.5vw, 9px);">
+                receba semanalmente.
+              </div>
+            </.link>
           </div>
           <div style="margin-bottom: 25px;">
             <h4 style="font-size: 58px; line-height: 45px;">
@@ -370,7 +357,7 @@ defmodule PlazaWeb.LandingLive do
                 product={product}
                 meta={true}
                 disabled={false}
-                style="width: 315px;"
+                style="width: 375px;"
               />
             </div>
           </div>
