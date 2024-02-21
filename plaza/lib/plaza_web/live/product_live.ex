@@ -701,7 +701,7 @@ defmodule PlazaWeb.ProductLive do
             <div style="margin-left: auto; position: relative; left: 10px; top: 10px;">
               <button phx-click="add-to-cart" style="width: 145px;">
                 <img src="svg/yellow-ellipse.svg" />
-                <div class="has-font-3" style="position: relative; bottom: 63px; font-size: 34px;">
+                <div class="has-font-3" style="position: relative; bottom: 65px; font-size: 34px;">
                   comprar
                 </div>
               </button>

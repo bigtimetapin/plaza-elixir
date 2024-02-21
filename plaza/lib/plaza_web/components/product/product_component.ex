@@ -90,7 +90,7 @@ defmodule PlazaWeb.ProductComponent do
             />
           </div>
           <div :if={@meta}>
-            <div style="display: flex; font-size: 26px; margin-bottom: 5px;">
+            <div style="display: flex; font-size: 26px;">
               <%= @product.name %>
             </div>
             <div style="display: flex; font-size: 22px;">
