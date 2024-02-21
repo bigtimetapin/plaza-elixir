@@ -346,7 +346,7 @@ defmodule PlazaWeb.ProductLive do
                     Feito no Brasil
                   </div>
                   <div>
-                    SKU: 222270M213012
+                    <%= "SKU: #{@product.id}" %>
                   </div>
                 </div>
               </div>
@@ -737,7 +737,7 @@ defmodule PlazaWeb.ProductLive do
             Feito no Brasil
           </div>
           <div>
-            SKU: 222270M213012
+            <%= "SKU: #{@product.id}" %>
           </div>
         </div>
       </div>
