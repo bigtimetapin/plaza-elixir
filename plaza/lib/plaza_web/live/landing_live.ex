@@ -204,13 +204,8 @@ defmodule PlazaWeb.LandingLive do
     <div class="is-landing-desktop has-font-3" style="margin-left: 20px; margin-right: 20px;">
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; flex-direction: column; width: 100%; max-width: 1750px;">
-          <div style="font-size: min(24.5vw, 476px); line-height: min(24.5vw, 476px); margin-bottom: min(3vw, 50px);">
-            <div>
-              Bem vindo
-            </div>
-            <div>
-              ao Plaza!
-            </div>
+          <div style="margin-bottom: 150px; margin-top: 45px;">
+            <img src="/svg/landing-group-desktop-03.svg" />
           </div>
           <div style="margin-bottom: 100px;">
             <ProductComponent.products3 products={@top_products} />
