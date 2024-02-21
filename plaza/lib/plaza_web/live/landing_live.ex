@@ -212,19 +212,11 @@ defmodule PlazaWeb.LandingLive do
               ao Plaza!
             </div>
           </div>
-          <div style="margin-bottom: 50px;">
+          <div style="margin-bottom: 100px;">
             <ProductComponent.products3 products={@top_products} />
           </div>
-          <div style="font-size: min(11.5vw, 220px); line-height: min(11.6vw, 230px); margin-bottom: 100px;">
-            <div>
-              aqui você encontra
-            </div>
-            <div>
-              camisetas e posters de
-            </div>
-            <div>
-              artistas independentes.
-            </div>
+          <div style="margin-bottom: 100px;">
+            <img src="/svg/landing-group-desktop-02.svg" />
           </div>
           <div :if={!Enum.empty?(@curated_products)} style="display: flex; margin-bottom: 30px;">
             <div>
@@ -259,20 +251,12 @@ defmodule PlazaWeb.LandingLive do
             </div>
           </div>
           <div id="top-products-desktop" />
-          <div :if={!Enum.empty?(@curated_products)} style="margin-bottom: 50px;">
+          <div :if={!Enum.empty?(@curated_products)}>
             <ProductComponent.products3 products={@curated_products} />
           </div>
-          <div style="font-size: min(11vw, 210px); line-height: min(11.5vw, 220px); margin-bottom: 100px;">
+          <div style="margin-bottom: 100px; margin-top: 100px;">
             <.link navigate="/upload">
-              <div style="text-decoration: underline; text-decoration-thickness: min(0.5vw, 9px);">
-                Crie um produto,
-              </div>
-              <div style="text-decoration: underline; text-decoration-thickness: min(0.5vw, 9px);">
-                coloque a venda,
-              </div>
-              <div style="text-decoration: underline; text-decoration-thickness: min(0.5vw, 9px);">
-                receba semanalmente.
-              </div>
+              <img src="/svg/landing-group-desktop-01.svg" />
             </.link>
           </div>
           <div style="margin-bottom: 25px;">
