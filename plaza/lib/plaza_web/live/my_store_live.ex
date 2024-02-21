@@ -880,22 +880,22 @@ defmodule PlazaWeb.MyStoreLive do
 
   defp right(assigns) do
     ~H"""
-    <div style="padding-top: 150px; width: 100%; border-left: 1px solid #707070;">
-      <div style="margin-left: 100px; margin-bottom: 50px;">
+    <div style="padding-top: 50px; width: 100%; border-left: 1px solid #707070;">
+      <div style="margin-left: 100px; margin-bottom: 25px;">
         <.link navigate="/upload" style="text-decoration: underline;" class="has-font-3 is-size-6">
-          upload more stuff
+          Criar mais produtos
         </.link>
       </div>
-      <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 200px">
+      <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 25px">
         <ProductComponent.products3 products={@products} />
       </div>
-      <div :if={!@all_products} style="display: flex; justify-content: center; margin-bottom: 100px;">
+      <div :if={!@all_products} style="display: flex; justify-content: center; margin-bottom: 200px;">
         <button
           class="has-font-3"
           style="text-decoration: underline; font-size: 28px;"
           phx-click="all-products"
         >
-          Ver todos os produtos
+          Ver todos os meus produtos
         </button>
       </div>
     </div>
