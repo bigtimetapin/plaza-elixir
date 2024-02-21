@@ -531,20 +531,16 @@ defmodule PlazaWeb.ProductLive do
             class="has-font-3"
             style="border-top: 1px solid grey;"
           >
-            <div style="margin-left: 100px;">
-              <div style="font-size: 28px; margin-top: 25px; margin-bottom: 10px;">
-                Outros produtos parecidos
-              </div>
-              <div style="display: flex; justify-content: center; margin-bottom: 100px;">
-                <div :for={product <- @top_3_other_products} style="width: 100%;">
-                  <ProductComponent.product product={product} meta={true} disabled={false} />
-                </div>
-              </div>
-              <div style="display: flex; justify-content: center; margin-bottom: 100px;">
-                <.link navigate="/" style="font-size: 28px; text-decoration: underline;">
-                  Voltar para loja principal
-                </.link>
-              </div>
+            <div style="font-size: 28px; margin-top: 25px; margin-bottom: 10px;">
+              Outros produtos parecidos
+            </div>
+            <div style="margin-bottom: 100px;">
+              <ProductComponent.products3 products={@top_3_other_products} />
+            </div>
+            <div style="display: flex; justify-content: center; margin-bottom: 100px;">
+              <.link navigate="/" style="font-size: 28px; text-decoration: underline;">
+                Voltar para loja principal
+              </.link>
             </div>
           </div>
         </div>
