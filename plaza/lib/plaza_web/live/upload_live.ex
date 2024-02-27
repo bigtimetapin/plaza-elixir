@@ -7,6 +7,7 @@ defmodule PlazaWeb.UploadLive do
 
   alias Plaza.Accounts
   alias Plaza.Accounts.Seller
+  alias Plaza.Accounts.UserNotifier
   alias Plaza.Products
   alias Plaza.Products.Product
   alias Plaza.Products.Designs
@@ -587,6 +588,7 @@ defmodule PlazaWeb.UploadLive do
 
             seller ->
               {:ok, product} = Products.create_product(product)
+              UserNotifier.deliver_admin_notice_of_product_upload(product)
 
               socket
               |> assign(write_status: :db_storage)

@@ -15,6 +15,19 @@ defmodule Plaza.Accounts.UserNotifier do
     Mailer.deliver(email)
   end
 
+  def deliver_admin_notice_of_product_upload(product) do
+    artist_href = URI.encode_query(%{"user_name" => product.user_name})
+    artist_href = "https://plazaaaaa.com/artist?#{artist_href}"
+    product_href = URI.encode_query(%{"product-id" => product.id})
+    product_href = "https://plazaaaaa.com/product?#{product_href}"
+
+    deliver("admin@plazaaaaa.com", "Product Upload", """
+    Product uploaded
+    by: #{artist_href}
+    product: #{product_href} 
+    """)
+  end
+
   def deliver_admin_notice_of_login(email) do
     deliver("admin@plazaaaaa.com", "User Login", """
     User logged in with email: #{email}
