@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="ranch" type="mix">
-    <CLASSES />
-    <JAVADOC />
-    <SOURCES>
-      <root url="file://$PROJECT_DIR$/plaza/deps/ranch/src" />
-    </SOURCES>
-  </library>
-</component>
