@@ -855,14 +855,20 @@ defmodule PlazaWeb.CheckoutLive do
           mock_url =
             if product.designs.display == 0, do: product.mocks.front, else: product.mocks.back
 
+          product_url =
+            "#{Application.get_env(:plaza, :app_url)}/product?product_id=#{product.id}"
+
           {:ok, stripe_product} =
             Stripe.Product.create(%{
               images: [mock_url],
               name: product.name,
-              url: "#{Application.get_env(:plaza, :app_url)}/product?product_id=#{product.id}",
+              url: product_url,
               default_price_data: %{
                 unit_amount: Product.price_unit_amount(product),
                 currency: "brl"
+              },
+              metadata: %{
+                url: product_url
               }
             })
 
