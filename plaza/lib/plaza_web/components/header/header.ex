@@ -454,11 +454,8 @@ defmodule PlazaWeb.Header do
           </div>
           <div style="margin-left: auto; margin-right: 20px;">
             <div style="margin-top: 25px;">
-              <button class="has-font-3" style="width: 110px;" phx-click="open-mobile-header">
-                <img src="/svg/yellow-ellipse.svg" />
-                <div class="has-font-3" style="position: relative; bottom: 53px; font-size: 30px;">
-                  menu
-                </div>
+              <button class="has-font-3" phx-click="open-mobile-header">
+                <img src="/svg/menu.svg" />
               </button>
             </div>
           </div>
