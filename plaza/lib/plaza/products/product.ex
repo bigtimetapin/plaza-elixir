@@ -19,6 +19,7 @@ defmodule Plaza.Products.Product do
     field :campaign_duration_timestamp, :naive_datetime
     field :active, :boolean
     field :curated, :boolean
+    field :top, :boolean
     timestamps()
   end
 
@@ -42,7 +43,8 @@ defmodule Plaza.Products.Product do
       :campaign_duration,
       :campaign_duration_timestamp,
       :active,
-      :curated
+      :curated,
+      :top
     ])
     |> validate_required([
       :user_id,
@@ -57,7 +59,8 @@ defmodule Plaza.Products.Product do
       :campaign_duration,
       :campaign_duration_timestamp,
       :active,
-      :curated
+      :curated,
+      :top
     ])
     |> unique_constraint([
       :user_id,

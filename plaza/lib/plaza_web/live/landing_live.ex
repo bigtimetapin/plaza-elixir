@@ -11,11 +11,7 @@ defmodule PlazaWeb.LandingLive do
       case connected?(socket) do
         true ->
           ## top products
-          top_product_ids = GenServer.call(TopProducts, :get)
-          first = Products.get_product(top_product_ids.first)
-          second = Products.get_product(top_product_ids.second)
-          third = Products.get_product(top_product_ids.third)
-          top_products = [first, second, third]
+          top_products = Products.top_3()
           ## curated products 
           curated_products =
             Products.top_n_paginated(

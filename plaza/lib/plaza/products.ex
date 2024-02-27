@@ -8,12 +8,12 @@ defmodule Plaza.Products do
 
   alias Plaza.Products.Product
 
-  def top_10 do
+  def top_3 do
     Repo.all(
-      from Product,
-        where: [active: true],
-        order_by: [desc: :updated_at],
-        limit: 10
+      from p in Product,
+        where: [top: true],
+        order_by: [desc: :updated_at, desc: :id],
+        limit: 3
     )
   end
 
@@ -32,30 +32,13 @@ defmodule Plaza.Products do
       Repo.paginate(
         from(
           p in Product,
-          where: [active: true, curated: ^curated],
+          where: [active: true, top: false, curated: ^curated],
           order_by: [desc: :updated_at, desc: :id]
         ),
         before: cursors.before,
         after: cursors.after,
         cursor_fields: [{:updated_at, :desc}, {:id, :desc}],
         limit: n
-      )
-
-    %{entries: entries, metadata: metadata}
-  end
-
-  def top_8_uncurated_paginated(cursors) do
-    %{entries: entries, metadata: metadata} =
-      Repo.paginate(
-        from(
-          p in Product,
-          where: [active: true, curated: false],
-          order_by: [desc: :updated_at, desc: :id]
-        ),
-        before: cursors.before,
-        after: cursors.after,
-        cursor_fields: [{:updated_at, :desc}, {:id, :desc}],
-        limit: 8
       )
 
     %{entries: entries, metadata: metadata}
@@ -110,6 +93,20 @@ defmodule Plaza.Products do
     update_product(
       product,
       %{"curated" => false}
+    )
+  end
+
+  def top_product(product) do
+    update_product(
+      product,
+      %{"top" => true}
+    )
+  end
+
+  def untop_product(product) do
+    update_product(
+      product,
+      %{"top" => false}
     )
   end
 

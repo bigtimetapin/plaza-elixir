@@ -85,7 +85,8 @@ defmodule PlazaWeb.UploadLive do
                     campaign_duration: campaign_duration,
                     campaign_duration_timestamp: campaign_duration_timestamp,
                     active: active,
-                    curated: false
+                    curated: false,
+                    top: false
                   },
                   %{}
                 )
