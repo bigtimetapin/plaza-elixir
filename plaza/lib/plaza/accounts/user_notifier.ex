@@ -15,6 +15,12 @@ defmodule Plaza.Accounts.UserNotifier do
     Mailer.deliver(email)
   end
 
+  def deliver_admin_notice_of_login(email) do
+    deliver("admin@plazaaaaa.com", "User Login", """
+    User logged in with email: #{email}
+    """)
+  end
+
   def deliver_newsletter_registration(email) do
     deliver(email, "Confirmado", """
     Bem vindo ao Plaza Newsletter,
