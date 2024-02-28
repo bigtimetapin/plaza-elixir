@@ -32,11 +32,16 @@ let Hooks = {};
 Hooks.LocalStorage = {
   mounted() {
     this.handleEvent("write", (obj) => this.write(obj));
+    this.handleEvent("write-and-checkout", (obj) => this.writeAndCheckout(obj));
     this.handleEvent("clear", (obj) => this.clear(obj));
     this.handleEvent("read", (obj) => this.read(obj));
   },
   write(obj) {
     localStorage.setItem(obj.key, obj.data);
+  },
+  writeAndCheckout(obj) {
+    localStorage.setItem(obj.key, obj.data);
+    this.pushEvent("checkout", {});
   },
   read(obj) {
     const data = localStorage.getItem(obj.key);

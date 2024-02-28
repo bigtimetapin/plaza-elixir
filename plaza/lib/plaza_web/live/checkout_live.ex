@@ -257,50 +257,17 @@ defmodule PlazaWeb.CheckoutLive do
     Phoenix.Token.encrypt(PlazaWeb.Endpoint, salt, state_data)
   end
 
-  def handle_event("change-size", %{"size" => size, "product-id" => product_id}, socket) do
+  def handle_event(
+        "change-quantity",
+        %{"op" => operator, "product-id" => product_id, "size" => size},
+        socket
+      ) do
     cart = socket.assigns.cart
     product_id = String.to_integer(product_id)
 
     {item, index} =
       Enum.with_index(cart)
-      |> Enum.find(fn {item, _} -> item.product.id == product_id end)
-
-    item = %{item | size: size}
-    cart = List.replace_at(cart, index, item)
-
-    cart_total_amount =
-      List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
-
-    Enum.each(cart, fn item ->
-      Task.async(fn ->
-        sku = Map.get(@sku_map, "white-#{item.size}")
-        {:ok, value} = Dimona.Requests.Availability.get(sku)
-        {:availability, item.product.id, value}
-      end)
-    end)
-
-    socket =
-      socket
-      |> assign(cart: cart)
-      |> assign(cart_total_amount: cart_total_amount)
-      |> push_event(
-        "write",
-        %{
-          key: @local_storage_key,
-          data: serialize_to_token(cart)
-        }
-      )
-
-    {:noreply, socket}
-  end
-
-  def handle_event("change-quantity", %{"op" => operator, "product-id" => product_id}, socket) do
-    cart = socket.assigns.cart
-    product_id = String.to_integer(product_id)
-
-    {item, index} =
-      Enum.with_index(cart)
-      |> Enum.find(fn {item, _} -> item.product.id == product_id end)
+      |> Enum.find(fn {item, _} -> item.product.id == product_id && item.size == size end)
 
     quantity = item.quantity
 
@@ -339,13 +306,13 @@ defmodule PlazaWeb.CheckoutLive do
     {:noreply, socket}
   end
 
-  def handle_event("remove-from-cart", %{"product-id" => product_id}, socket) do
+  def handle_event("remove-from-cart", %{"product-id" => product_id, "size" => size}, socket) do
     cart = socket.assigns.cart
     product_id = String.to_integer(product_id)
 
     {_, index} =
       Enum.with_index(cart)
-      |> Enum.find(fn {item, _} -> item.product.id == product_id end)
+      |> Enum.find(fn {item, _} -> item.product.id == product_id && item.size == size end)
 
     cart = List.delete_at(cart, index)
     cart_out_of_stock = Enum.any?(cart, fn i -> !i.available end)
@@ -954,7 +921,7 @@ defmodule PlazaWeb.CheckoutLive do
     <div class="is-checkout-page-desktop">
       <div
         class="has-font-3"
-        style="margin-top: 150px; margin-bottom: 150px; display: flex; justify-content: center;"
+        style="margin-top: 250px; margin-bottom: 500px; display: flex; justify-content: center;"
       >
         <div style="display: flex; flex-direction: column; text-align: center;">
           <div style="font-size: 40px;">
@@ -971,7 +938,7 @@ defmodule PlazaWeb.CheckoutLive do
     <div class="is-checkout-page-mobile">
       <div
         class="has-font-3"
-        style="margin-top: 150px; margin-bottom: 150px; display: flex; justify-content: center;"
+        style="margin-top: 250px; margin-bottom: 500px; display: flex; justify-content: center;"
       >
         <div style="display: flex; flex-direction: column; text-align: center;">
           <div style="font-size: 34px;">
@@ -1011,7 +978,7 @@ defmodule PlazaWeb.CheckoutLive do
             </div>
             <div style="margin-top: 20px; width: 100%;">
               <div :for={item <- @cart} style="display: flex;">
-                <div style="width: 100px;">
+                <div style="width: 127px;">
                   <button phx-click="product-href" phx-value-product-id={item.product.id}>
                     <img src={
                       if item.product.designs.display == 0,
@@ -1025,54 +992,7 @@ defmodule PlazaWeb.CheckoutLive do
                     <%= item.product.name %>
                   </div>
                   <div style="font-size: 28px; color: grey;">
-                    <button
-                      phx-click="change-size"
-                      phx-value-size="p"
-                      phx-value-product-id={item.product.id}
-                      style={
-                        if item.size == "p",
-                          do: "font-size: 38px; margin-left: 5px",
-                          else: "margin-left: 5px"
-                      }
-                    >
-                      P
-                    </button>
-                    <button
-                      phx-click="change-size"
-                      phx-value-size="m"
-                      phx-value-product-id={item.product.id}
-                      style={
-                        if item.size == "m",
-                          do: "font-size: 38px; margin-left: 5px",
-                          else: "margin-left: 5px"
-                      }
-                    >
-                      M
-                    </button>
-                    <button
-                      phx-click="change-size"
-                      phx-value-size="g"
-                      phx-value-product-id={item.product.id}
-                      style={if item.size == "g", do: "font-size: 38px;"}
-                    >
-                      G
-                    </button>
-                    <button
-                      phx-click="change-size"
-                      phx-value-size="gg"
-                      phx-value-product-id={item.product.id}
-                      style={if item.size == "gg", do: "font-size: 38px;"}
-                    >
-                      GG
-                    </button>
-                    <button
-                      phx-click="change-size"
-                      phx-value-size="xgg"
-                      phx-value-product-id={item.product.id}
-                      style={if item.size == "xgg", do: "font-size: 38px;"}
-                    >
-                      XGG
-                    </button>
+                    <%= "Tamanho: #{String.upcase(item.size)}" %>
                   </div>
                 </div>
                 <div style="margin-left: auto; margin-right: 10px;">
@@ -1085,6 +1005,7 @@ defmodule PlazaWeb.CheckoutLive do
                         phx-click="change-quantity"
                         phx-value-op="add"
                         phx-value-product-id={item.product.id}
+                        phx-value-size={item.size}
                       >
                         +
                       </button>
@@ -1093,6 +1014,7 @@ defmodule PlazaWeb.CheckoutLive do
                         phx-click="change-quantity"
                         phx-value-op="subtract"
                         phx-value-product-id={item.product.id}
+                        phx-value-size={item.size}
                       >
                         -
                       </button>
@@ -1104,11 +1026,12 @@ defmodule PlazaWeb.CheckoutLive do
                   <div :if={!item.available} style="font-size: 22px;">
                     out of stock
                   </div>
-                  <div>
+                  <div style="text-align: right;">
                     <button
                       style="font-size: 18px; color: grey; position: relative; bottom: 25px;"
                       phx-click="remove-from-cart"
                       phx-value-product-id={item.product.id}
+                      phx-value-size={item.size}
                     >
                       remover
                     </button>
@@ -1194,6 +1117,7 @@ defmodule PlazaWeb.CheckoutLive do
                         phx-click="change-quantity"
                         phx-value-op="add"
                         phx-value-product-id={item.product.id}
+                        phx-value-size={item.size}
                       >
                         +
                       </button>
@@ -1202,6 +1126,7 @@ defmodule PlazaWeb.CheckoutLive do
                         phx-click="change-quantity"
                         phx-value-op="subtract"
                         phx-value-product-id={item.product.id}
+                        phx-value-size={item.size}
                       >
                         -
                       </button>
@@ -1223,6 +1148,7 @@ defmodule PlazaWeb.CheckoutLive do
                   style="text-decoration: underline;"
                   phx-click="remove-from-cart"
                   phx-value-product-id={item.product.id}
+                  phx-value-size={item.size}
                 >
                   remover
                 </button>
