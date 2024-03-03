@@ -139,18 +139,19 @@ defmodule PlazaWeb.ArtistLive do
           </div>
           <div
             :for={product <- @products}
-            style="margin-bottom: 50px; margin-left: 5px; margin-right: 5px;"
+            style="margin-bottom: 150px; margin-left: 5px; margin-right: 5px;"
           >
             <ProductComponent.product product={product} meta={true} disabled={false} />
           </div>
           <div
             :if={!@all_products && Enum.count(@products) == 3}
-            style="text-align: center; font-size: 24px; margin-bottom: 100px; margin-top: 100px;"
+            style="text-align: center; font-size: 24px;"
           >
             <button class="has-font-3" phx-click="all-products" style="text-decoration: underline;">
               Ver todos os produtos
             </button>
           </div>
+          <div style="margin-bottom: 250px;"></div>
         </div>
       </div>
     </div>
