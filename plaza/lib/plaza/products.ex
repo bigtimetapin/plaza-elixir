@@ -32,7 +32,7 @@ defmodule Plaza.Products do
       Repo.paginate(
         from(
           p in Product,
-          where: [active: true, top: false, curated: ^curated],
+          where: [active: true, curated: ^curated],
           order_by: [desc: :updated_at, desc: :id]
         ),
         before: cursors.before,
