@@ -1075,7 +1075,10 @@ defmodule PlazaWeb.CheckoutLive do
               </button>
             </div>
           </div>
-          <div :if={!@current_user} style="font-size: 44px; margin-left: 10px; width: 100%;">
+          <div
+            :if={!@current_user}
+            style="font-size: 44px; margin-left: 10px; margin-right: 10px; width: 100%;"
+          >
             <.sign_in_or_continue_as_guest
               current_user={@current_user}
               cart_out_of_stock={@cart_out_of_stock}
@@ -1449,7 +1452,7 @@ defmodule PlazaWeb.CheckoutLive do
 
   defp sign_in_or_continue_as_guest(%{current_user: nil} = assigns) do
     ~H"""
-    <div style="display: flex; justify-content: center;">
+    <div style="display: flex; justify-content: right;">
       <div>
         <div style="font-size: 40px;">
           checkout
