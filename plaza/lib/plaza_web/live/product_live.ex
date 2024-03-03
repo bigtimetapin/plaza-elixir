@@ -481,7 +481,7 @@ defmodule PlazaWeb.ProductLive do
               Escolha um tamanho
             </div>
           </div>
-          <div style="margin-left: auto;">
+          <div style="margin-left: auto; align-self: center; width: 168px;">
             <div :if={@product.active}>
               <button phx-click="add-to-cart">
                 <img src="/svg/comprar.svg" />
