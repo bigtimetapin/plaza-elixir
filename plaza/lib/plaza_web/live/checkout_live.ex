@@ -13,11 +13,11 @@ defmodule PlazaWeb.CheckoutLive do
 
   @local_storage_key "plaza-checkout-cart"
   @sku_map %{
-    "white-p" => "010101110108",
-    "white-m" => "010101110109",
-    "white-g" => "010101110110",
-    "white-gg" => "010101110111",
-    "white-xgg" => "010101110112"
+    "white-p" => "010110110108",
+    "white-m" => "010110110109",
+    "white-g" => "010110110110",
+    "white-gg" => "010110110111",
+    "white-xgg" => "010110110112"
   }
 
   @impl Phoenix.LiveView
