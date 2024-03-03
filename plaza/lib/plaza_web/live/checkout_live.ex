@@ -964,7 +964,7 @@ defmodule PlazaWeb.CheckoutLive do
         style="margin-top: 150px; margin-bottom: 150px; display: flex; justify-content: center;"
       >
         <div style="display: flex; max-width: 1750px; width: 100%; margin-left: 10px;">
-          <div style="font-size: 44px; width: 50%;">
+          <div style="font-size: 44px; width: 100%;">
             <div style="display: flex; border-bottom: 2px solid grey; width: 100%">
               <div>
                 carrinho
@@ -999,7 +999,10 @@ defmodule PlazaWeb.CheckoutLive do
                   <div style="font-size: 28px;">
                     <%= "R$ #{String.replace(Float.to_string(item.product.price), ".", ",")}" %>
                   </div>
-                  <div :if={item.available} style="display: flex; font-size: 22px;">
+                  <div
+                    :if={item.available}
+                    style="display: flex; font-size: 22px; justify-content: right;"
+                  >
                     <div>
                       <button
                         phx-click="change-quantity"
@@ -1039,7 +1042,7 @@ defmodule PlazaWeb.CheckoutLive do
                 </div>
               </div>
             </div>
-            <div style="width: 100%;">
+            <div style="width: 100%; margin-bottom: 75px;">
               <div style="display: flex; border-bottom: 2px solid grey; width: 100%;"></div>
               <div style="display: flex; font-size: 28px;">
                 <div>
@@ -1058,8 +1061,21 @@ defmodule PlazaWeb.CheckoutLive do
                 </div>
               </div>
             </div>
+            <div style="display: flex;">
+              <div style="margin-left: auto; margin-right: 61px; font-size: 32px; align-self: center;">
+                <.link navigate="/" style="text-decoration: underline;">
+                  voltar para loja
+                </.link>
+              </div>
+              <button :if={@current_user} phx-click="step" phx-value-step="2">
+                <img src="/svg/checkout.svg" />
+              </button>
+              <button :if={!@current_user} disabled style="opacity: 50%;">
+                <img src="/svg/checkout.svg" />
+              </button>
+            </div>
           </div>
-          <div style="font-size: 44px; margin-left: auto; width: 50%;">
+          <div :if={!@current_user} style="font-size: 44px; margin-left: 10px; width: 100%;">
             <.sign_in_or_continue_as_guest
               current_user={@current_user}
               cart_out_of_stock={@cart_out_of_stock}
@@ -1434,7 +1450,7 @@ defmodule PlazaWeb.CheckoutLive do
   defp sign_in_or_continue_as_guest(%{current_user: nil} = assigns) do
     ~H"""
     <div style="display: flex; justify-content: center;">
-      <div style="margin-left: 150px;">
+      <div>
         <div style="font-size: 40px;">
           checkout
         </div>
@@ -1489,19 +1505,7 @@ defmodule PlazaWeb.CheckoutLive do
 
   defp sign_in_or_continue_as_guest(assigns) do
     ~H"""
-    <div style="display: flex; justify-content: center; width: 100%; margin-top: 150px;">
-      <button
-        phx-click="step"
-        phx-value-step="2"
-        style={if @cart_out_of_stock, do: "opacity: 50%"}
-        disabled={@cart_out_of_stock}
-      >
-        <img src="svg/yellow-ellipse.svg" />
-        <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-          checkout
-        </div>
-      </button>
-    </div>
+
     """
   end
 
