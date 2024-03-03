@@ -137,7 +137,7 @@ defmodule PlazaWeb.ArtistLive do
           </div>
           <div
             :for={product <- @products}
-            style="margin-bottom: 150px; margin-left: 5px; margin-right: 5px;"
+            style="margin-bottom: 50px; margin-left: 5px; margin-right: 5px;"
           >
             <ProductComponent.product product={product} meta={true} disabled={false} />
           </div>
