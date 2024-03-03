@@ -509,7 +509,7 @@ defmodule PlazaWeb.ProductLive do
           </div>
         </div>
         <div :if={!Enum.empty?(@top_3_other_products)} style="margin-bottom: 450px;">
-          <div style="font-size: 36px; margin-bottom: 19px; margin-left: 20px;">
+          <div style="font-size: 32px; margin-bottom: 15px; margin-left: 20px;">
             Outros produtos parecidos
           </div>
           <div
