@@ -332,7 +332,7 @@ defmodule PlazaWeb.ProductLive do
                 </div>
               </div>
               <div style="margin-top: auto;">
-                <div style="display: flex; width: 229px; margin-bottom: 91px;">
+                <div style="display: flex; width: 250px; margin-bottom: 91px;">
                   <button class="has-font-3" phx-click="change-size" phx-value-size="p">
                     <img :if={@cart_product_size != "p"} src="/svg/p.svg" />
                     <img :if={@cart_product_size == "p"} src="/svg/p-selected.svg" />
