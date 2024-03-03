@@ -119,18 +119,18 @@ defmodule PlazaWeb.ArtistLive do
     <div class="is-artist-page-mobile has-font-3" style="margin-top: 50px;">
       <div style="display: flex; margin-left: 20px; margin-right: 20px;">
         <div style="display: flex; flex-direction: column; width: 100%;">
-          <div style="width: 150px; height: 150px; background: lightgrey; overflow: hidden; margin-bottom: 25px; align-self: center;">
+          <div style="width: 202px; height: 202px; background: lightgrey; overflow: hidden; margin-bottom: 17px; align-self: center;">
             <img
               :if={@seller.profile_photo_url}
               src={@seller.profile_photo_url}
               style="min-width: 100%; min-height: 100%; border: 1px dotted lightgrey;"
             />
           </div>
-          <div style="font-size: 32px; text-align: center; margin-bottom: 10px;">
+          <div style="font-size: 32px; text-align: center; margin-bottom: 18px;">
             <%= @seller.user_name %>
           </div>
-          <div style="align-self: center; margin-bottom: 100px; width: 400px;">
-            <div style="font-size: 24px; text-align: center; margin-bottom: 20px;">
+          <div style="align-self: center; margin-bottom: 73px; width: 200px;">
+            <div style="font-size: 22px; text-align: center; margin-bottom: 8px;">
               <%= @seller.description %>
             </div>
             <div style="font-size: 20px; text-decoration: underline; text-align: center;">
