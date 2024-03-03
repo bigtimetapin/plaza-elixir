@@ -380,7 +380,7 @@ defmodule PlazaWeb.LandingLive do
             </div>
           </div>
           <div style="padding-left: 10px; padding-right: 10px;">
-            <div :for={product <- @uncurated_products} style="margin-bottom: 50px;">
+            <div :for={product <- @uncurated_products} style="margin-bottom: 150px;">
               <ProductComponent.product product={product} meta={true} disabled={false} />
             </div>
           </div>
