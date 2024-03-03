@@ -59,12 +59,8 @@ defmodule PlazaWeb.ProductLive do
           end
 
         socket =
-          case {product, seller} do
-            {%{active: false}, _} ->
-              socket
-              |> assign(step: -2)
-
-            {_, %{stripe_id: nil}} ->
+          case seller do
+            %{stripe_id: nil} ->
               socket
               |> assign(step: -1)
 
@@ -151,19 +147,27 @@ defmodule PlazaWeb.ProductLive do
 
     cart = [item | cart]
     cart = Enum.uniq_by(cart, fn i -> "#{i.product.id}-#{i.size}" end)
-    IO.inspect(cart)
 
     socket =
-      socket
-      |> push_event(
-        "write-and-checkout",
-        %{
-          key: @local_storage_key,
-          data: serialize_to_token(cart)
-        }
-      )
-      |> assign(cart: cart)
-      |> assign(already_in_cart: true)
+      case product.active do
+        false ->
+          ## this is validation 
+          ## against this event being fired off 
+          ## from the browser / hacker
+          socket
+
+        true ->
+          socket
+          |> push_event(
+            "write-and-checkout",
+            %{
+              key: @local_storage_key,
+              data: serialize_to_token(cart)
+            }
+          )
+          |> assign(cart: cart)
+          |> assign(already_in_cart: true)
+      end
 
     {:noreply, socket}
   end
@@ -265,21 +269,18 @@ defmodule PlazaWeb.ProductLive do
     <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 200px;">
       <div style="display: flex; justify-content: center;">
         <div>
-          <ProductComponent.product product={product} meta={true} disabled={true} />
+          <div>
+            <ProductComponent.product
+              product={product}
+              meta={true}
+              disabled={true}
+              style="width: 350px;"
+            />
+          </div>
+          <div>
+            this seller has not finished registration yet
+          </div>
         </div>
-        <div>
-          this seller has not finished registration yet
-        </div>
-      </div>
-    </div>
-    """
-  end
-
-  def render(%{product: product, step: -2} = assigns) do
-    ~H"""
-    <div class="has-font-3" style="margin-top: 150px; margin-bottom: 200px;">
-      <div style="display: flex; justify-content: center;">
-        <ProductComponent.product product={product} meta={true} disabled={true} style="width: 350px;" />
       </div>
     </div>
     """
@@ -301,8 +302,18 @@ defmodule PlazaWeb.ProductLive do
               <div style="font-size: 36px; margin-bottom: 12px;">
                 <%= @product.name %>
               </div>
-              <div style="color: grey; font-size: 24px; width: 225px; margin-bottom: 38px;">
+              <div
+                :if={@product.active}
+                style="color: grey; font-size: 24px; width: 225px; margin-bottom: 38px;"
+              >
                 <%= "Disponível por mais #{@product_days_remaining} dias" %>
+              </div>
+              <div
+                :if={!@product.active}
+                class="has-font-1"
+                style="color: #F00; font-size: 28px; letter-spacing: 0.84px; margin-bottom: 28px;"
+              >
+                Produto Expirado
               </div>
               <div style="font-size: 36px; margin-bottom: 24px;">
                 <%= "R$ #{@product.price |> Float.to_string() |> String.replace(".", ",")}" %>
@@ -358,9 +369,14 @@ defmodule PlazaWeb.ProductLive do
                     <img :if={@cart_product_size == "xgg"} src="/svg/xgg-selected.svg" />
                   </button>
                 </div>
-                <div>
+                <div :if={@product.active}>
                   <button phx-click="add-to-cart">
                     <img src="/svg/comprar.svg" />
+                  </button>
+                </div>
+                <div :if={!@product.active}>
+                  <button phx-click="add-to-cart" disabled>
+                    <img src="/svg/comprar-disabled.svg" />
                   </button>
                 </div>
               </div>

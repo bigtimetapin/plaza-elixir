@@ -110,7 +110,7 @@ defmodule PlazaWeb.ArtistLive do
     ~H"""
     <div class="is-artist-page-desktop">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; max-width: 1750px; width: 100%;">
+        <div style="display: flex; max-width: 1750px; width: 100%; margin-right: 10px;">
           <.left seller={@seller} />
           <.right products={@products} all_products={@all_products} />
         </div>
@@ -334,7 +334,7 @@ defmodule PlazaWeb.ArtistLive do
   defp right(assigns) do
     ~H"""
     <div style="padding-top: 75px; width: 100%; border-left: 1px solid #707070;">
-      <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 75px">
+      <div style="margin-left: 75px; margin-bottom: 75px">
         <ProductComponent.products3 products={@products} />
       </div>
       <div

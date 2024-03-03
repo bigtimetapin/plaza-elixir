@@ -632,7 +632,7 @@ defmodule PlazaWeb.MyStoreLive do
     ~H"""
     <div class="is-my-store-page-desktop">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; margin-bottom: 50px; max-width: 1750px; width: 100%;">
+        <div style="display: flex; margin-bottom: 50px; max-width: 1750px; width: 100%; margin-right: 10px;">
           <.left seller={@seller} />
           <div style="margin-left: 150px; margin-top: 150px;">
             <div class="has-font-3" style="font-size: 34px;">
@@ -673,7 +673,7 @@ defmodule PlazaWeb.MyStoreLive do
     ~H"""
     <div class="is-my-store-page-desktop">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; margin-bottom: 50px; max-width: 1750px; width: 100%;">
+        <div style="display: flex; margin-bottom: 50px; max-width: 1750px; width: 100%; margin-right: 10px;">
           <.left seller={@seller} />
           <div style="margin-left: 150px; margin-top: 150px;">
             <div class="has-font-3" style="font-size: 34px;">
@@ -714,7 +714,7 @@ defmodule PlazaWeb.MyStoreLive do
     ~H"""
     <div class="is-my-store-page-desktop">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; max-width: 1750px; width: 100%;">
+        <div style="display: flex; max-width: 1750px; width: 100%; margin-right: 10px;">
           <.left seller={@seller} />
           <.right products={@products} all_products={@all_products} />
         </div>
@@ -886,7 +886,7 @@ defmodule PlazaWeb.MyStoreLive do
           Criar mais produtos
         </.link>
       </div>
-      <div style="margin-left: 75px; margin-right: 75px; margin-bottom: 75px">
+      <div style="margin-left: 75px; margin-bottom: 75px">
         <ProductComponent.products3 products={@products} />
       </div>
       <div :if={!@all_products} style="display: flex; justify-content: center; margin-bottom: 200px;">
