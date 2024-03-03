@@ -1107,7 +1107,7 @@ defmodule PlazaWeb.CheckoutLive do
             </div>
           </div>
           <div style="margin-left: 10px; margin-right: 10px;">
-            <div :for={item <- @cart}>
+            <div :for={item <- @cart} style="margin-bottom: 13px;">
               <div>
                 <button phx-click="product-href" phx-value-product-id={item.product.id}>
                   <img src={
@@ -1120,7 +1120,7 @@ defmodule PlazaWeb.CheckoutLive do
               <div style="font-size: 24px;">
                 <%= item.product.name %>
               </div>
-              <div style="font-size: 26px; display: flex;">
+              <div style="font-size: 28px; display: flex;">
                 <div style="color: grey;">
                   <%= "Tamanho: #{String.upcase(item.size)}" %>
                 </div>
@@ -1128,7 +1128,7 @@ defmodule PlazaWeb.CheckoutLive do
                   <%= "R$ #{(item.product.price * item.quantity) |> Float.to_string() |> String.replace(".", ",")}" %>
                 </div>
               </div>
-              <div :if={item.available} style="display: flex; font-size: 22px; margin-top: 5px;">
+              <div :if={item.available} style="display: flex; font-size: 20px; margin-top: 5px;">
                 <div style="margin-left: auto;">
                   <div style="display: flex;">
                     <div>
@@ -1161,7 +1161,7 @@ defmodule PlazaWeb.CheckoutLive do
                   out of stock
                 </div>
               </div>
-              <div style="font-size: 20px; color: grey;">
+              <div style="font-size: 22px; color: grey;">
                 <button
                   class="has-font-3"
                   style="text-decoration: underline;"
@@ -1187,7 +1187,7 @@ defmodule PlazaWeb.CheckoutLive do
             </div>
           </div>
           <div :if={!@checkout_as_guest_mobile && !@current_user}>
-            <div style="border-bottom: 1px solid grey; margin-bottom: 10px; margin-top: 50px;">
+            <div style="border-bottom: 1px solid grey; margin-bottom: 17px; margin-top: 50px;">
               <div style="font-size: 36px; line-height: 40px; margin-left: 10px;">
                 Checkout
               </div>
