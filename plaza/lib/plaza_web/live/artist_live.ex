@@ -129,13 +129,11 @@ defmodule PlazaWeb.ArtistLive do
           <div style="font-size: 32px; text-align: center; margin-bottom: 18px;">
             <%= @seller.user_name %>
           </div>
-          <div style="align-self: center; margin-bottom: 73px; width: 200px;">
-            <div style="font-size: 22px; text-align: center; margin-bottom: 8px;">
-              <%= @seller.description %>
-            </div>
-            <div style="font-size: 20px; text-decoration: underline; text-align: center;">
-              <.urls_mobile seller={@seller} />
-            </div>
+          <div style="font-size: 22px; text-align: center; width: 200px; align-self: center; margin-bottom: 8px;">
+            <%= @seller.description %>
+          </div>
+          <div style="font-size: 20px; text-decoration: underline; text-align: center; margin-bottom: 73px;">
+            <.urls_mobile seller={@seller} />
           </div>
           <div
             :for={product <- @products}
