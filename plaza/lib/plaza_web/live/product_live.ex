@@ -410,166 +410,35 @@ defmodule PlazaWeb.ProductLive do
     </div>
     <div class="is-product-page-mobile has-font-3" style="margin-top: 50px;">
       <div style="margin-left: 25px; margin-right: 25px;">
-        <div style="display: flex; justify-content: center; font-size: 32px;">
-          <div>
+        <div style="display: flex; justify-content: center; margin-bottom: 7px;">
+          <div style="font-size: 36px;">
             <%= @product.name %>
           </div>
-          <div style="margin-left: auto;">
+          <div style="margin-left: auto; font-size: 26px; align-self: center;">
             <%= "R$ #{@product.price |> Float.to_string() |> String.replace(".", ",")}" %>
           </div>
         </div>
-        <div style="color: grey; text-decoration: underline; font-size: 28px; position: relative; bottom: 15px;">
+        <div style="color: grey; text-decoration: underline; font-size: 28px; position: relative; bottom: 18px;">
           <p>
             <.link navigate={@artist_href}>
               <%= @product.user_name %>
             </.link>
           </p>
         </div>
-        <div>
-          <button phx-click="change-product-display">
-            <img src={
-              if @product_display == "front", do: @product.mocks.front, else: @product.mocks.back
-            } />
-          </button>
+        <div style="display: flex; overflow: scroll; margin-bottom: 21px;">
+          <img src={@product.mocks.front} style="width: 325px; margin-right: 10px;" />
+          <img src={@product.mocks.back} style="width: 325px;" />
         </div>
-        <div style="width: 150px;">
-          <button phx-click="change-product-display">
-            <img src={
-              if @product_display == "front", do: @product.mocks.back, else: @product.mocks.front
-            } />
-          </button>
+        <div :if={@product.active} style="color: grey; font-size: 24px; margin-bottom: 10px;">
+          <%= "Disponível por mais #{@product_days_remaining} dias" %>
         </div>
-        <div :if={!@already_in_cart}>
-          <div style="display: flex;">
-            <div style="font-size: 22px; margin-top: 25px; position: relative; right: 10px;">
-              <div style="display: inline-block;">
-                <button
-                  class="has-font-3"
-                  phx-click="change-size"
-                  phx-value-size="p"
-                  style={if @cart_product_size == "p", do: "margin-right: 9px;"}
-                >
-                  <div style="position: absolute;">
-                    <img
-                      :if={@cart_product_size == "p"}
-                      src="svg/yellow-circle.svg"
-                      style="position: relative; width: 35px; right: 13px;"
-                    />
-                  </div>
-                  <div style="position: relative;">
-                    P
-                  </div>
-                </button>
-                /
-                <button
-                  class="has-font-3"
-                  phx-click="change-size"
-                  phx-value-size="m"
-                  style={if @cart_product_size == "m", do: "margin-right: 7px; margin-left: 7px;"}
-                >
-                  <div style="position: absolute;">
-                    <img
-                      :if={@cart_product_size == "m"}
-                      src="svg/yellow-circle.svg"
-                      style="position: relative; width: 35px; right: 10px;"
-                    />
-                  </div>
-                  <div style="position: relative;">
-                    M
-                  </div>
-                </button>
-                /
-                <button
-                  class="has-font-3"
-                  phx-click="change-size"
-                  phx-value-size="g"
-                  style={if @cart_product_size == "g", do: "margin-right: 7px; margin-left: 8px;"}
-                >
-                  <div style="position: absolute;">
-                    <img
-                      :if={@cart_product_size == "g"}
-                      src="svg/yellow-circle.svg"
-                      style="position: relative; width: 35px; right: 11px;"
-                    />
-                  </div>
-                  <div style="position: relative;">
-                    G
-                  </div>
-                </button>
-                /
-                <button
-                  class="has-font-3"
-                  phx-click="change-size"
-                  phx-value-size="gg"
-                  style={if @cart_product_size == "gg", do: "margin-right: 3px; margin-left: 3px;"}
-                >
-                  <div style="position: absolute;">
-                    <img
-                      :if={@cart_product_size == "gg"}
-                      src="svg/yellow-circle.svg"
-                      style="position: relative; width: 35px; right: 4px;"
-                    />
-                  </div>
-                  <div style="position: relative;">
-                    GG
-                  </div>
-                </button>
-                /
-                <button
-                  class="has-font-3"
-                  phx-click="change-size"
-                  phx-value-size="xgg"
-                  style={if @cart_product_size == "xgg", do: "font-size: 18px; width: 35px;"}
-                >
-                  <div style="position: absolute;">
-                    <img
-                      :if={@cart_product_size == "xgg"}
-                      src="svg/yellow-circle.svg"
-                      style="position: relative; bottom: 4px;"
-                    />
-                  </div>
-                  <div style="position: relative;">
-                    XGG
-                  </div>
-                </button>
-              </div>
-            </div>
-            <div style="margin-left: auto; position: relative; left: 10px; top: 10px;">
-              <button phx-click="add-to-cart" style="width: 145px;">
-                <img src="svg/yellow-ellipse.svg" />
-                <div class="has-font-3" style="position: relative; bottom: 65px; font-size: 34px;">
-                  comprar
-                </div>
-              </button>
-            </div>
-          </div>
+        <div :if={!@product.active} style="color: #F00; font-size: 26px; margin-bottom: 10px;">
+          Produto Expirado
         </div>
-        <div :if={@already_in_cart}>
-          <div style="text-decoration: underline; font-size: 24px; display: flex; justify-content: right;">
-            <.link navigate="/">loja</.link>
-          </div>
-          <div style="position: relative; top: 10px; display: flex; justify-content: right;">
-            <button phx-click="checkout-href">
-              <img src="svg/yellow-ellipse.svg" style="width: 175px;" />
-              <div class="has-font-3" style="position: relative; bottom: 73px; font-size: 34px;">
-                carrinho
-              </div>
-            </button>
-          </div>
-        </div>
-        <div style="color: grey; text-align: center; margin-top: 10px; margin-bottom: 20px;">
-          <%= "Este produto está disponível por mais #{@product_days_remaining} dias" %>
-        </div>
-        <div style="font-size: 28px; margin-bottom: 50px;">
+        <div style="font-size: 26px; margin-bottom: 16px;">
           <%= @product.description %>
         </div>
-        <div style="font-size: 22px; line-height: 24px; margin-bottom: 50px;">
-          <div>
-            Camiseta de algodão
-          </div>
-          <div>
-            Cor: Branco
-          </div>
+        <div style="font-size: 22px; line-height: 38px; margin-bottom: 28px;">
           <div>
             100% Algodão
           </div>
@@ -580,19 +449,78 @@ defmodule PlazaWeb.ProductLive do
             <%= "SKU: #{@product.id}" %>
           </div>
         </div>
-      </div>
-      <div :if={!Enum.empty?(@top_3_other_products)} style="margin-bottom: 450px;">
-        <div style="font-size: 28px; margin-bottom: 10px; margin-left: 20px;">
-          Outros produtos parecidos
+        <div style="display: flex; margin-bottom: 30px;">
+          <div style="align-self: center;">
+            <div style="display: flex;">
+              <button class="has-font-3" phx-click="change-size" phx-value-size="p">
+                <img :if={@cart_product_size != "p"} src="/svg/p.svg" />
+                <img :if={@cart_product_size == "p"} src="/svg/p-selected.svg" />
+              </button>
+              <img src="/svg/forward-slash.svg" style="margin-left: 5px; margin-right: 5px;" />
+              <button class="has-font-3" phx-click="change-size" phx-value-size="m">
+                <img :if={@cart_product_size != "m"} src="/svg/m.svg" />
+                <img :if={@cart_product_size == "m"} src="/svg/m-selected.svg" />
+              </button>
+              <img src="/svg/forward-slash.svg" style="margin-left: 5px; margin-right: 5px;" />
+              <button class="has-font-3" phx-click="change-size" phx-value-size="g">
+                <img :if={@cart_product_size != "g"} src="/svg/g.svg" />
+                <img :if={@cart_product_size == "g"} src="/svg/g-selected.svg" />
+              </button>
+              <img src="/svg/forward-slash.svg" style="margin-left: 5px; margin-right: 5px;" />
+              <button class="has-font-3" phx-click="change-size" phx-value-size="gg">
+                <img :if={@cart_product_size != "gg"} src="/svg/gg.svg" />
+                <img :if={@cart_product_size == "gg"} src="/svg/gg-selected.svg" />
+              </button>
+              <img src="/svg/forward-slash.svg" style="margin-left: 5px; margin-right: 5px;" />
+              <button class="has-font-3" phx-click="change-size" phx-value-size="xgg">
+                <img :if={@cart_product_size != "xgg"} src="/svg/xgg.svg" />
+                <img :if={@cart_product_size == "xgg"} src="/svg/xgg-selected.svg" />
+              </button>
+            </div>
+            <div style="color: #F00; font-size: 22px; letter-spacing: 0.66px;">
+              Escolha um tamanho
+            </div>
+          </div>
+          <div style="margin-left: auto;">
+            <div :if={@product.active}>
+              <button phx-click="add-to-cart">
+                <img src="/svg/comprar.svg" />
+              </button>
+            </div>
+            <div :if={!@product.active}>
+              <button phx-click="add-to-cart" disabled>
+                <img src="/svg/comprar-disabled.svg" />
+              </button>
+            </div>
+          </div>
         </div>
-        <div
-          :for={{product, index} <- Enum.with_index(@top_3_other_products)}
-          style="margin-bottom: 100px; margin-left: 20px; margin-right: 20px;"
-        >
-          <ProductComponent.product product={product} meta={true} disabled={false} />
+        <div style="font-size: 24px; text-decoration: underline; color: grey; margin-bottom: 237px;">
+          <div style="margin-bottom: 19px;">
+            <a style="color: grey;">Guia de tamanhos</a>
+          </div>
+          <div style="margin-bottom: 19px;">
+            <a style="color: grey;">Como funciona a entrega</a>
+          </div>
+          <div style="margin-bottom: 19px;">
+            <a style="color: grey;">Instruções de Lavagem</a>
+          </div>
+          <div style="margin-bottom: 19px;">
+            <a style="color: grey;">Termos e condições</a>
+          </div>
+        </div>
+        <div :if={!Enum.empty?(@top_3_other_products)} style="margin-bottom: 450px;">
+          <div style="font-size: 36px; margin-bottom: 19px; margin-left: 20px;">
+            Outros produtos parecidos
+          </div>
+          <div
+            :for={{product, index} <- Enum.with_index(@top_3_other_products)}
+            style="margin-bottom: 150px;"
+          >
+            <ProductComponent.product product={product} meta={true} disabled={false} />
+          </div>
         </div>
       </div>
-      <div :if={Enum.empty?(@top_3_other_products)} style="margin-bottom: 200px;"></div>
+      <div :if={Enum.empty?(@top_3_other_products)} style="margin-bottom: 250px;"></div>
     </div>
     """
   end
