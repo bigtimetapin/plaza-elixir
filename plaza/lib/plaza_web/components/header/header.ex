@@ -510,7 +510,7 @@ defmodule PlazaWeb.Header do
 
   defp no_store_yet_href(assigns) do
     ~H"""
-    <.link phx-click="close-mobile-header" navigate="/upload">
+    <.link phx-click="close-mobile-header" navigate="/how-it-works/seller">
       quero vender
     </.link>
     """
@@ -594,7 +594,7 @@ defmodule PlazaWeb.Header do
 
   defp no_store_yet_href_mobile(assigns) do
     ~H"""
-    <.link phx-click="close-mobile-header" navigate="/upload">
+    <.link phx-click="close-mobile-header" navigate="/how-it-works/seller">
       <div class="has-font-3" style="font-size: 32px; text-decoration: underline;">
         quero vender
       </div>
@@ -604,7 +604,7 @@ defmodule PlazaWeb.Header do
 
   defp no_store_yet_href_selected_mobile(assigns) do
     ~H"""
-    <.link phx-click="close-mobile-header" navigate="/upload">
+    <.link phx-click="close-mobile-header" navigate="/how-it-works/seller">
       <div class="has-font-3" style="font-size: 32px; text-decoration: underline;">
         quero vender
       </div>

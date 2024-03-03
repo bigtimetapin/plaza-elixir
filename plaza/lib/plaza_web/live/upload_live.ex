@@ -30,12 +30,12 @@ defmodule PlazaWeb.UploadLive do
           {seller, user_id, user_name, active, step} =
             case socket.assigns.current_user do
               nil ->
-                {nil, -1, @default_user_name, false, 1}
+                {nil, -1, @default_user_name, false, 4}
 
               %{id: id} ->
                 case Accounts.get_seller_by_id(id) do
                   nil ->
-                    {nil, id, @default_user_name, false, 1}
+                    {nil, id, @default_user_name, false, 4}
 
                   %{stripe_id: nil} = seller ->
                     case Products.count(id) > 0 do
@@ -72,7 +72,7 @@ defmodule PlazaWeb.UploadLive do
                     user_name: user_name,
                     product_type: "camiseta-classic-branco",
                     price: 75.0,
-                    internal_expense: 46.9,
+                    internal_expense: 66.9,
                     designs: %Designs{
                       display: 0
                     },
@@ -419,33 +419,6 @@ defmodule PlazaWeb.UploadLive do
     back = socket.assigns.back_local_upload
 
     socket =
-      case back do
-        nil ->
-          socket
-
-        _ ->
-          data = socket.assigns.product_form.data
-
-          {:ok, product} =
-            Product.changeset_internal_expense(
-              data,
-              %{"internal_expense" => 64.9}
-            )
-            |> Changeset.apply_action(:update)
-
-          form =
-            Product.changeset(
-              product,
-              %{}
-            )
-            |> Map.put(:action, :validate)
-            |> to_form
-
-          socket
-          |> assign(product_form: form)
-      end
-
-    socket =
       socket
       |> assign(front_local_upload: file_name)
 
@@ -454,33 +427,6 @@ defmodule PlazaWeb.UploadLive do
 
   def handle_event("back-upload-change", file_name, socket) do
     front = socket.assigns.front_local_upload
-
-    socket =
-      case front do
-        nil ->
-          socket
-
-        _ ->
-          data = socket.assigns.product_form.data
-
-          {:ok, product} =
-            Product.changeset_internal_expense(
-              data,
-              %{"internal_expense" => 64.9}
-            )
-            |> Changeset.apply_action(:update)
-
-          form =
-            Product.changeset(
-              product,
-              %{}
-            )
-            |> Map.put(:action, :validate)
-            |> to_form
-
-          socket
-          |> assign(product_form: form)
-      end
 
     socket =
       socket
@@ -492,24 +438,8 @@ defmodule PlazaWeb.UploadLive do
   def handle_event("front-upload-cancel", _, socket) do
     data = socket.assigns.product_form.data
 
-    {:ok, product} =
-      Product.changeset_internal_expense(
-        data,
-        %{"internal_expense" => 46.9}
-      )
-      |> Changeset.apply_action(:update)
-
-    form =
-      Product.changeset(
-        product,
-        %{}
-      )
-      |> Map.put(:action, :validate)
-      |> to_form
-
     socket =
       socket
-      |> assign(product_form: form)
       |> assign(front_local_upload: nil)
       |> assign(:uuid, UUID.uuid1())
       |> push_event("front-upload-cancel", %{})
@@ -520,24 +450,8 @@ defmodule PlazaWeb.UploadLive do
   def handle_event("back-upload-cancel", _, socket) do
     data = socket.assigns.product_form.data
 
-    {:ok, product} =
-      Product.changeset_internal_expense(
-        data,
-        %{"internal_expense" => 46.9}
-      )
-      |> Changeset.apply_action(:update)
-
-    form =
-      Product.changeset(
-        product,
-        %{}
-      )
-      |> Map.put(:action, :validate)
-      |> to_form
-
     socket =
       socket
-      |> assign(product_form: form)
       |> assign(back_local_upload: nil)
       |> assign(:uuid, UUID.uuid1())
       |> push_event("back-upload-cancel", %{})
@@ -735,94 +649,6 @@ defmodule PlazaWeb.UploadLive do
     """
   end
 
-  def render(%{step: 1} = assigns) do
-    ~H"""
-    <div class="is-upload-page-desktop" style="margin-top: 150px;">
-      <div class="has-font-3" style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column;">
-          <div style="font-size: 54px; margin-bottom: 50px;">
-            Vender no plaza é fácil e totalmente grátis
-          </div>
-          <div style="font-size: 32px; line-height: 34px; margin-bottom: 25px;">
-            Faça o upload da sua arte, configure o produto, escolha o preço e publique sua campanha de vendas.
-          </div>
-          <div style="font-size: 32px; line-height: 34px; margin-bottom: 25px;">
-            Crie sua loja e conecte com nosso parceiro de pagamentos
-            <a href="https://stripe.com/en-br/connect" target="_blank">
-              <em style="text-decoration: underline;">stripe.</em>
-            </a>
-          </div>
-          <div style="font-size: 32px; line-height: 34px;">
-            A partir daí você só precisa esperar pra receber seus lucros.
-          </div>
-          <div style="font-size: 32px; line-height: 34px; margin-bottom: 25px;">
-            Receba pelo que vender, e se não vender tudo bem, ninguém perde nada.
-          </div>
-          <div style="font-size: 32px; line-height: 34px;">
-            Cada produto vendido é produzido sobre demanda e entregue direto para o cliente final,
-          </div>
-          <div style="font-size: 32px; line-height: 34px; margin-bottom: 100px;">
-            assim não temos desperdício de recursos e você não precisa investir produzindo um estoque.
-          </div>
-          <div style="font-size: 36px;">
-            <button phx-click="step" phx-value-step="2">
-              <img src="/svg/yellow-ellipse.svg" />
-              <div class="has-font-3" style="position: relative; bottom: 79px;">
-                Criar Produto
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="is-upload-page-mobile">
-      <PlazaWeb.CustomComponents.how_it_works_seller_mobile />
-    </div>
-    """
-  end
-
-  def render(%{step: 2} = assigns) do
-    ~H"""
-    <div class="is-upload-page-desktop" style="margin-top: 150px;">
-      <div class="has-font-3" style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column;">
-          <div style="font-size: 54px; margin-bottom: 50px;">
-            Tem mais um detalhe importante
-          </div>
-          <div style="font-size: 32px; line-height: 34px; margin-bottom: 25px;">
-            As campanhas de vendas tem tempo LIMITADO.
-          </div>
-          <div style="font-size: 32px; line-height: 34px;">
-            Escolha a duração da sua campanha entre  7, 14, 21, 30 ou 45 dias.
-          </div>
-          <div style="font-size: 32px; line-height: 34px;">
-            45 dias é mais tempo para você divulgar e receber pedidos, mas um produto exclusivo
-          </div>
-          <div style="font-size: 32px; line-height: 34px; margin-bottom: 25px;">
-            por apenas 7 dias pode ser um sucesso também.
-          </div>
-          <div style="font-size: 32px; line-height: 34px;">
-            Após o período de campanha seu produto
-            <span style="text-decoration: underline;">não estará mais disponível</span>
-            para encomendas.
-          </div>
-          <div style="font-size: 32px; line-height: 34px; margin-bottom: 50px;">
-            E apenas você poderá republicar a campanha por mais períodos se tiver interesse.
-          </div>
-          <div style="font-size: 36px; margin-bottom: 50px;">
-            <button phx-click="step" phx-value-step="3">
-              <img src="/svg/yellow-ellipse.svg" />
-              <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
-                Ok
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    """
-  end
-
   def render(%{step: 4} = assigns) do
     ~H"""
     <div class="is-upload-page-desktop">
@@ -865,8 +691,13 @@ defmodule PlazaWeb.UploadLive do
       />
       <div class="has-font-3" style="display: flex; justify-content: center;  margin-top: 50px;">
         <div style="display: flex; flex-direction: column; max-width: 1250px;">
-          <div style="font-size: 30px; margin-bottom: 25px; align-self: center;">
-            Seu produto ficou assim:
+          <div style="font-size: 30px; margin-bottom: 25px; align-self: center; display: flex;">
+            <div style="margin-right: 25px; align-self: center;">
+              Seu produto ficou assim
+            </div>
+            <button phx-click="step" phx-value-step="7">
+              <img src="/svg/confirmar.svg" />
+            </button>
           </div>
           <div style="display: flex;">
             <div style="width: 50%; margin-right: 100px;">
@@ -880,14 +711,6 @@ defmodule PlazaWeb.UploadLive do
               <div style="font-size: 34px;">
                 Costas
               </div>
-            </div>
-            <div style="position: relative; top: 50px;">
-              <button phx-click="step" phx-value-step="7">
-                <img src="/svg/yellow-ellipse.svg" />
-                <div class="has-font-3 is-size-4" style="position: relative; bottom: 68px;">
-                  Confirmar
-                </div>
-              </button>
             </div>
           </div>
         </div>
@@ -906,15 +729,15 @@ defmodule PlazaWeb.UploadLive do
         product_form={@product_form}
       />
       <div class="has-font-3" style="display: flex; justify-content: center;  margin-top: 50px;">
-        <div style="display: flex; max-width: 1550px; width: 100%;">
+        <div style="display: flex; max-width: 1750px; width: 100%;">
           <div style="width: 34%; margin-right: 25px; max-width: 400px;">
             <div style="display: flex;">
-              <div style="font-size: 22px; margin-left: auto;">
+              <div style="font-size: 34px; margin-left: auto;">
                 Foto principal:
                 <button
                   :if={@product_form.data.designs.display == 0}
                   class="has-font-3"
-                  style="border-bottom: 2px solid black; height: 35px;"
+                  style="border-bottom: 3px solid black; height: 43px;"
                 >
                   Frente
                 </button>
@@ -935,7 +758,7 @@ defmodule PlazaWeb.UploadLive do
                 <button
                   :if={@product_form.data.designs.display == 1}
                   class="has-font-3"
-                  style="border-bottom: 2px solid black; height: 35px;"
+                  style="border-bottom: 3px solid black; height: 43px;"
                 >
                   / Costas
                 </button>
@@ -1001,7 +824,7 @@ defmodule PlazaWeb.UploadLive do
                         </div>
                       </div>
                       <div style="display: flex; margin-bottom: 10px;">
-                        <div style="align-self: center; margin-bottom: 5px; margin-right: 5px;">
+                        <div style="align-self: center; margin-right: 17px; font-size: 34px;">
                           Defina o preço final de venda:
                         </div>
                         <div>
@@ -1021,7 +844,7 @@ defmodule PlazaWeb.UploadLive do
                           </.input>
                         </div>
                       </div>
-                      <div>
+                      <div style="font-size: 34px;">
                         Se vender 30 unidades seu lucro será: R$<%= ((@product_form.data.price -
                                                                         @product_form.data.internal_expense) *
                                                                        30)
@@ -1349,19 +1172,29 @@ defmodule PlazaWeb.UploadLive do
     <div class="has-font-3">
       <.upload_input side={@side} />
       <div style="width: 90%; font-size: 28px;">
-        <div style="margin-top: 25px; line-height: 32px;">
+        <div style="margin-top: 27px; line-height: 32px;">
           Arquivo PNG com formato de cores RGB com pelo menos 300 dpi de resolução.
         </div>
         <div style="font-size: 23px;">
           Envie seu arquivo com as medidas ajustadas dentro da proporção 1:1.414 do A3 (29,7 x 42 cm)
         </div>
-        <div style="margin-top: 50px;">
+        <div style="margin-top: 39px;">
           Seus arquivos:
         </div>
       </div>
-      <div style="margin-bottom: 50px;">
-        <.upload_item side="front" local_upload={@front_local_upload} no_file_yet="front.png" />
-        <.upload_item side="back" local_upload={@back_local_upload} no_file_yet="back.png" />
+      <div style="margin-bottom: 34px; width: 90%; display: flex;">
+        <div>
+          <.upload_item side="front" local_upload={@front_local_upload} no_file_yet="front.png" />
+          <.upload_item side="back" local_upload={@back_local_upload} no_file_yet="back.png" />
+        </div>
+        <div style="width: 200px; margin-left: auto;">
+          <button :if={@front_local_upload || @back_local_upload} phx-click="step" phx-value-step="6">
+            <img src="/svg/yellow-ellipse.svg" />
+            <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
+              Próximo
+            </div>
+          </button>
+        </div>
       </div>
       <div class="has-font-1" style="font-size: 30px; display: flex; margin-bottom: 25px;">
         <div style="text-decoration: underline; margin-right: 5px">
@@ -1370,20 +1203,19 @@ defmodule PlazaWeb.UploadLive do
         <div style="margin-right: 5px;">/</div>
         <div style="color: lightgrey; text-decoration: underline;">Poster</div>
       </div>
-      <div style="font-size: 28px; margin-bottom: 50px;">
+      <div style="font-size: 28px; margin-bottom: 29px;">
         Tecido: <span style="text-decoration: underline;">Plaza Standard 100% Algodão</span>
       </div>
-      <div style="font-size: 22px;">
-        Custo de produção por unidade:
+      <div style="display: flex; margin-bottom: 21px;">
+        <div style="font-size: 28px; margin-right: 14px;">
+          Cor:
+        </div>
+        <img src="/svg/blue.svg" style="margin-right: 8px;" />
+        <img src="/svg/black.svg" style="margin-right: 8px;" />
+        <img src="/svg/white.svg" />
       </div>
-      <div style="font-size: 20px;">
-        Estampa apenas de um lado <span class="has-font-1">R$ 46,90</span>
-      </div>
-      <div style="font-size: 20px;">
-        Estampa frente e costas <span class="has-font-1">R$ 64,90</span>
-      </div>
-      <div style="font-size: 14px; margin-bottom: 100px;">
-        Produtos tamanho XGG podem ter um acrescimo no valor final.
+      <div style="font-size: 20px; margin-bottom: 152px;">
+        Custo de produção por unidade: <span style="font-size: 18px;">R$ 66,90</span>
       </div>
       <div style="font-size: 28px;">
         Dúvidas?
@@ -1516,14 +1348,6 @@ defmodule PlazaWeb.UploadLive do
           style="border-bottom: 2px solid black; height: 43px;"
         >
           Costas
-        </button>
-      </div>
-      <div style="position: relative; top: 20px; width: 200px;">
-        <button :if={@front_local_upload || @back_local_upload} phx-click="step" phx-value-step="6">
-          <img src="/svg/yellow-ellipse.svg" />
-          <div class="has-font-3 is-size-4" style="position: relative; bottom: 79px;">
-            Próximo
-          </div>
         </button>
       </div>
     </div>

@@ -129,7 +129,7 @@ defmodule PlazaWeb.DesktopFooter do
                       </.link>
                     </div>
                     <div style="text-decoration: underline; font-size: min(1.4vw, 26px);">
-                      <.link navigate="/upload">
+                      <.link navigate="/how-it-works/seller">
                         Quero Vender
                       </.link>
                     </div>
@@ -188,7 +188,7 @@ defmodule PlazaWeb.DesktopFooter do
                       </.link>
                     </div>
                     <div style="text-decoration: underline; font-size: 2.4vw;">
-                      <.link navigate="/upload">
+                      <.link navigate="/how-it-works/seller">
                         Quero Vender
                       </.link>
                     </div>

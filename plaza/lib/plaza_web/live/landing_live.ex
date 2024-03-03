@@ -246,7 +246,7 @@ defmodule PlazaWeb.LandingLive do
             <ProductComponent.products3 products={@curated_products} />
           </div>
           <div style="margin-bottom: 100px; margin-top: 100px;">
-            <.link navigate="/upload">
+            <.link navigate="/how-it-works/seller">
               <img src="/svg/landing-group-desktop-01.svg" />
             </.link>
           </div>
