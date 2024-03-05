@@ -9,9 +9,7 @@ defmodule PlazaWeb.Auth.Login do
 
   def login_quick(assigns) do
     ~H"""
-    <div>
-      <.login form={@form} full={false} button_right={@button_right} width={@width} />
-    </div>
+    <.login form={@form} full={false} button_right={@button_right} width={@width} />
     """
   end
 
@@ -26,12 +24,12 @@ defmodule PlazaWeb.Auth.Login do
   attr :form, :any, required: true
   attr :full, :boolean, default: true
   attr :button_right, :boolean, default: true
-  attr :width, :integer, required: true
+  attr :width, :string, required: true
 
   def login(assigns) do
     ~H"""
-    <div class="has-font-3" style="display: flex; justify-content: center;">
-      <div style={"display: flex; flex-direction: column; width: #{@width}px;"}>
+    <div class="has-font-3" style="display: flex; justify-content: center; width: 100%;">
+      <div style={"display: flex; flex-direction: column; width: #{@width};"}>
         <div :if={@full} style="border-bottom: 1px solid grey; margin-bottom: 25px;">
           <div style="margin-left: 10px; font-size: 34px; line-height: 40px;">
             Acessar Conta

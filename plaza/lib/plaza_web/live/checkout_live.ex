@@ -201,13 +201,14 @@ defmodule PlazaWeb.CheckoutLive do
           cart_total_amount =
             List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
 
-          Enum.each(cart, fn item ->
-            Task.async(fn ->
-              sku = Map.get(@sku_map, "white-#{item.size}")
-              {:ok, value} = Dimona.Requests.Availability.get(sku)
-              {:availability, item.product.id, value}
-            end)
-          end)
+          ## TODO; turn back on
+          ## Enum.each(cart, fn item ->
+          ##   Task.async(fn ->
+          ##     sku = Map.get(@sku_map, "white-#{item.size}")
+          ##     {:ok, value} = Dimona.Requests.Availability.get(sku)
+          ##     {:availability, item.product.id, value}
+          ##   end)
+          ## end)
 
           IO.inspect(cart)
 
@@ -283,13 +284,14 @@ defmodule PlazaWeb.CheckoutLive do
     cart_total_amount =
       List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
 
-    Enum.each(cart, fn item ->
-      Task.async(fn ->
-        sku = Map.get(@sku_map, "white-#{item.size}")
-        {:ok, value} = Dimona.Requests.Availability.get(sku)
-        {:availability, item.product.id, value}
-      end)
-    end)
+    # TODO; turn back on
+    ## Enum.each(cart, fn item ->
+    ##   Task.async(fn ->
+    ##     sku = Map.get(@sku_map, "white-#{item.size}")
+    ##     {:ok, value} = Dimona.Requests.Availability.get(sku)
+    ##     {:availability, item.product.id, value}
+    ##   end)
+    ## end)
 
     socket =
       socket
@@ -957,7 +959,6 @@ defmodule PlazaWeb.CheckoutLive do
 
   def render(%{step: 1} = assigns) do
     ~H"""
-    <div id="checkout-page-top" />
     <div class="is-checkout-page-desktop">
       <div
         class="has-font-3"
@@ -1077,7 +1078,7 @@ defmodule PlazaWeb.CheckoutLive do
           </div>
           <div
             :if={!@current_user}
-            style="font-size: 44px; margin-left: 10px; margin-right: 10px; width: 100%;"
+            style="font-size: 44px; margin-left: 50px; margin-right: 10px; width: 100%;"
           >
             <.sign_in_or_continue_as_guest
               current_user={@current_user}
@@ -1098,7 +1099,7 @@ defmodule PlazaWeb.CheckoutLive do
               Carrinho
             </div>
           </div>
-          <div style="border-bottom: 1px solid grey; display: flex; margin-left: 10px; margin-right: 10px; margin-bottom: 20px;">
+          <div style="border-bottom: 1px solid grey; display: flex; margin-left: 10px; margin-right: 10px; margin-bottom: 11px;">
             <div style="font-size: 22px; line-height: 40px; margin-left: 10px;">
               item
             </div>
@@ -1107,7 +1108,7 @@ defmodule PlazaWeb.CheckoutLive do
             </div>
           </div>
           <div style="margin-left: 10px; margin-right: 10px;">
-            <div :for={item <- @cart} style="margin-bottom: 13px; border-bottom: 1px solid lightgrey;">
+            <div :for={item <- @cart} style="border-bottom: 1px solid lightgrey; margin-top: 13px;">
               <div>
                 <button phx-click="product-href" phx-value-product-id={item.product.id}>
                   <img src={
@@ -1161,10 +1162,10 @@ defmodule PlazaWeb.CheckoutLive do
                   out of stock
                 </div>
               </div>
-              <div style="font-size: 22px; color: grey;">
+              <div style="font-size: 22px; color: grey; margin-bottom: 13px;">
                 <a
                   class="has-font-3"
-                  style="text-decoration: underline;"
+                  style="text-decoration: underline; color: grey;"
                   phx-click="remove-from-cart"
                   phx-value-product-id={item.product.id}
                   phx-value-size={item.size}
@@ -1174,45 +1175,45 @@ defmodule PlazaWeb.CheckoutLive do
                 </a>
               </div>
             </div>
-            <div style="display: flex; margin-top: 10px;">
+            <div style="display: flex; margin-top: 7px;">
               <div style="margin-left: auto;">
                 <div style="display: flex;">
-                  <div style="font-size: 24px; line-height: 43px; margin-right: 20px;">
+                  <div style="font-size: 22px; margin-right: 14px; align-self: center;">
                     Total:
                   </div>
-                  <div style="font-size: 28px;">
+                  <div style="font-size: 32px;">
                     <%= "R$ #{Float.to_string(@cart_total_amount) |> String.replace(".", ",")}" %>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div :if={!@checkout_as_guest_mobile && !@current_user}>
+          <div :if={!@checkout_as_guest_mobile && !@current_user} style="margin-bottom: 50px;">
             <div style="border-bottom: 1px solid grey; margin-bottom: 17px; margin-top: 50px;">
               <div style="font-size: 36px; line-height: 40px; margin-left: 10px;">
                 Checkout
               </div>
             </div>
-            <div style="font-size: 20px; line-height: 18px; margin-left: 10px;">
-              coloque seu email para fazer login
-            </div>
-            <div style="font-size: 20px; line-height: 18px; margin-left: 10px; margin-bottom: 35px;">
-              ou continue como
-              <button
-                class="has-font-3"
-                style="text-decoration: underline;"
-                phx-click="checkout-as-guest"
-              >
-                convidado
-              </button>
-            </div>
-            <div style="display: flex; justify-content: center;">
-              <div>
+            <div style="margin-left: 10px; padding-right: 20px; width: 100%;">
+              <div style="font-size: 20px; line-height: 18px;">
+                coloque seu email para fazer login
+              </div>
+              <div style="font-size: 20px; line-height: 18px; margin-bottom: 23px;">
+                ou continue como
+                <button
+                  class="has-font-3"
+                  style="text-decoration: underline;"
+                  phx-click="checkout-as-guest"
+                >
+                  convidado
+                </button>
+              </div>
+              <div style="display: flex; justify-content: center;">
                 <PlazaWeb.Auth.Login.login_quick
                   form={@login_form}
                   redirect_url="/checkout"
                   button_right={false}
-                  width={300}
+                  width="100%"
                 />
               </div>
             </div>
@@ -1238,18 +1239,8 @@ defmodule PlazaWeb.CheckoutLive do
                   />
                   <div style={if @email_form_is_empty, do: "opacity: 50%;"}>
                     <div style="display: flex; justify-content: center; margin-top: 50px;">
-                      <a
-                        disabled={@email_form_is_empty}
-                        href="#checkout-page-top"
-                        phx-click="submit-email-form"
-                      >
-                        <img src="svg/yellow-ellipse.svg" />
-                        <div
-                          class="has-font-3"
-                          style="position: relative; bottom: 79px; left: 39px; font-size: 36px;"
-                        >
-                          Continuar
-                        </div>
+                      <a disabled={@email_form_is_empty} href="#top" phx-click="submit-email-form">
+                        <img src="/svg/continuar.svg" />
                       </a>
                     </div>
                   </div>
@@ -1269,7 +1260,7 @@ defmodule PlazaWeb.CheckoutLive do
             </div>
           </div>
           <div :if={@current_user}>
-            <div style="display: flex; justify-content: center; margin-top: 50px; margin-bottom: 50px;">
+            <div style="display: flex; justify-content: center; margin-top: 50px; margin-bottom: 150px;">
               <a
                 phx-click="step"
                 phx-value-step="2"
@@ -1277,13 +1268,7 @@ defmodule PlazaWeb.CheckoutLive do
                 disabled={@cart_out_of_stock}
                 href="#top"
               >
-                <img src="svg/yellow-ellipse.svg" />
-                <div
-                  class="has-font-3"
-                  style="position: relative; bottom: 79px; left: 45px; font-size: 36px;"
-                >
-                  Comprar
-                </div>
+                <img src="/svg/comprar.svg" />
               </a>
             </div>
           </div>
@@ -1297,17 +1282,17 @@ defmodule PlazaWeb.CheckoutLive do
     ~H"""
     <div
       class="has-font-3"
-      style="margin-top: 150px; margin-bottom: 400px; margin-left: 10px; margin-right: 10px;"
+      style="margin-top: 50px; margin-bottom: 400px; margin-left: 10px; margin-right: 10px;"
     >
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; flex-direction: column;">
-          <div style="align-self: center; font-size: 40px;">
+          <div style="align-self: center; font-size: 46px; margin-bottom: 9px;">
             Endereço para entrega
           </div>
-          <div style="align-self: center; font-size: 22px; margin-bottom: 25px;">
+          <div style="align-self: center; font-size: 22px; margin-bottom: 55px;">
             preencha com o endereço para calcular o frete
           </div>
-          <div style="margin-bottom: 25px; align-self: center;">
+          <div style="margin-bottom: 19px; align-self: center;">
             <.form for={@name_form} phx-change="change-name-form">
               <.input
                 field={@name_form[:name]}
@@ -1327,7 +1312,7 @@ defmodule PlazaWeb.CheckoutLive do
               phx-change="change-address-form"
               phx-submit="submit-address-form"
             >
-              <div style="display: flex;">
+              <div style="display: flex; margin-bottom: 21px;">
                 <.input
                   field={@address_form[:line1]}
                   type="text"
@@ -1354,7 +1339,7 @@ defmodule PlazaWeb.CheckoutLive do
                 type="text"
                 placeholder="complemento"
                 class="text-input-1"
-                style="width: 350px; font-size: 28px;"
+                style="width: 350px; font-size: 28px; margin-bottom: 21px;"
                 autocomplete="shipping address-line3"
                 phx-debounce="500"
               >
@@ -1365,7 +1350,7 @@ defmodule PlazaWeb.CheckoutLive do
                 type="text"
                 placeholder="cep"
                 class="text-input-1"
-                style="width: 350px; font-size: 28px;"
+                style="width: 350px; font-size: 28px; margin-bottom: 21px;"
                 autocomplete="shipping postal-code"
                 phx-debounce="500"
                 onKeypress="window.hyphen();"
@@ -1398,15 +1383,12 @@ defmodule PlazaWeb.CheckoutLive do
                   disabled={!(@name_form_valid && @address_form.source.valid?)}
                   style={if !(@name_form_valid && @address_form.source.valid?), do: "opacity: 50%"}
                 >
-                  <img src="svg/yellow-ellipse.svg" />
-                  <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                    Continuar
-                  </div>
+                  <img src="/svg/continuar.svg" />
                 </button>
               </div>
             </.form>
           </div>
-          <div style="align-self: center; position: relative; bottom: 100px;">
+          <div style="align-self: center; position: relative; bottom: 50px;">
             <.delivery_method_form
               options={@delivery_methods}
               selected={@delivery_method}
@@ -1455,7 +1437,7 @@ defmodule PlazaWeb.CheckoutLive do
     ~H"""
     <div style="display: flex; justify-content: right;">
       <div>
-        <div style="font-size: 40px;">
+        <div style="font-size: 44px;">
           checkout
         </div>
         <div style="font-size: 22px;">
@@ -1466,7 +1448,7 @@ defmodule PlazaWeb.CheckoutLive do
             form={@login_form}
             redirect_url="/checkout"
             button_right={true}
-            width={500}
+            width="100%"
           />
         </div>
         <div>
@@ -1482,16 +1464,16 @@ defmodule PlazaWeb.CheckoutLive do
                 field={@email_form[:email]}
                 type="text"
                 class="text-input-1"
-                style="width: 400px;"
+                style="width: 100%;"
                 placeholder="seu email"
                 autocomplete="email"
               />
-              <div style="display: flex; width: 400px;">
+              <div style="display: flex; width: 100%;">
                 <div style="margin-left: auto;">
                   <div style={if @email_form_is_empty, do: "opacity: 50%;"}>
                     <button
                       disabled={@email_form_is_empty}
-                      style="font-size: 28px; text-decoration: underline;"
+                      style="font-size: 32px; text-decoration: underline;"
                       class="has-font-3"
                     >
                       Continuar
