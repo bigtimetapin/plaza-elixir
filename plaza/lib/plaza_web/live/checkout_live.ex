@@ -1107,7 +1107,7 @@ defmodule PlazaWeb.CheckoutLive do
             </div>
           </div>
           <div style="margin-left: 10px; margin-right: 10px;">
-            <div :for={item <- @cart} style="margin-bottom: 13px;">
+            <div :for={item <- @cart} style="margin-bottom: 13px; border-bottom: 1px solid lightgrey;">
               <div>
                 <button phx-click="product-href" phx-value-product-id={item.product.id}>
                   <img src={
@@ -1162,18 +1162,19 @@ defmodule PlazaWeb.CheckoutLive do
                 </div>
               </div>
               <div style="font-size: 22px; color: grey;">
-                <button
+                <a
                   class="has-font-3"
                   style="text-decoration: underline;"
                   phx-click="remove-from-cart"
                   phx-value-product-id={item.product.id}
                   phx-value-size={item.size}
+                  href="#top"
                 >
                   remover
-                </button>
+                </a>
               </div>
             </div>
-            <div style="display: flex; border-top: 2px solid lightgrey; margin-top: 10px;">
+            <div style="display: flex; margin-top: 10px;">
               <div style="margin-left: auto;">
                 <div style="display: flex;">
                   <div style="font-size: 24px; line-height: 43px; margin-right: 20px;">
