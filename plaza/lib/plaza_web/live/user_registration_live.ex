@@ -51,10 +51,7 @@ defmodule PlazaWeb.UserRegistrationLive do
               <div style="display: flex;">
                 <div style="margin-left: auto;">
                   <button phx-disable-with="criando...">
-                    <img src="/svg/yellow-ellipse.svg" />
-                    <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                      criar conta
-                    </div>
+                    <img src="/svg/criar-conta.svg" />
                   </button>
                 </div>
               </div>

@@ -70,20 +70,14 @@ defmodule PlazaWeb.Auth.Login do
             <div :if={@button_right} style="display: flex;">
               <div style="margin-left: auto;">
                 <button phx-disable-with="signing in...">
-                  <img src="/svg/yellow-ellipse.svg" />
-                  <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                    accesar
-                  </div>
+                  <img src="/svg/accesar.svg" />
                 </button>
               </div>
             </div>
             <div :if={!@button_right} style="display: flex; justify-content: center;">
               <div>
                 <button phx-disable-with="signing in...">
-                  <img src="/svg/yellow-ellipse.svg" />
-                  <div class="has-font-3" style="position: relative; bottom: 79px; font-size: 36px;">
-                    accesar
-                  </div>
+                  <img src="/svg/accesar.svg" />
                 </button>
               </div>
             </div>
