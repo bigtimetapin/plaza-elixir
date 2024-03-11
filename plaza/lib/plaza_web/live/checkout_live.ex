@@ -201,14 +201,13 @@ defmodule PlazaWeb.CheckoutLive do
           cart_total_amount =
             List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
 
-          ## TODO; turn back on
-          ## Enum.each(cart, fn item ->
-          ##   Task.async(fn ->
-          ##     sku = Map.get(@sku_map, "white-#{item.size}")
-          ##     {:ok, value} = Dimona.Requests.Availability.get(sku)
-          ##     {:availability, item.product.id, value}
-          ##   end)
-          ## end)
+          Enum.each(cart, fn item ->
+            Task.async(fn ->
+              sku = Map.get(@sku_map, "white-#{item.size}")
+              {:ok, value} = Dimona.Requests.Availability.get(sku)
+              {:availability, item.product.id, value}
+            end)
+          end)
 
           IO.inspect(cart)
 
@@ -284,14 +283,13 @@ defmodule PlazaWeb.CheckoutLive do
     cart_total_amount =
       List.foldl(cart, 0, fn item, acc -> item.product.price * item.quantity + acc end)
 
-    # TODO; turn back on
-    ## Enum.each(cart, fn item ->
-    ##   Task.async(fn ->
-    ##     sku = Map.get(@sku_map, "white-#{item.size}")
-    ##     {:ok, value} = Dimona.Requests.Availability.get(sku)
-    ##     {:availability, item.product.id, value}
-    ##   end)
-    ## end)
+    Enum.each(cart, fn item ->
+      Task.async(fn ->
+        sku = Map.get(@sku_map, "white-#{item.size}")
+        {:ok, value} = Dimona.Requests.Availability.get(sku)
+        {:availability, item.product.id, value}
+      end)
+    end)
 
     socket =
       socket
@@ -1548,7 +1546,7 @@ defmodule PlazaWeb.CheckoutLive do
           <button
             :for={option <- options}
             class="has-font-3"
-            style="display: flex; font-size: 26px;"
+            style="display: flex; font-size: 26px; margin-bottom: 10px;"
             phx-click="select-delivery-method"
             phx-value-id={option.id}
             phx-value-price={option.price}
@@ -1561,9 +1559,9 @@ defmodule PlazaWeb.CheckoutLive do
                   do: "/svg/yellow-circle.svg",
                   else: "/svg/white-circle.svg"
               }
-              style="width: 30px;"
+              style="width: 30px; align-self: center;"
             />
-            <div style="font-size: 24px; margin-left: 5px; margin-bottom: 10px;">
+            <div style="font-size: 24px; margin-left: 5px;">
               <%= "#{option.name} #{option.days} Dias Úteis R$#{(option.price / 100) |> Float.to_string() |> String.replace(".", ",")}" %>
             </div>
           </button>
