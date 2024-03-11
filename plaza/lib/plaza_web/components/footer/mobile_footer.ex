@@ -6,18 +6,18 @@ defmodule PlazaWeb.MobileFooter do
     ~H"""
     <div class="has-font-3" style="display: flex; justify-content: center;">
       <div style="margin-left: 10px; margin-right: 10px; margin-top: 75px;">
-        <div style="font-size: 30px; text-align: center;" class="has-font-1">
+        <div style="font-size: 30px; text-align: center; margin-bottom: 17px;" class="has-font-1">
           Conta
         </div>
-        <div style="text-decoration: underline; text-align: center; font-size: 26px; margin-bottom: 75px;">
+        <div style="text-decoration: underline; text-align: center; font-size: 26px; margin-bottom: 49px;">
           <.link navigate="/my-account">
             Acessar Conta
           </.link>
         </div>
-        <div style="font-size: 30px; text-align: center;" class="has-font-1">
+        <div style="font-size: 30px; text-align: center; margin-bottom: 17px;" class="has-font-1">
           Sobre
         </div>
-        <div style="text-decoration: underline; text-align: center; font-size: 26px; margin-bottom: 75px;">
+        <div style="text-decoration: underline; text-align: center; font-size: 26px; margin-bottom: 49px;">
           <a href="mailto:admin@plazaaaaa.com">
             Contato
           </a>
