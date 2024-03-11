@@ -297,18 +297,10 @@ defmodule PlazaWeb.LandingLive do
       <div style="display: flex; justify-content: center; margin-left: 10px; margin-right: 10px;">
         <div style="display: flex; flex-direction: column; width: 100%;">
           <div style="margin-left: 10px; margin-right: 10px;">
-            <div style="font-size: 24px; line-height: 26px;">
-              <h1>
-                Bem vindo ao plaza,
-              </h1>
-              <h2>
-                aqui você encontra camisetas e posters
-              </h2>
-              <h2>
-                de artistas independentes.
-              </h2>
-            </div>
-            <div style="display: flex; justify-content: center; margin-top: 25px; margin-bottom: 25px;">
+            <h1 style="margin-bottom: 35px;">
+              <img src="/svg/landing-group-mobile-01.svg" />
+            </h1>
+            <div style="display: flex; justify-content: center; margin-bottom: 30px;">
               <div style="width: 30%; margin-right: 25px;">
                 <img src="/svg/yellow-rectangle.svg" style="width: 100%;" />
               </div>
@@ -319,11 +311,11 @@ defmodule PlazaWeb.LandingLive do
                 <img src="/svg/yellow-polygon.svg" style="width: 100%;" />
               </div>
             </div>
-            <h2 style="font-size: 32px; line-height: 34px;">
-              Apoie a comunidade criativa
+            <h2 style="margin-bottom: 5px;">
+              <img src="/svg/landing-group-mobile-02.svg" />
             </h2>
-            <h2 style="font-size: 24px;  margin-bottom: 50px;">
-              Compre de artistas independentes
+            <h2 style="margin-bottom: 54px;">
+              <img src="/svg/landing-group-mobile-03.svg" />
             </h2>
           </div>
           <div style="display: flex; overflow-x: scroll; margin-bottom: 100px; padding-top: 15px;">
@@ -338,26 +330,26 @@ defmodule PlazaWeb.LandingLive do
           </div>
           <div style="border-top: 1px solid lightgrey; border-bottom: 1px solid lightgrey;">
             <div style="margin-left: 20px;">
-              <div style="font-size: 32px; line-height: 34px; margin-top: 35px; margin-bottom: 17px;">
+              <div style="font-size: 38px; line-height: 40px; margin-top: 35px; margin-bottom: 22px;">
                 <h2>
                   Para Artistas
                 </h2>
               </div>
-              <div style="margin-bottom: 25px;">
+              <div style="margin-bottom: 22px;">
                 <img src="/svg/big-yellow-circle.svg" style="width: 140px;" />
               </div>
-              <div style="font-size: 32px; line-height: 34px;">
+              <div style="font-size: 38px; line-height: 40px;">
                 <h2>
                   Inscreva-se e venda seus
                 </h2>
               </div>
-              <div style="font-size: 32px; line-height: 34px;margin-bottom: 25px;">
+              <div style="font-size: 38px; line-height: 40px; margin-bottom: 22px;">
                 <h2>
                   designs hoje mesmo.
                 </h2>
               </div>
               <div
-                style="font-size: 24px; text-decoration: underline; margin-bottom: 75px;"
+                style="font-size: 24px; text-decoration: underline; margin-bottom: 46px;"
                 id="top-products"
               >
                 <.link navigate="/how-it-works/seller">
@@ -366,7 +358,7 @@ defmodule PlazaWeb.LandingLive do
               </div>
             </div>
           </div>
-          <div style="font-size: 22px; line-height: 24px; display: flex; margin-top: 50px; margin-bottom: 50px; margin-left: 10px;">
+          <div style="font-size: 24px; line-height: 26px; display: flex; margin-top: 46px; margin-bottom: 46px; margin-left: 10px;">
             <div style="position: relative; margin-right: 20px;">
               <img src="/svg/arrow-down.svg" />
             </div>
