@@ -312,10 +312,10 @@ defmodule PlazaWeb.LandingLive do
               <div style="width: 30%; margin-right: 25px;">
                 <img src="/svg/yellow-rectangle.svg" style="width: 100%;" />
               </div>
-              <div style="width: 37%; margin-right: 25px;">
+              <div style="width: 36%; margin-right: 25px;">
                 <img src="/svg/big-yellow-ellipse.svg" style="width: 100%;" />
               </div>
-              <div style="width: 33%;">
+              <div style="width: 34%;">
                 <img src="/svg/yellow-polygon.svg" style="width: 100%;" />
               </div>
             </div>

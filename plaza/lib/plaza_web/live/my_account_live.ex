@@ -70,7 +70,7 @@ defmodule PlazaWeb.MyAccountLive do
         style="display: flex; justify-content: center; margin-top: 200px; margin-bottom: 250px; margin-left: 10px; margin-right: 10px;"
       >
         <div style="display: flex; flex-direction: column;">
-          <img src="/svg/yellow-rectangle.svg" style="margin-bottom: 50px;" />
+          <img src="/svg/yellow-rectangle-just.svg" style="margin-bottom: 50px;" />
           <h2 style="font-size: 32px; margin-bottom: 50px;">
             Minha Conta
           </h2>
