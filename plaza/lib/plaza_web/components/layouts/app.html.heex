@@ -7,9 +7,9 @@
       <script id="plaza-s3-file-uploader" phx-hook="S3FileUploader" />
       <%= @inner_content %>
     </main>
-    <div :if={!assigns[:mobile_header_open]} style="border-top: 1px solid #707070">
+    <div :if={!assigns[:mobile_header_open]}>
       <footer class="is-footer-desktop"
-        style="margin-left: 10px; margin-right: 10px; margin-top: 50px; margin-bottom: 50px;">
+        style="margin-left: 10px; margin-right: 10px; padding-top: 50px; margin-bottom: 50px; border-top: 1px solid #707070">
         <.live_component module={PlazaWeb.DesktopFooter} id="footer-desktop" />
       </footer>
       <footer class=" is-footer-mobile">
