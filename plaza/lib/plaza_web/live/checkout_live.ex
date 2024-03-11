@@ -366,6 +366,9 @@ defmodule PlazaWeb.CheckoutLive do
   end
 
   def handle_event("change-name-form", %{"name-form" => %{"name" => name} = attrs}, socket) do
+    address_form = socket.assigns.address_form
+    IO.inspect(address_form)
+    IO.inspect(address_form.source.valid?)
     data = socket.assigns.name_form.data
 
     changes =
@@ -387,7 +390,7 @@ defmodule PlazaWeb.CheckoutLive do
           form =
             {%{name: name}, %{name: :string}}
             |> Changeset.cast(%{}, [])
-            |> Map.put(:action, :validation)
+            |> Map.put(:action, :validate)
             |> to_form(as: "name-form")
 
           socket
@@ -450,7 +453,7 @@ defmodule PlazaWeb.CheckoutLive do
           end)
 
           address_form =
-            Address.changeset_postal_code(
+            Address.changeset(
               address,
               %{}
             )
@@ -487,7 +490,7 @@ defmodule PlazaWeb.CheckoutLive do
             address,
             %{}
           )
-          |> Map.put(:action, :validation)
+          |> Map.put(:action, :validate)
           |> to_form()
       end
 
@@ -1304,8 +1307,9 @@ defmodule PlazaWeb.CheckoutLive do
               </.input>
             </.form>
           </div>
-          <div style="align-self: center;">
+          <div style="align-self: center; margin-bottom: 50px;">
             <.form
+              id="address-form"
               for={@address_form}
               phx-change="change-address-form"
               phx-submit="submit-address-form"
@@ -1376,23 +1380,25 @@ defmodule PlazaWeb.CheckoutLive do
                 >
                 </.input>
               </div>
-              <div style="display: flex; justify-content: center; position: relative; top: 300px;">
-                <button
-                  disabled={!(@name_form_valid && @address_form.source.valid?)}
-                  style={if !(@name_form_valid && @address_form.source.valid?), do: "opacity: 50%"}
-                >
-                  <img src="/svg/continuar.svg" />
-                </button>
-              </div>
             </.form>
           </div>
-          <div style="align-self: center; position: relative; bottom: 50px;">
+          <div style="align-self: center; margin-bottom: 50px;">
             <.delivery_method_form
               options={@delivery_methods}
               selected={@delivery_method}
               error={@delivery_methods_error}
               waiting={@delivery_methods_waiting}
             />
+          </div>
+          <div style="display: flex; justify-content: center; ">
+            <button
+              type="submit"
+              form="address-form"
+              disabled={!(@name_form_valid && @address_form.source.valid?)}
+              style={if !(@name_form_valid && @address_form.source.valid?), do: "opacity: 50%"}
+            >
+              <img src="/svg/continuar.svg" />
+            </button>
           </div>
         </div>
       </div>
