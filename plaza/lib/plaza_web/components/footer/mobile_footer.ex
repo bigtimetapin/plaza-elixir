@@ -22,10 +22,10 @@ defmodule PlazaWeb.MobileFooter do
             Contato
           </a>
         </div>
-        <div style="display: flex; justify-content: center; margin-bottom: 75px; margin-left: 25px; margin-right: 25px;">
+        <div style="display: flex; justify-content: center; margin-bottom: 71px; margin-left: 20px; margin-right: 20px;">
           <img src="/svg/footer-left-02.svg" />
         </div>
-        <div style="display: flex; justify-content: center; margin-bottom: 75px; margin-left: 10px;">
+        <div style="display: flex; justify-content: center; margin-bottom: 55px; margin-left: 10px;">
           <div style="font-size: 22px; line-height: 24px; ">
             <div>
               Plaza é uma plataforma de integração de
