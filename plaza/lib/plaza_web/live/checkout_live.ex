@@ -390,7 +390,7 @@ defmodule PlazaWeb.CheckoutLive do
           form =
             {%{name: name}, %{name: :string}}
             |> Changeset.cast(%{}, [])
-            |> Map.put(:action, :validate)
+            |> Map.put(:action, :validation)
             |> to_form(as: "name-form")
 
           socket
@@ -1228,15 +1228,16 @@ defmodule PlazaWeb.CheckoutLive do
             <div style="font-size: 20px; line-height: 18px; margin-left: 10px; margin-bottom: 10px;">
               coloque apenas seu email
             </div>
-            <div style="display: flex; justify-content: center;">
-              <div style="display: flex; flex-direction: column;">
-                <.form for={@email_form} phx-change="change-email-form">
+            <div style="display: flex; justify-content: center; margin-left: 10px;">
+              <div style="display: flex; flex-direction: column; width: 100%;">
+                <.form for={@email_form} phx-change="change-email-form" style="width: 100%">
                   <.input
                     field={@email_form[:email]}
                     type="text"
                     class="text-input-1"
                     placeholder="seu email"
                     autocomplete="email"
+                    style="width: 100%"
                   />
                   <div style={if @email_form_is_empty, do: "opacity: 50%;"}>
                     <div style="display: flex; justify-content: center; margin-top: 50px;">
@@ -1247,7 +1248,7 @@ defmodule PlazaWeb.CheckoutLive do
                   </div>
                 </.form>
                 <div style="margin-left: auto;">
-                  <div style="position: relative; bottom: 200px;">
+                  <div style="position: relative; bottom: 145px;">
                     <button
                       class="has-font-3"
                       style="text-decoration: underline; font-size: 20px;"
