@@ -291,28 +291,17 @@ defmodule PlazaWeb.LandingLive do
       <div style="display: flex; justify-content: center; margin-left: 10px; margin-right: 10px;">
         <div style="display: flex; flex-direction: column; width: 100%;">
           <div style="margin-left: 10px; margin-right: 10px;">
-            <h1 style="margin-bottom: 35px;">
-              <img src="/svg/landing-group-mobile-01.svg" />
+            <h1 style="margin-bottom: 65px;">
+              <img src="/svg/landing-group-mobile-01.svg" style="width: 100%;" />
             </h1>
-            <div style="display: flex; justify-content: center; margin-bottom: 30px;">
-              <div style="width: 30%; margin-right: 25px;">
-                <img src="/svg/yellow-rectangle.svg" style="width: 100%;" />
-              </div>
-              <div style="width: 36%; margin-right: 25px;">
-                <img src="/svg/big-yellow-ellipse.svg" style="width: 100%;" />
-              </div>
-              <div style="width: 34%;">
-                <img src="/svg/yellow-polygon.svg" style="width: 100%;" />
-              </div>
-            </div>
             <h2 style="margin-bottom: 5px;">
-              <img src="/svg/landing-group-mobile-02.svg" />
+              <img src="/svg/landing-group-mobile-02.svg" style="width: 100%;" />
             </h2>
             <h2 style="margin-bottom: 54px;">
-              <img src="/svg/landing-group-mobile-03.svg" />
+              <img src="/svg/landing-group-mobile-03.svg" style="width: 100%;" />
             </h2>
           </div>
-          <div style="display: flex; overflow-x: scroll; margin-bottom: 100px; padding-top: 15px;">
+          <div style="display: flex; overflow-x: scroll; margin-bottom: 62px; padding-top: 15px;">
             <div :for={product <- @top_products} style="margin-right: 15px;">
               <ProductComponent.product
                 product={product}
@@ -322,37 +311,19 @@ defmodule PlazaWeb.LandingLive do
               />
             </div>
           </div>
-          <div style="border-top: 1px solid lightgrey; border-bottom: 1px solid lightgrey;">
-            <div style="margin-left: 20px;">
-              <div style="font-size: 38px; line-height: 40px; margin-top: 35px; margin-bottom: 22px;">
-                <h2>
-                  Para Artistas
-                </h2>
+          <div style="border-top: 1px solid lightgrey; border-bottom: 1px solid lightgrey; background: #F8FC5F; height: 674px; margin-left: -10px; margin-right: -10px; display: flex; justify-content: center;">
+            <div>
+              <div style="margin-top: 98px; margin-bottom: 30px;">
+                <img src="/png/seu-design.png" />
               </div>
-              <div style="margin-bottom: 22px;">
-                <img src="/svg/big-yellow-circle.svg" style="width: 140px;" />
-              </div>
-              <div style="font-size: 38px; line-height: 40px;">
-                <h2>
-                  Inscreva-se e venda seus
-                </h2>
-              </div>
-              <div style="font-size: 38px; line-height: 40px; margin-bottom: 22px;">
-                <h2>
-                  designs hoje mesmo.
-                </h2>
-              </div>
-              <div
-                style="font-size: 24px; text-decoration: underline; margin-bottom: 46px;"
-                id="top-products"
-              >
+              <div style="display: flex; justify-content: center;">
                 <.link navigate="/how-it-works/seller">
-                  Saiba como funciona
+                  <img src="/svg/landing-group-mobile-04.svg" />
                 </.link>
               </div>
             </div>
           </div>
-          <div style="font-size: 24px; line-height: 26px; display: flex; margin-top: 46px; margin-bottom: 46px; margin-left: 10px;">
+          <div style="font-size: 24px; line-height: 26px; display: flex; margin-top: 55px; margin-bottom: 46px; margin-left: 10px;">
             <div style="position: relative; margin-right: 20px;">
               <img src="/svg/arrow-down.svg" />
             </div>
