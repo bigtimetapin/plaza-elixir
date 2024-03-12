@@ -14,24 +14,22 @@ defmodule PlazaWeb.LandingLive do
           top_products = Products.top_3()
           ## curated products 
           curated_products =
-            Products.top_n_paginated(
+            Products.top_n_curated(
               %{
                 before: nil,
                 after: nil
               },
-              3,
-              true
+              3
             )
 
           ## uncurated products
           uncurated_products =
-            Products.top_n_paginated(
+            Products.top_n(
               %{
                 before: nil,
                 after: nil
               },
-              9,
-              false
+              9
             )
 
           seller =
@@ -88,13 +86,12 @@ defmodule PlazaWeb.LandingLive do
 
   def handle_event("curated-cursor-after", _, socket) do
     curated_products =
-      Products.top_n_paginated(
+      Products.top_n_curated(
         %{
           before: nil,
           after: socket.assigns.curated_cursor_after
         },
-        3,
-        true
+        3
       )
 
     socket =
@@ -108,13 +105,12 @@ defmodule PlazaWeb.LandingLive do
 
   def handle_event("curated-cursor-before", _, socket) do
     curated_products =
-      Products.top_n_paginated(
+      Products.top_n_curated(
         %{
           before: socket.assigns.curated_cursor_before,
           after: nil
         },
-        3,
-        true
+        3
       )
 
     socket =
@@ -128,13 +124,12 @@ defmodule PlazaWeb.LandingLive do
 
   def handle_event("uncurated-cursor-after", _, socket) do
     uncurated_products =
-      Products.top_n_paginated(
+      Products.top_n(
         %{
           before: nil,
           after: socket.assigns.uncurated_cursor_after
         },
-        9,
-        false
+        9
       )
 
     socket =
@@ -148,13 +143,12 @@ defmodule PlazaWeb.LandingLive do
 
   def handle_event("uncurated-cursor-before", _, socket) do
     uncurated_products =
-      Products.top_n_paginated(
+      Products.top_n(
         %{
           before: socket.assigns.uncurated_cursor_before,
           after: nil
         },
-        9,
-        false
+        9
       )
 
     socket =
