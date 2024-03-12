@@ -323,7 +323,7 @@ defmodule PlazaWeb.LandingLive do
           <div style="border-top: 1px solid lightgrey; border-bottom: 1px solid lightgrey; background: #F8FC5F; height: 674px; margin-left: -10px; margin-right: -10px; display: flex; justify-content: center;">
             <div>
               <div style="margin-top: 98px; margin-bottom: 30px;">
-                <img src="/svg/seu-design.svg" style="height: 342px;" />
+                <img src="/png/seu-design.png" style="height: 342px;" />
               </div>
               <div style="display: flex; justify-content: center;">
                 <.link navigate="/how-it-works/seller">
