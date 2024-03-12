@@ -17,15 +17,15 @@ defmodule PlazaWeb.MobileFooter do
         <div style="font-size: 30px; text-align: center; margin-bottom: 17px;" class="has-font-1">
           Sobre
         </div>
-        <div style="text-decoration: underline; text-align: center; font-size: 26px; margin-bottom: 49px;">
+        <div style="text-decoration: underline; text-align: center; font-size: 26px; margin-bottom: 71px;">
           <a href="mailto:admin@plazaaaaa.com">
             Contato
           </a>
         </div>
-        <div style="display: flex; justify-content: center; margin-bottom: 71px; margin-left: 20px; margin-right: 20px;">
+        <div style="display: flex; justify-content: center; margin-bottom: 71px; margin-left: 10px; margin-right: 10px;">
           <img src="/svg/footer-left-02.svg" />
         </div>
-        <div style="display: flex; justify-content: center; margin-bottom: 55px; margin-left: 10px;">
+        <div style="display: flex; justify-content: center; margin-bottom: 55px;">
           <div style="font-size: 22px; line-height: 24px; ">
             <div>
               Plaza é uma plataforma de integração de
