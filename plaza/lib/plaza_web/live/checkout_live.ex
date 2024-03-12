@@ -913,8 +913,17 @@ defmodule PlazaWeb.CheckoutLive do
   @impl Phoenix.LiveView
   def render(%{waiting: true} = assigns) do
     ~H"""
-    <div style="margin-top: 200px; margin-bottom: 200px; display: flex; justify-content: center;">
-      <img src="gif/loading.gif" class="is-loading" />
+    <div style="display: flex; justify-content: center;">
+      <img
+        src="/gif/loading.gif"
+        class="is-loading-desktop"
+        style="margin-top: 200px; margin-bottom: 200px;"
+      />
+      <img
+        src="/gif/loading-mobile.gif"
+        class="is-loading-mobile"
+        style="margin-top: 50px; margin-bottom: 50px;"
+      />
     </div>
     """
   end
@@ -1504,10 +1513,7 @@ defmodule PlazaWeb.CheckoutLive do
     ~H"""
     <div style="text-align: center;">
       <div style="font-size: 28px;">
-        Opções de frete:
-      </div>
-      <div style="width: 350px;">
-        <img src="gif/loading.gif" />
+        . . .
       </div>
     </div>
     """

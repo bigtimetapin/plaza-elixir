@@ -358,13 +358,15 @@ $spacing-values: (
   }
 }
 
-.is-loading {
-  @include until($tablet) {
-    max-width: 400px;
-  }
-
+.is-loading-mobile {
   @include from($tablet) {
-    max-width: 1000px;
+    display: none;
+  }
+}
+
+.is-loading-desktop {
+  @include until($tablet) {
+    display: none;
   }
 }
 

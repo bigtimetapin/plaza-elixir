@@ -62,7 +62,7 @@ defmodule PlazaWeb.Auth.Login do
               type="password"
               label="Password"
               required
-              style="border-bottom: 2px solid grey; font-size: 28px; width: 100%; background: #F8FC5F; margin-bottom: 50px;"
+              style="border-bottom: 2px solid grey; font-size: 28px; width: 100%; background: #F8FC5F; margin-bottom: 35px;"
               class="has-font-3"
               placeholder="senha"
             />
