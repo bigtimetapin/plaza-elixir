@@ -33,13 +33,12 @@ defmodule PlazaWeb.ArtistLive do
                 nil
 
               _ ->
-                Products.list_active_products_by_user_id(seller.user_id, 3)
+                Products.list_active_products_by_user_id(seller.user_id)
             end
 
           socket
           |> assign(seller: seller)
           |> assign(products: products)
-          |> assign(all_products: false)
           |> assign(waiting: false)
 
         false ->
@@ -66,17 +65,6 @@ defmodule PlazaWeb.ArtistLive do
     socket =
       socket
       |> assign(mobile_header_open: false)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("all-products", _, socket) do
-    products = Products.list_active_products_by_user_id(socket.assigns.seller.user_id)
-
-    socket =
-      socket
-      |> assign(products: products)
-      |> assign(all_products: true)
 
     {:noreply, socket}
   end
@@ -112,7 +100,7 @@ defmodule PlazaWeb.ArtistLive do
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; max-width: 1750px; width: 100%; margin-right: 10px;">
           <.left seller={@seller} />
-          <.right products={@products} all_products={@all_products} />
+          <.right products={@products} />
         </div>
       </div>
     </div>
@@ -140,14 +128,6 @@ defmodule PlazaWeb.ArtistLive do
             style="margin-bottom: 50px; margin-left: 5px; margin-right: 5px;"
           >
             <ProductComponent.product product={product} meta={true} disabled={false} />
-          </div>
-          <div
-            :if={!@all_products && Enum.count(@products) == 3}
-            style="text-align: center; font-size: 24px;"
-          >
-            <button class="has-font-3" phx-click="all-products" style="text-decoration: underline;">
-              Ver todos os produtos
-            </button>
           </div>
           <div style="margin-bottom: 250px;"></div>
         </div>
@@ -335,18 +315,6 @@ defmodule PlazaWeb.ArtistLive do
     <div style="padding-top: 75px; width: 100%; border-left: 1px solid #707070;">
       <div style="margin-left: 75px; margin-bottom: 75px">
         <ProductComponent.products3 products={@products} />
-      </div>
-      <div
-        :if={!@all_products && Enum.count(@products) == 3}
-        style="display: flex; justify-content: center; margin-bottom: 200px;"
-      >
-        <button
-          class="has-font-3"
-          style="text-decoration: underline; font-size: 28px;"
-          phx-click="all-products"
-        >
-          Ver todos os produtos
-        </button>
       </div>
     </div>
     """
