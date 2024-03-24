@@ -57,7 +57,7 @@ defmodule PlazaWeb.ProductComponent do
               _ -> diff
             end
 
-          {"Disponível por mais #{diff} dias", expiring}
+          {"#{diff} dias restantes", expiring}
 
         false ->
           {"expired", false}
@@ -90,19 +90,39 @@ defmodule PlazaWeb.ProductComponent do
             />
           </div>
           <div :if={@meta}>
-            <div style="display: flex; font-size: 26px;">
+            <div class="is-hidden-mobile" style="display: flex; font-size: 38px; height: 60px;">
               <%= @product.name %>
             </div>
-            <div style="display: flex; font-size: 22px;">
+            <div class="is-hidden-desktop" style="display: flex; font-size: 26px; height: 36px;">
+              <%= @product.name %>
+            </div>
+            <div
+              class="is-hidden-mobile"
+              style="display: flex; font-size: 24px; height: 35px; margin-bottom: 5px;"
+            >
               <.link navigate={@artist_href}>
                 <%= @product.user_name %>
               </.link>
             </div>
-            <div style="display: flex; font-size: 18px; color: grey;">
+            <div class="is-hidden-desktop" style="display: flex; font-size: 24px; height: 30px;">
+              <.link navigate={@artist_href}>
+                <%= @product.user_name %>
+              </.link>
+            </div>
+            <div
+              class="is-hidden-mobile"
+              style="display: flex; font-size: 18px; color: grey; height: 27px; margin-bottom: 10px;"
+            >
               <%= @days_remaining %>
             </div>
-            <div style="display: flex; font-size: 20px;">
-              <%= "R$ #{@product.price}" %>
+            <div
+              class="is-hidden-desktop"
+              style="display: flex; font-size: 18px; color: grey; height: 23px;"
+            >
+              <%= @days_remaining %>
+            </div>
+            <div class="has-font-4" style="display: flex; font-size: 20px; height: 32px;">
+              <%= "R$ #{@product.price |> Float.to_string() |> String.replace(".", ",")}" %>
             </div>
           </div>
         </button>
