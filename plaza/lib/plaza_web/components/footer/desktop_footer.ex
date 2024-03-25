@@ -49,7 +49,7 @@ defmodule PlazaWeb.DesktopFooter do
   def render(assigns) do
     ~H"""
     <div style="display: flex; justify-content: center;">
-      <div style="display: flex; max-width: 1750px; width: 100%;">
+      <div style="display: flex;">
         <div style="margin-right: 20px;">
           <img src="/svg/footer-left.svg" />
         </div>

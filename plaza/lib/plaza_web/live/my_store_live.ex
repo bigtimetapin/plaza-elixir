@@ -641,7 +641,7 @@ defmodule PlazaWeb.MyStoreLive do
     ~H"""
     <div class="is-my-store-page-desktop">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; margin-bottom: 50px; max-width: 1750px; width: 100%; margin-right: 10px;">
+        <div style="display: flex; margin-bottom: 50px; max-width: 1687px; width: 100%; margin-right: 10px;">
           <.left seller={@seller} />
           <div style="margin-left: 150px; margin-top: 150px;">
             <div class="has-font-3" style="font-size: 34px;">
@@ -682,7 +682,7 @@ defmodule PlazaWeb.MyStoreLive do
     ~H"""
     <div class="is-my-store-page-desktop">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; margin-bottom: 50px; max-width: 1750px; width: 100%; margin-right: 10px;">
+        <div style="display: flex; margin-bottom: 50px; max-width: 1687px; width: 100%; margin-right: 10px;">
           <.left seller={@seller} />
           <div style="margin-left: 150px; margin-top: 150px;">
             <div class="has-font-3" style="font-size: 34px;">
@@ -723,7 +723,7 @@ defmodule PlazaWeb.MyStoreLive do
     ~H"""
     <div class="is-my-store-page-desktop">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; max-width: 1750px; width: 100%; margin-right: 10px;">
+        <div style="display: flex; max-width: 1687px; width: 100%; margin-right: 10px;">
           <.left seller={@seller} />
           <.right products={@products} all_products={@all_products} />
         </div>

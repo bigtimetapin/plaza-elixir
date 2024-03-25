@@ -299,7 +299,7 @@ defmodule PlazaWeb.ProductLive do
     ~H"""
     <div class="is-product-page-desktop has-font-3" style="margin-top: 50px;">
       <div style="display: flex; justify-content: center;">
-        <div style="max-width: 1750px; width: 100%; margin-left: 10px; margin-right: 10px;">
+        <div style="max-width: 1687px; width: 100%; margin-left: 10px; margin-right: 10px;">
           <div style="display: flex; margin-bottom: 86px;">
             <div style="margin-right: 10px;">
               <img src={@product.mocks.front} />

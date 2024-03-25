@@ -419,7 +419,7 @@ defmodule PlazaWeb.Header do
     <div class="hero-head has-font-3">
       <div class="is-navbar is-navbar-desktop">
         <nav style="display: flex; justify-content: center; margin-left: 10px; margin-right: 10px;">
-          <div style="display: flex; max-width: 1750px; width: 100%;">
+          <div style="display: flex; max-width: 1687px; width: 100%;">
             <div style="font-size: 72px;">
               <div style="display: flex;">
                 <div style="align-self: center; margin-right: 20px; margin-top: 15px;">

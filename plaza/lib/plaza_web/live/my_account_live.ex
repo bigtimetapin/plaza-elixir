@@ -43,7 +43,7 @@ defmodule PlazaWeb.MyAccountLive do
         class="has-font-3"
         style="display: flex; justify-content: center; margin-left: 10px; margin-right: 10px;"
       >
-        <div style="display: flex; max-width: 1750px; width: 100%;">
+        <div style="display: flex; max-width: 1687px; width: 100%;">
           <div style="margin-right: 50px;">
             <img src="/svg/big-yellow-circle.svg" style="width: 350px;" />
           </div>

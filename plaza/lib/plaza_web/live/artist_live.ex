@@ -107,7 +107,7 @@ defmodule PlazaWeb.ArtistLive do
     ~H"""
     <div class="is-artist-page-desktop">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; max-width: 1750px; width: 100%; margin-right: 10px;">
+        <div style="display: flex; max-width: 1687px; width: 100%; margin-right: 10px;">
           <.left seller={@seller} />
           <.right products={@products} />
         </div>

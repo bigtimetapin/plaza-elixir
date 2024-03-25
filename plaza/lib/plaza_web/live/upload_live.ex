@@ -738,7 +738,7 @@ defmodule PlazaWeb.UploadLive do
         product_form={@product_form}
       />
       <div class="has-font-3" style="display: flex; justify-content: center;  margin-top: 50px;">
-        <div style="display: flex; max-width: 1750px; width: 100%;">
+        <div style="display: flex; max-width: 1687px; width: 100%;">
           <div style="width: 34%; margin-right: 25px; max-width: 400px;">
             <div style="display: flex;">
               <div style="font-size: 34px; margin-left: auto;">
@@ -1145,7 +1145,7 @@ defmodule PlazaWeb.UploadLive do
             back_local_upload={@back_local_upload}
             product_form={@product_form}
           />
-          <div style="display: flex; margin-top: 50px; max-width: 1750px;">
+          <div style="display: flex; margin-top: 50px; max-width: 1687px;">
             <div style="width: 50%; margin-left: 10px;">
               <.upload_form
                 side={@side}

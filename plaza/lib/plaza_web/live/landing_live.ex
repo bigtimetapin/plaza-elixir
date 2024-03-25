@@ -202,7 +202,7 @@ defmodule PlazaWeb.LandingLive do
     ~H"""
     <div class="is-landing-desktop has-font-3" style="margin-left: 20px; margin-right: 20px;">
       <div style="display: flex; justify-content: center;">
-        <div style="display: flex; flex-direction: column; width: 100%; max-width: 1750px;">
+        <div style="display: flex; flex-direction: column; width: 100%; max-width: 1687px;">
           <div style="margin-bottom: 150px; margin-top: 45px;">
             <img src="/svg/landing-group-desktop-03.svg" />
           </div>

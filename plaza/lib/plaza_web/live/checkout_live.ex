@@ -974,7 +974,7 @@ defmodule PlazaWeb.CheckoutLive do
         class="has-font-3"
         style="margin-top: 150px; margin-bottom: 150px; display: flex; justify-content: center;"
       >
-        <div style="display: flex; max-width: 1750px; width: 100%; margin-left: 10px;">
+        <div style="display: flex; max-width: 1687px; width: 100%; margin-left: 10px;">
           <div style="font-size: 44px; width: 100%;">
             <div style="display: flex; border-bottom: 2px solid grey; width: 100%">
               <div>
