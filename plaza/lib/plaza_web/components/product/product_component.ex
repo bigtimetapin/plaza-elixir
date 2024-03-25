@@ -90,38 +90,21 @@ defmodule PlazaWeb.ProductComponent do
             />
           </div>
           <div :if={@meta}>
-            <div class="is-hidden-mobile" style="display: flex; font-size: 38px; height: 60px;">
+            <div style="display: flex; font-size: min(5.0vw, 38px); height: min(6.0vw, 60px);">
               <%= @product.name %>
             </div>
-            <div class="is-hidden-desktop" style="display: flex; font-size: 26px; height: 36px;">
-              <%= @product.name %>
-            </div>
-            <div
-              class="is-hidden-mobile"
-              style="display: flex; font-size: 24px; height: 35px; margin-bottom: 5px;"
-            >
+            <div style="display: flex; font-size: min(4.0vw, 24px); height: min(4.5vw, 30px);">
               <.link navigate={@artist_href}>
                 <%= @product.user_name %>
               </.link>
             </div>
-            <div class="is-hidden-desktop" style="display: flex; font-size: 24px; height: 30px;">
-              <.link navigate={@artist_href}>
-                <%= @product.user_name %>
-              </.link>
-            </div>
-            <div
-              class="is-hidden-mobile"
-              style="display: flex; font-size: 18px; color: grey; height: 27px; margin-bottom: 10px;"
-            >
+            <div style="display: flex; font-size: min(3.0vw, 18px); color: grey; height: min(3.5vw, 27px);">
               <%= @days_remaining %>
             </div>
             <div
-              class="is-hidden-desktop"
-              style="display: flex; font-size: 18px; color: grey; height: 23px;"
+              class="has-font-4"
+              style="display: flex; font-size: min(3.2vw, 20px); height: min(3.5vw, 32px);"
             >
-              <%= @days_remaining %>
-            </div>
-            <div class="has-font-4" style="display: flex; font-size: 20px; height: 32px;">
               <%= "R$ #{@product.price |> Float.to_string() |> String.replace(".", ",")}" %>
             </div>
           </div>

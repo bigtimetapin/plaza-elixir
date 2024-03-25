@@ -73,6 +73,8 @@ defmodule PlazaWeb.MyStoreLive do
             |> assign(seller: seller)
             |> assign(products: products)
             |> assign(all_products: false)
+            |> assign(deleting_products: false)
+            |> assign(delete_buffer: nil)
             |> assign(logo_upload: logo_upload)
             |> assign(seller_form: seller_form)
             |> assign(uuid: UUID.uuid1())
@@ -110,6 +112,61 @@ defmodule PlazaWeb.MyStoreLive do
       socket
       |> assign(products: products)
       |> assign(all_products: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("show-delete-button", _, socket) do
+    socket =
+      socket
+      |> assign(deleting_products: true)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("hide-delete-button", _, socket) do
+    socket =
+      socket
+      |> assign(deleting_products: false)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("add-product-to-delete-buffer", %{"product-id" => product_id}, socket) do
+    socket =
+      socket
+      |> assign(delete_buffer: String.to_integer(product_id))
+
+    {:noreply, socket}
+  end
+
+  def handle_event("remove-product-from-delete-buffer", _, socket) do
+    socket =
+      socket
+      |> assign(delete_buffer: nil)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("delete-product", _, socket) do
+    user_id = socket.assigns.current_user.id
+    product_id = socket.assigns.delete_buffer
+    product = Products.get_product!(product_id)
+    Products.delete_product(product)
+
+    products =
+      case socket.assigns.all_products do
+        true ->
+          Products.list_products_by_user_id(user_id)
+
+        false ->
+          Products.list_products_by_user_id(user_id, 3)
+      end
+
+    socket =
+      socket
+      |> assign(products: products)
+      |> assign(delete_buffer: nil)
 
     {:noreply, socket}
   end
@@ -725,7 +782,12 @@ defmodule PlazaWeb.MyStoreLive do
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; max-width: 1687px; width: 100%; margin-right: 10px;">
           <.left seller={@seller} />
-          <.right products={@products} all_products={@all_products} />
+          <.right
+            products={@products}
+            all_products={@all_products}
+            deleting_products={@deleting_products}
+            delete_buffer={@delete_buffer}
+          />
         </div>
       </div>
     </div>
@@ -807,7 +869,7 @@ defmodule PlazaWeb.MyStoreLive do
 
     ~H"""
     <div class="has-font-3">
-      <div style="width: 377px; height: 377px; overflow: hidden; border-bottom: 1px solid grey;">
+      <div style="width: 395px; height: 377px; overflow: hidden; border-bottom: 1px solid grey;">
         <div
           :if={!@seller.profile_photo_url}
           style="display: flex; justify-content: center; height: 100%; text-decoration: underline; text-align: center; font-size: 22px;"
@@ -828,20 +890,23 @@ defmodule PlazaWeb.MyStoreLive do
         />
       </div>
       <div style="display: flex; flex-direction: column;">
-        <div style="margin-left: 25px; margin-top: 10px; height: 600px;">
-          <div class="is-size-6 mb-small" style="text-decoration: underline;">
+        <div style="margin-left: 60px; margin-top: 22px;">
+          <div style="text-decoration: underline; font-size: 32px; margin-bottom: 22px;">
             <%= @seller.user_name %>
           </div>
-          <div class="is-size-6 mb-xsmall" style="line-height: 30px; width: 267px;">
+          <div style="font-size: 32px; line-height: 30px; width: 267px; margin-bottom: 15px;">
             <%= @user_description %>
           </div>
-          <div class="is-size-6 mb-small has-dark-gray-text">
+          <div class="has-dark-gray-text" style="margin-bottom: 45px; font-size: 28px;">
             <%= @user_location %>
           </div>
-          <div :for={url <- @user_urls} class="is-size-6" style="text-decoration: underline;">
+          <div
+            :for={url <- @user_urls}
+            style="text-decoration: underline; font-size: 30px; line-height: 39px;"
+          >
             <.url_or url={url} />
           </div>
-          <div style="margin-top: 50px; height: 30px; width: 33px; border-top: none; border-left: none; border-right: none; border-bottom: 2px solid grey; color: grey;">
+          <div style="margin-top: 43px; height: 30px; width: 33px; border-top: none; border-left: none; border-right: none; border-bottom: 2px solid grey; color: grey;">
             <button phx-click="edit-seller" class="has-font-3" style="font-size: 24px;">
               Editar
             </button>
@@ -889,14 +954,90 @@ defmodule PlazaWeb.MyStoreLive do
 
   defp right(assigns) do
     ~H"""
-    <div style="padding-top: 50px; width: 100%; border-left: 1px solid #707070;">
-      <div style="margin-left: 100px; margin-bottom: 25px;">
-        <.link navigate="/upload" style="text-decoration: underline;" class="has-font-3 is-size-6">
+    <div style="padding-top: 45px; width: 100%; border-left: 1px solid #707070;">
+      <div style="margin-left: 167px; margin-bottom: 45px; display: flex;">
+        <.link
+          navigate="/upload"
+          style="text-decoration: underline; font-size: 32px; margin-right: 15px;"
+          class="has-font-3"
+        >
           Criar mais produtos
         </.link>
+        <button
+          :if={!@deleting_products}
+          style="text-decoration: underline; font-size: 32px; color: grey;"
+          class="has-font-3"
+          phx-click="show-delete-button"
+        >
+          Excluir produtos
+        </button>
+        <button
+          :if={@deleting_products}
+          style="text-decoration: underline; font-size: 32px; color: #F00;"
+          class="has-font-3"
+          phx-click="hide-delete-button"
+        >
+          Parar de excluir
+        </button>
       </div>
-      <div style="margin-left: 75px; margin-bottom: 75px">
-        <ProductComponent.products3 products={@products} />
+      <div style="margin-left: 75px; margin-bottom: 150px">
+        <div class="columns is-multiline is-7">
+          <%= for product <- @products do %>
+            <div
+              class="column is-one-third-widescreen is-half-desktop is-12-tablet"
+              style="position: relative;"
+            >
+              <div>
+                <ProductComponent.product product={product} meta={true} disabled={false} />
+              </div>
+              <div
+                :if={@deleting_products}
+                style="position: absolute; height: 100%; width: 100%; left: 0; top: 0;"
+              >
+                <div style="margin-left: 25px; margin-top: 10px;">
+                  <button
+                    phx-click="add-product-to-delete-buffer"
+                    phx-value-product-id={product.id}
+                    style="text-decoration: underline; font-size: 32px;"
+                    class="has-font-3"
+                  >
+                    Deletar
+                  </button>
+                </div>
+                <div
+                  :if={@delete_buffer == product.id}
+                  style="display: flex; justify-content: center; margin-top: 34px;"
+                  class="has-font-3"
+                >
+                  <div style="width: 70%; aspect-ratio: 9/10; background-color: #F8FC5F; border: 1px solid black; display: flex; justify-content: center;">
+                    <div style="display: flex; flex-direction: column; justify-content: center;">
+                      <div style="text-align: center; font-size: 32px; margin-bottom: 36px; text-decoration: underline;">
+                        Tem certeza que deseja
+                        deletar seu produto?
+                      </div>
+                      <div style="display: flex; justify-content: center;">
+                        <button
+                          phx-click="remove-product-from-delete-buffer"
+                          style="font-size: 32px; text-decoration: underline; margin-right: 44px;"
+                          class="has-font-3"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          phx-click="delete-product"
+                          style="font-size: 32px; text-decoration: underline;"
+                          class="has-font-3"
+                        >
+                          Sim
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
       </div>
       <div :if={!@all_products} style="display: flex; justify-content: center; margin-bottom: 200px;">
         <button
