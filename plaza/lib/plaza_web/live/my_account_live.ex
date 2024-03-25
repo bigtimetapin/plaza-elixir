@@ -38,28 +38,30 @@ defmodule PlazaWeb.MyAccountLive do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <div class="is-my-account-page-desktop">
+    <div class="is-my-account-page-desktop" style="margin-top: 200px; margin-bottom: 250px;">
       <div
         class="has-font-3"
-        style="display: flex; margin-top: 200px; margin-bottom: 250px; margin-left: 100px; margin-right: 10px;"
+        style="display: flex; justify-content: center; margin-left: 10px; margin-right: 10px;"
       >
-        <div style="margin-right: 50px;">
-          <img src="/svg/big-yellow-circle.svg" style="width: 350px;" />
-        </div>
-        <div style="margin-top: 30px;">
-          <h2 style="font-size: 32px; margin-bottom: 50px;">
-            Minha Conta
-          </h2>
-          <div style="font-size: 24px;">
-            email cadastrado:
+        <div style="display: flex; max-width: 1750px; width: 100%;">
+          <div style="margin-right: 50px;">
+            <img src="/svg/big-yellow-circle.svg" style="width: 350px;" />
           </div>
-          <div style="font-size: 24px; margin-bottom: 50px;">
-            <%= @current_user.email %>
-          </div>
-          <div style="font-size: 24px; text-decoration: underline;">
-            <.link href="/users/log_out" method="delete">
-              Sair
-            </.link>
+          <div style="margin-top: 30px;">
+            <h2 style="font-size: 32px; margin-bottom: 50px;">
+              Minha Conta
+            </h2>
+            <div style="font-size: 24px;">
+              email cadastrado:
+            </div>
+            <div style="font-size: 24px; margin-bottom: 50px;">
+              <%= @current_user.email %>
+            </div>
+            <div style="font-size: 24px; text-decoration: underline;">
+              <.link href="/users/log_out" method="delete">
+                Sair
+              </.link>
+            </div>
           </div>
         </div>
       </div>
@@ -67,7 +69,7 @@ defmodule PlazaWeb.MyAccountLive do
     <div class="is-my-account-page-mobile">
       <div
         class="has-font-3"
-        style="display: flex; justify-content: center; margin-top: 200px; margin-bottom: 250px; margin-left: 10px; margin-right: 10px;"
+        style="display: flex; justify-content: center; margin-top: 50px; margin-bottom: 250px; margin-left: 10px; margin-right: 10px;"
       >
         <div style="display: flex; flex-direction: column;">
           <img src="/svg/yellow-rectangle-just.svg" style="margin-bottom: 50px;" />
