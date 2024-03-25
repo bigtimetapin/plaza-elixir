@@ -254,28 +254,34 @@ defmodule PlazaWeb.ArtistLive do
 
     ~H"""
     <div class="has-font-3">
-      <div style="width: 377px; height: 377px; overflow: hidden; border-bottom: 1px solid grey;">
+      <div style="width: 395px; height: 377px; overflow: hidden; border-bottom: 1px solid grey;">
         <img
           src={if @seller.profile_photo_url, do: @seller.profile_photo_url, else: "png/pep.png"}
           style="min-width: 100%; min-height: 100%;"
         />
       </div>
       <div style="display: flex; flex-direction: column;">
-        <div style="margin-left: 25px; margin-top: 10px; height: 600px;">
-          <div class="is-size-6 mb-small" style="text-decoration: underline;">
+        <div style="margin-left: 60px; margin-top: 22px;">
+          <div style="text-decoration: underline; font-size: 32px; margin-bottom: 22px;">
             <%= @seller.user_name %>
           </div>
           <div
             :if={@seller.description}
-            class="is-size-6 mb-xsmall"
-            style="line-height: 30px; width: 267px;"
+            style="font-size: 32px; line-height: 30px; width: 267px; margin-bottom: 15px;"
           >
             <%= @seller.description %>
           </div>
-          <div :if={@seller.location} class="is-size-6 mb-small has-dark-gray-text">
+          <div
+            :if={@seller.location}
+            class="has-dark-gray-text"
+            style="margin-bottom: 45px; font-size: 28px;"
+          >
             <%= @seller.location %>
           </div>
-          <div :for={url <- @user_urls} class="is-size-6" style="text-decoration: underline;">
+          <div
+            :for={url <- @user_urls}
+            style="text-decoration: underline; font-size: 30px; line-height: 39px;"
+          >
             <.url_or url={url} />
           </div>
         </div>
@@ -322,8 +328,16 @@ defmodule PlazaWeb.ArtistLive do
   defp right(assigns) do
     ~H"""
     <div style="padding-top: 75px; width: 100%; border-left: 1px solid #707070;">
-      <div style="margin-left: 75px; margin-bottom: 75px">
-        <ProductComponent.products3 products={@products} />
+      <div style="margin-left: 75px; margin-bottom: 150px">
+        <div class="columns is-multiline is-7">
+          <%= for product <- @products do %>
+            <div class="column is-one-third-widescreen is-half-desktop is-12-tablet">
+              <div>
+                <ProductComponent.product product={product} meta={true} disabled={false} />
+              </div>
+            </div>
+          <% end %>
+        </div>
       </div>
     </div>
     """
