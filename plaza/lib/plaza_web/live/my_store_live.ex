@@ -609,10 +609,10 @@ defmodule PlazaWeb.MyStoreLive do
   def render(%{seller: nil, product_buffer: nil} = assigns) do
     ~H"""
     <div class="is-my-store-page-desktop">
-      <div class="has-font-3" style="margin-top: 150px; margin-bottom: 250px; font-size: 34px;">
+      <div class="has-font-3" style="margin-top: 100px; margin-bottom: 250px; font-size: 34px;">
         <div style="display: flex; justify-content: center; margin-bottom: 100px;">
           <.link navigate="/upload" style="text-decoration: underline;">
-            go upload some stuff
+            Vá fazer upload do seu primeiro produto
           </.link>
         </div>
         <div style="display: flex; justify-content: center;">
@@ -637,17 +637,24 @@ defmodule PlazaWeb.MyStoreLive do
   def render(%{seller: nil, product_buffer: product} = assigns) do
     ~H"""
     <div class="is-my-store-page-desktop">
-      <div class="has-font-3" style="font-size: 34px; margin-top: 150px; margin-bottom: 250px;">
+      <div class="has-font-3" style="font-size: 34px; margin-top: 100px; margin-bottom: 250px;">
         <div style="display: flex; justify-content: center;">
           <div>
-            you've uploaded your first product
-            <div>
-              <ProductComponent.product product={product} meta={false} disabled={true} />
+            <div style="margin-bottom: 50px;">
+              Você enviou seu primeiro produto
+            </div>
+            <div style="display: flex; justify-content: center;">
+              <ProductComponent.product
+                product={product}
+                meta={false}
+                disabled={true}
+                style="width: 250px;"
+              />
             </div>
           </div>
         </div>
-        <div style="display: flex; justify-content: center; margin-top: 100px; margin-bottom: 50px;">
-          create your store before the product goes live
+        <div style="display: flex; justify-content: center; margin-bottom: 50px;">
+          Crie sua loja antes que o produto seja lançado
         </div>
         <div>
           <.seller_form
@@ -668,7 +675,7 @@ defmodule PlazaWeb.MyStoreLive do
   def render(%{step: "edit-seller"} = assigns) do
     ~H"""
     <div class="is-my-store-page-desktop">
-      <div style="margin-top: 150px; margin-bottom: 150px;">
+      <div style="margin-top: 100px; margin-bottom: 150px;">
         <div style="display: flex; flex-direction: column;">
           <.seller_form
             seller_form={@seller_form}
@@ -700,27 +707,27 @@ defmodule PlazaWeb.MyStoreLive do
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; margin-bottom: 50px; max-width: 1687px; width: 100%; margin-right: 10px;">
           <.left seller={@seller} />
-          <div style="margin-left: 150px; margin-top: 150px;">
+          <div style="margin-left: 150px; margin-top: 100px;">
             <div class="has-font-3" style="font-size: 34px;">
               <div style="display: flex; justify-content: center;">
                 <div style="text-align: center;">
-                  <div style="margin-bottom: 50px;">
-                    Ok you've created your seller (loja) profile
+                  <div style="margin-bottom: 20px;">
+                    Ok, você criou sua loja
                   </div>
                   <div style="margin-bottom: 50px;">
-                    Go upload your first product
+                    Vá fazer upload do seu primeiro produto
                     <div style="text-decoration: underline;">
                       <.link navigate="/upload">
                         upload
                       </.link>
                     </div>
                   </div>
-                  <div style="width: 785px;">
-                    Or link your bank info with stripe so you can get paid for every sale.
-                    You'll need to do this before your products go live.
-                    <div style="text-decoration: underline;">
-                      <button phx-click="stripe-link-account">link stripe account</button>
-                    </div>
+                </div>
+                <div style="max-width: 500px;">
+                  Ou vincule suas informações bancárias ao stripe para que você possa receber o pagamento por cada venda.
+                  Você precisará fazer isso antes de sua loja entrar no ar.
+                  <div style="text-decoration: underline;">
+                    <button phx-click="stripe-link-account">Crie uma conta stripe</button>
                   </div>
                 </div>
               </div>
@@ -741,28 +748,38 @@ defmodule PlazaWeb.MyStoreLive do
       <div style="display: flex; justify-content: center;">
         <div style="display: flex; margin-bottom: 50px; max-width: 1687px; width: 100%; margin-right: 10px;">
           <.left seller={@seller} />
-          <div style="margin-left: 150px; margin-top: 150px;">
+          <div style="margin-top: 100px; width: 100%;">
             <div class="has-font-3" style="font-size: 34px;">
-              <div style="text-align: center;">
-                <div style="margin-bottom: 50px;">
-                  Ok you've created your seller (loja) profile
-                </div>
-                <div style="margin-bottom: 50px;">
-                  and you've uploaded your first product
-                  <div style="display: flex; justify-content: center; margin-top: 50px;">
-                    <ProductComponent.product
-                      product={product}
-                      meta={false}
-                      disabled={true}
-                      style="width: 500px;"
-                    />
+              <div style="display: flex; justify-content: center;">
+                <div style="text-align: center; margin-right: 20px;">
+                  <div style="margin-bottom: 20px;">
+                    Ok, você criou sua loja
                   </div>
-                </div>
-              </div>
-              <div style="border: 1px dotted black; text-align: center;">
-                You just need to link your bank info with stripe so you can get paid for every sale.
-                <div style="text-decoration: underline; margin-top: 50px;">
-                  <button phx-click="stripe-link-account">link stripe account</button>
+                  <div>
+                    <div style="margin-bottom: 50px;">
+                      E você enviou seu primeiro produto
+                    </div>
+                    <div style="display: flex; justify-content: center;">
+                      <ProductComponent.product
+                        product={product}
+                        meta={false}
+                        disabled={true}
+                        style="width: 250px;"
+                      />
+                    </div>
+                  </div>
+                  <div style="border: 1px dotted black; text-align: center; padding-left: 10px; padding-right: 10px; max-width: 500px;">
+                    Você só precisa vincular suas informações bancárias ao stripe para poder receber o pagamento por cada venda.
+                    <div style="margin-top: 25px; margin-bottom: 25px;">
+                      <button
+                        class="has-font-3"
+                        style="text-decoration: underline;"
+                        phx-click="stripe-link-account"
+                      >
+                        Crie uma conta stripe
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -30,12 +30,12 @@ defmodule PlazaWeb.UploadLive do
           {seller, user_id, user_name, active, step} =
             case socket.assigns.current_user do
               nil ->
-                {nil, -1, @default_user_name, false, 4}
+                {nil, -1, @default_user_name, false, -3}
 
               %{id: id} ->
                 case Accounts.get_seller_by_id(id) do
                   nil ->
-                    {nil, id, @default_user_name, false, 4}
+                    {nil, id, @default_user_name, false, -3}
 
                   %{stripe_id: nil} = seller ->
                     case Products.count(id) > 0 do
@@ -43,7 +43,7 @@ defmodule PlazaWeb.UploadLive do
                         {seller, id, seller.user_name, false, -1}
 
                       false ->
-                        {seller, id, seller.user_name, false, 4}
+                        {seller, id, seller.user_name, false, -3}
                     end
 
                   seller ->
@@ -135,32 +135,52 @@ defmodule PlazaWeb.UploadLive do
     socket =
       case restore_from_token(token_data) do
         {:ok, nil} ->
-          # do nothing with the previous state
+          # no buffer 
+          # move on to uploading
+
           socket
+          |> assign(step: 4)
 
         {:ok, restored} ->
           case socket.assigns.step do
-            1 ->
+            # unregistered user 
+            # found buffer so indicate to register store
+            -3 ->
               socket
               |> assign(product_buffer: restored)
               |> assign(step: -2)
 
+            ## registed user 
+            ## found buffer so continue to step -1
+            -1 ->
+              socket
+
+            # registered user
+            # found buffer but it's left over from registration
             _ ->
               socket
+              |> assign(step: 4)
           end
 
         {:error, reason} ->
           # We don't continue checking. Display error.
           # Clear the token so it doesn't keep showing an error.
+
           socket
           |> clear_browser_storage()
+          |> assign(step: 4)
       end
 
     {:noreply, socket}
   end
 
   def handle_event("read-product-form", _token_data, socket) do
-    Logger.debug("No (valid) prodouct-form to restore")
+    Logger.debug("No (valid) product-form to restore")
+
+    socket =
+      socket
+      |> assign(step: 4)
+
     {:noreply, socket}
   end
 
@@ -601,27 +621,36 @@ defmodule PlazaWeb.UploadLive do
     """
   end
 
-  def render(%{step: -2, product_buffer: product} = assigns) do
+  def render(%{step: -3} = assigns) do
+    ~H"""
+    <div style="display: flex; justify-content: center;">
+      <img
+        src="/gif/loading.gif"
+        class="is-loading-desktop"
+        style="margin-top: 200px; margin-bottom: 200px;"
+      />
+      <img
+        src="/gif/loading-mobile.gif"
+        class="is-loading-mobile"
+        style="margin-top: 50px; margin-bottom: 50px;"
+      />
+    </div>
+    """
+  end
+
+  def render(%{step: -2, product_buffer: _} = assigns) do
     ~H"""
     <div class="is-upload-page-desktop">
-      <div class="has-font-3 is-size-4" style="margin-top: 125px; margin-bottom: 125px;">
+      <div class="has-font-3 is-size-4" style="margin-top: 250px; margin-bottom: 500px;">
         <div style="display: flex; justify-content: center;">
           <div style="display: flex; flex-direction: column; width: 500px;">
-            <div style="display: flex; justify-content: center;">
-              <PlazaWeb.ProductComponent.product
-                product={product}
-                meta={false}
-                disabled={true}
-                style="width: 500px;"
-              />
-            </div>
             <div style="text-align: center;">
-              you've already uploaded your first product but haven't created a seller profile yet.
+              Você já carregou seu primeiro produto, mas ainda não criou um perfil de vendedor,
               <.link
                 navigate="/my-store"
                 style="margin-left: 5px; margin-right: 5px; text-decoration: underline;"
               >
-                go do that
+                faça isso agora
               </.link>
             </div>
           </div>
@@ -637,17 +666,17 @@ defmodule PlazaWeb.UploadLive do
   def render(%{step: -1} = assigns) do
     ~H"""
     <div class="is-upload-page-desktop">
-      <div class="has-font-3 is-size-4" style="margin-top: 125px; margin-bottom: 125px;">
+      <div class="has-font-3 is-size-4" style="margin-top: 250px; margin-bottom: 500px;">
         <div style="display: flex; justify-content: center;">
           <div style="width: 500px; text-align: center;">
-            you've already uploaded your first product but haven't linked your bank account yet.
+            Você já enviou seu primeiro produto, mas ainda não cadastrou uma conta bancária para receber os pagamentos,
             <.link
               navigate="/my-store"
               style="margin-left: 5px; margin-right: 5px; text-decoration: underline;"
             >
-              go do that
+              faça isso agora
             </.link>
-            to activate your first product and continue uploading more products.
+            para ativar sua loja e colocar ainda mais produtos.
           </div>
         </div>
       </div>
@@ -1047,7 +1076,7 @@ defmodule PlazaWeb.UploadLive do
                 V
               </div>
               <div style="display: inline-block; position: relative; right: 6px;">
-                isitar your store to finish registering before this product is live
+                isite sua loja para finalizar o registro antes que este produto seja lançado
               </div>
             </.link>
           </div>
