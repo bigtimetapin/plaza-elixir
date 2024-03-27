@@ -244,7 +244,6 @@ defmodule PlazaWeb.LandingLive do
               </div>
             </div>
           </div>
-          <div id="top-products-desktop" />
           <div :if={!Enum.empty?(@curated_products)}>
             <ProductComponent.products3 products={@curated_products} />
           </div>
@@ -253,6 +252,7 @@ defmodule PlazaWeb.LandingLive do
               <img src="/svg/landing-group-desktop-01.svg" />
             </.link>
           </div>
+          <div id="top-products-desktop" style="height: 0px; position: relative; bottom: 200px;" />
           <div style="margin-bottom: 25px;">
             <h4 style="font-size: 58px; line-height: 45px;">
               Todos os produtos
@@ -332,6 +332,7 @@ defmodule PlazaWeb.LandingLive do
               </div>
             </div>
           </div>
+          <div id="top-products" style="height: 0px; position: relative; bottom: 200px;"></div>
           <div style="font-size: 24px; line-height: 26px; display: flex; margin-top: 55px; margin-bottom: 46px; margin-left: 10px;">
             <div style="position: relative; margin-right: 20px;">
               <img src="/svg/arrow-down.svg" />
