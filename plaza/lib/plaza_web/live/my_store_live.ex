@@ -824,7 +824,7 @@ defmodule PlazaWeb.MyStoreLive do
           {:default, "Website"}
 
         nn ->
-          {:url, nn}
+          %{url: nn, name: "Website"}
       end
 
     instagram =
@@ -833,7 +833,7 @@ defmodule PlazaWeb.MyStoreLive do
           {:default, "Instagram"}
 
         nn ->
-          {:url, nn}
+          %{url: nn, name: "Instagram"}
       end
 
     twitter =
@@ -842,7 +842,7 @@ defmodule PlazaWeb.MyStoreLive do
           {:default, "Twitter"}
 
         nn ->
-          {:url, nn}
+          %{url: nn, name: "Twitter"}
       end
 
     soundcloud =
@@ -851,7 +851,7 @@ defmodule PlazaWeb.MyStoreLive do
           {:default, "Soundcloud"}
 
         nn ->
-          {:url, nn}
+          %{url: nn, name: "Soundcloud"}
       end
 
     urls = [
@@ -917,31 +917,29 @@ defmodule PlazaWeb.MyStoreLive do
     """
   end
 
-  defp url_or(%{url: {:url, url}} = assigns) do
-    {url, href} =
+  defp url_or(%{url: %{url: url, name: _}} = assigns) do
+    href =
       case String.starts_with?(url, "https://") do
         true ->
-          {String.replace_prefix(url, "https://", ""), url}
+          url
 
         false ->
           case String.starts_with?(url, "http://") do
             true ->
-              href = String.replace_prefix(url, "http://", "https://")
-              {href |> String.replace_prefix("https://", ""), href}
+              url
 
             false ->
-              {url, "https://#{url}"}
+              "http://#{url}"
           end
       end
 
     assigns =
       assigns
-      |> assign(url: url)
       |> assign(href: href)
 
     ~H"""
     <a href={@href} target="_blank">
-      <%= @url %>
+      <%= @url.name %>
     </a>
     """
   end
