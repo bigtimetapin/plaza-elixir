@@ -218,7 +218,7 @@ defmodule PlazaWeb.LandingLive do
                 Produtos do Mês
               </h4>
               <h5 style="font-size: 32px;">
-                Melhores envios de fevereiro
+                Melhores envios de março
               </h5>
             </div>
             <div style="margin-left: auto; margin-right: 120px; display: flex; position: relative; top: 45px;">
